@@ -15,8 +15,8 @@ public class GameController {
 		view = new GameView(model);
 		reader = new Scanner(System.in);
 		view.drawView(model.getGOList(), model.getMOList());
-		view.getGamePanel().addKeyListener(new InputController());
-		view.add(view.getGamePanel());
+		view.addKeyListener(new InputController());
+		//view.add(view.getGamePanel());
 		//main game loop
 		//while(!model.isGameOver()){
 			//get user input
@@ -41,8 +41,8 @@ public class GameController {
 
 		@Override
 		public void keyPressed(KeyEvent e) {
-			System.out.println("A pressed");
-			 if(e.getSource().equals(KeyEvent.VK_A)){
+			 //if(e.getSource().equals(KeyEvent.VK_A)){
+			if(e.getKeyChar() == 'a') {
 				 System.out.println("A pressed");
 				 model.setPlayerAction(1);
 	         }
