@@ -4,6 +4,8 @@ public class Player extends MovingObject{
 	public Player(int x, int y, int h, int w) {
 		super(x, y, h, w);
 		symbol = 'X';
+		xVel = 1;
+		yVel = -5;
 		killOnCollision = false;
 		hasPowerUp = false;		
 		action = -1;
@@ -14,11 +16,15 @@ public class Player extends MovingObject{
 		dy = 0;
 		// 1: move right  0: move left 
 		switch(action){
-		case 0:
-			dx = 1;
-			break;
 		case 1:
-			dx = -1;
+			dx = -xVel;
+			break;
+		case 2:
+			dx = xVel;
+			break;
+		case 3:
+			dy = yVel;
+		case 4:
 			break;
 		}
 		xPos += dx;

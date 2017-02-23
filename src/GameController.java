@@ -28,7 +28,7 @@ public class GameController {
 	}
 	
 	private int getInput(Scanner reader) {
-		System.out.println("1 - left    0 - right");
+		System.out.println("1 - left    2 - right	3 - jump	4 - idle");
 		System.out.print("> ");
 		return reader.nextInt();
 	}
