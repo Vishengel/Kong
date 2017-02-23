@@ -1,6 +1,11 @@
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Scanner;
+
+import javax.swing.AbstractAction;
+import javax.swing.Timer;
+
 
 
 public class GameController {
@@ -16,6 +21,12 @@ public class GameController {
 		reader = new Scanner(System.in);
 		view.drawView(model.getGOList(), model.getMOList());
 		view.addKeyListener(new InputController());
+		AbstractAction FPSTimer = new AbstractAction(){
+			public void actionPerformed(ActionEvent e){
+				model.runGame();
+			}
+		};
+		new Timer(15, FPSTimer).start();
 		//view.add(view.getGamePanel());
 		//main game loop
 		//while(!model.isGameOver()){
@@ -45,7 +56,13 @@ public class GameController {
 			if(e.getKeyChar() == 'a') {
 				 System.out.println("A pressed");
 				 model.setPlayerAction(1);
+				 
 	         }
+			if(e.getKeyChar() == 'd') {
+				 System.out.println("D pressed");
+				 model.setPlayerAction(2);
+	         }
+			
 		}
 
 		@Override
