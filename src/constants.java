@@ -1,10 +1,10 @@
 
 public interface constants {
 	//player constants
-	int PLAYER_START_X = 25;
-	int PLAYER_START_Y = 47;
-	int PLAYER_HEIGHT = 3;
-	int PLAYER_WIDTH = 2;
+	int PLAYER_START_X = 100;
+	int PLAYER_START_Y = 500;
+	int PLAYER_HEIGHT = 30;
+	int PLAYER_WIDTH = 20;
 	
 	//barrel constants
 	

@@ -1,7 +1,8 @@
 import java.util.ArrayList;
+import java.util.Observer;
+import java.util.Observable;
 
-
-public class GameModel implements constants{
+public class GameModel extends Observable implements constants {
 	private int score = 0;
 	private int lives = 3;
 	private boolean gameOver = false; 
@@ -18,7 +19,10 @@ public class GameModel implements constants{
 	void runGame(){
 		for(MovingObject mo : MOList){
 				mo.act();
-		}	
+		}
+		setChanged();
+		notifyObservers();
+	
 		//stopping condition
 		//gameOver = true; 
 	}	

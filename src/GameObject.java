@@ -1,3 +1,4 @@
+import java.awt.Color;
 
 public abstract class GameObject {
 	protected int xPos;
@@ -6,6 +7,8 @@ public abstract class GameObject {
 	protected int width;
 	//insert here some variable that represents what the object looks like
 	char symbol;
+	//The color of the object
+	Color color;
 	
 	public GameObject(int x, int y, int h, int w){
 		xPos = x;
@@ -37,4 +40,7 @@ public abstract class GameObject {
 		return symbol;
 	}
 	
+	public Color getColor(){
+		return color;
+	}
 }
