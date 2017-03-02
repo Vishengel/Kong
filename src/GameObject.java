@@ -8,7 +8,7 @@ public abstract class GameObject {
 	//insert here some variable that represents what the object looks like
 	char symbol;
 	//The color of the object
-	Color color;
+	protected Color color;
 	
 	public GameObject(int x, int y, int h, int w){
 		xPos = x;
