@@ -1,9 +1,9 @@
 
 public interface constants {
 	//player constants
-	int PLAYER_START_X = 100;
-	int PLAYER_START_Y = 500;
-	int PLAYER_HEIGHT = 30;
+	int PLAYER_START_X = 90;
+	int PLAYER_START_Y = 545;
+	int PLAYER_HEIGHT = 35;
 	int PLAYER_WIDTH = 20;
 	
 	//barrel constants
@@ -18,10 +18,8 @@ public interface constants {
 	
 	
 	//platform constants
-	int platform_HEIGHT = 2;
-	int platform_WIDTH = 2;
-	
-	
+	int platform_HEIGHT = 20;
+	int platform_WIDTH = 40;
 	
 	//ladder constants
 }
