@@ -16,7 +16,7 @@ public class GameModel extends Observable implements constants {
 	
 	
 	//main game loop
-	void runGame(){
+	public void runGame(){
 		for(MovingObject mo : MOList){
 				mo.act();
 		}
@@ -66,6 +66,10 @@ public class GameModel extends Observable implements constants {
 	
 	public void setPlayerAction(int action){
 		mario.setAction(action);
+	}
+	
+	public void passKeysDownToPlayer(boolean[] down) {
+		mario.setKeysDown(down);
 	}
 	
 	
