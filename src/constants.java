@@ -1,6 +1,7 @@
 
 public interface constants {
 	//player constants
+
 	int PLAYER_START_X = 100;
 	int PLAYER_START_Y = 500;
 	int PLAYER_HEIGHT = 30;
@@ -18,8 +19,8 @@ public interface constants {
 	
 	
 	//platform constants
-	int platform_HEIGHT = 2;
-	int platform_WIDTH = 2;
+	int platform_HEIGHT = 1;
+	int platform_WIDTH = 3;
 	
 	
 	
