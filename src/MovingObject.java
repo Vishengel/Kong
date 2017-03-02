@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public abstract class MovingObject extends GameObject{
 	//These values represent the velocity in the x and y plane
@@ -11,16 +12,23 @@ public abstract class MovingObject extends GameObject{
 	protected boolean killOnCollision;
 	
 	//represents the action that the object can take
-	int action;
+	protected int action;
 	
-	public MovingObject(int x, int y, int h, int w) {
+	protected ArrayList<GameObject> GOList;
+	
+	public MovingObject(int x, int y, int h, int w, ArrayList<GameObject> GOList) {
 		super(x, y, h, w);	
+		this.GOList = GOList;
 	}
 	
-	//each subclass of this class implements its own version of the act function
-	public void act(){
-		
-	}
+	//each subclass of this class implements its own version of the act, movement and collision
+	public abstract void act();
+	public abstract boolean checkCollisions(ArrayList<GameObject> GOList);
+	public abstract boolean left();
+	public abstract boolean right();
+	public abstract boolean up();
+	public abstract boolean down();	
+	
 	public int getXVel(){
 		return xVel;
 	}
@@ -39,4 +47,6 @@ public abstract class MovingObject extends GameObject{
 	public void setAction(int a){
 		action = a;
 	}
+	
+	
 }

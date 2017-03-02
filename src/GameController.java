@@ -9,18 +9,21 @@ import javax.swing.Timer;
 
 
 public class GameController {
-	GameModel model;
-	GameView  view;
+	private GameModel model;
+	private GameView  view;
 	//for use input
-	Scanner reader;
+	private Scanner reader;
+	private InputController inputController = new InputController();
 	
 	public void start(){
 		//create game model and view
 		model = new GameModel();
 		view = new GameView(model);
 		reader = new Scanner(System.in);
+		
 		view.drawView(model.getGOList(), model.getMOList());
-		view.addKeyListener(new InputController());
+		view.addKeyListener(inputController);
+		
 		AbstractAction FPSTimer = new AbstractAction(){
 			public void actionPerformed(ActionEvent e){
 				model.runGame();
@@ -35,7 +38,7 @@ public class GameController {
 			//change action of player
 			//model.setPlayerAction(action);
 			//update the rest of the model
-			model.runGame();
+			//model.runGame();
 			//redraw view
 			//view.drawView(model.getGOList(), model.getMOList());			
 		//}
@@ -49,10 +52,17 @@ public class GameController {
 	*/
 	
 	class InputController implements KeyListener {
-
+		private boolean[] down = new boolean[255];
+		private boolean[] pressed = new boolean[255];
+		
 		@Override
 		public void keyPressed(KeyEvent e) {
-			 //if(e.getSource().equals(KeyEvent.VK_A)){
+			//System.out.println("Key pressed");
+			down[e.getKeyCode()] = true;
+			pressed[e.getKeyCode()] = true;
+			model.passKeysDownToPlayer(down);
+			
+			/*
 			if(e.getKeyChar() == 'a') {
 				 System.out.println("A pressed");
 				 model.setPlayerAction(1);
@@ -62,13 +72,24 @@ public class GameController {
 				 System.out.println("D pressed");
 				 model.setPlayerAction(2);
 	         }
-			
+			*/
 		}
 
 		@Override
 		public void keyReleased(KeyEvent e) {
-			// TODO Auto-generated method stub
-			
+			down[e.getKeyCode()]=false;
+			model.passKeysDownToPlayer(down);
+			/*
+			if(e.getKeyChar() == 'a') {
+				 System.out.println("A pressed");
+				 model.setPlayerAction(4);
+				 
+	         }
+			if(e.getKeyChar() == 'd') {
+				 System.out.println("D pressed");
+				 model.setPlayerAction(4);
+	         }
+	         */
 		}
 
 		@Override

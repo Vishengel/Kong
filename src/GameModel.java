@@ -16,7 +16,7 @@ public class GameModel extends Observable implements constants {
 	
 	
 	//main game loop
-	void runGame(){
+	public void runGame(){
 		for(MovingObject mo : MOList){
 				mo.act();
 		}
@@ -39,24 +39,32 @@ public class GameModel extends Observable implements constants {
 	private void initObjects() {
 		//initialize list
 		GOList = new ArrayList<GameObject>();
+		
 		//create platforms		
-		//Platform pl = new Platform(30,48,constants.platform_HEIGHT,constants.platform_WIDTH);
-		//Platform pl2 = new Platform(32,47,constants.platform_HEIGHT,constants.platform_WIDTH);
-		//Platform pl3 = new Platform(34,46,constants.platform_HEIGHT,constants.platform_WIDTH);
-
+		GOList.add(new Platform(50-constants.platform_WIDTH,580-constants.platform_HEIGHT,constants.platform_HEIGHT,constants.platform_WIDTH));
+		
+		int xStart = 50;
+		for (int i=0; i<6; i++) {
+			GOList.add(new Platform(xStart,580,constants.platform_HEIGHT,constants.platform_WIDTH));
+			xStart += constants.platform_WIDTH;
+		}
+		
+		GOList.add(new Platform(xStart,580-constants.platform_HEIGHT,constants.platform_HEIGHT,constants.platform_WIDTH));
+		xStart = 50;
+		for (int i=0; i<6; i++) {
+			GOList.add(new Platform(xStart,510,constants.platform_HEIGHT,constants.platform_WIDTH));
+			xStart += constants.platform_WIDTH;
+		}
 		//create ladders
 		
-		//add objects to list of game objects
-		//GOList.add(pl);
-		//GOList.add(pl2);
-		//GOList.add(pl3);
+		
 	}
 
 	private void initMovingObjects() {
 		//initialize list
 		MOList = new ArrayList<MovingObject>();
 		//initialize player
-		mario = new Player(constants.PLAYER_START_X,constants.PLAYER_START_Y,constants.PLAYER_HEIGHT,constants.PLAYER_WIDTH);	
+		mario = new Player(constants.PLAYER_START_X,constants.PLAYER_START_Y,constants.PLAYER_HEIGHT,constants.PLAYER_WIDTH, GOList);	
 		//add possible initial barrels or flames
 		//Barrel b = new Barrel(15,48,2,2, 0);
 		//add objects to list of moving objects
@@ -66,6 +74,10 @@ public class GameModel extends Observable implements constants {
 	
 	public void setPlayerAction(int action){
 		mario.setAction(action);
+	}
+	
+	public void passKeysDownToPlayer(boolean[] down) {
+		mario.setKeysDown(down);
 	}
 	
 	

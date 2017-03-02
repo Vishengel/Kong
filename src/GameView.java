@@ -35,9 +35,9 @@ public class GameView extends JFrame {
 	}
 	
 	public GameView(GameModel model) {
-		this(model, 800, 600);
+		this(model, 640, 680);
 	}
-	
+	// Not used anymore
 	public void drawView(ArrayList<GameObject> GOList, ArrayList<MovingObject> MOList) {
 		//initView();
 		//draw each game object
@@ -46,12 +46,13 @@ public class GameView extends JFrame {
 			int y = go.getYPos();
 			int height = go.getHeight();
 			int width = go.getWidth();
-			
+			/*
 			for(int i = y; i < y + height; i++){
 				for(int j = x; j < x + width; j++){
 					gameWorld[i][j] = go.getSymbol();
 				}		
 			}
+			*/
 		} 
 		//draw each moving object			
 		for(MovingObject mo : MOList){

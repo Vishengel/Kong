@@ -1,8 +1,5 @@
-import java.util.ArrayList;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.Observer;
 import java.util.Observable;
 
@@ -21,7 +18,8 @@ public class GamePanel extends JPanel implements Observer {
 		super.paintComponent(g); 
          
         for (GameObject object : model.getGOList()){
-            
+        	g.setColor(object.getColor());
+            g.fillRect(object.getXPos(), object.getYPos(), object.getWidth(), object.getHeight());
         }
         
         for (MovingObject object : model.getMOList()){
