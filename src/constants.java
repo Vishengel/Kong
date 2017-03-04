@@ -2,7 +2,7 @@
 public interface constants {
 	//player constants
 	int PLAYER_START_X = 90;
-	int PLAYER_START_Y = 545;
+	int PLAYER_START_Y = 0;
 	int PLAYER_HEIGHT = 35;
 	int PLAYER_WIDTH = 20;
 	

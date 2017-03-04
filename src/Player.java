@@ -11,6 +11,7 @@ public class Player extends MovingObject{
 	private boolean jumping;
 	private int maxJumpHeight = 100;
     private int jumpY;
+    private int jumpSpeed;
 	public Player(int x, int y, int h, int w, ArrayList<GameObject> GOList) {
 		super(x, y, h, w, GOList);
 		xVel = 5;
@@ -18,7 +19,7 @@ public class Player extends MovingObject{
 		killOnCollision = false;
 		color = Color.blue;
 		action = -1;
-				
+		jumpSpeed = 7;	
 		
 		
 	}
@@ -72,7 +73,9 @@ public class Player extends MovingObject{
 			// Store the left side, right side, top and bottom coordinates of the other object
 			// Only works for two rectangular objects
 			int l2 = GO.xPos, r2 = GO.xPos+GO.width, t2 = GO.yPos, b2 = GO.yPos+GO.height;
-			if (!(l1>=r2 || l2>=r1 || t1>=b2 || t2>=b1) && t2 < b1) {
+			//System.out.println(b1);
+			//System.out.println(b2);
+			if (!(l1>=r2 || l2>=r1 || t1>=b2 || t2>=b1) && t2 < b1 && b1 > b2) {
 				System.out.println("Collision");
 				return true;
 			} else {
