@@ -11,6 +11,8 @@ public abstract class MovingObject extends GameObject{
 	protected boolean hasCollision = false;
 	protected boolean killOnCollision;
 	
+	protected int gravity = 10;
+	
 	//represents the action that the object can take
 	protected int action;
 	
@@ -47,6 +49,20 @@ public abstract class MovingObject extends GameObject{
 	public void setAction(int a){
 		action = a;
 	}
-	
+	//check if object is standing on a platform
+	public boolean standing(){
+		for(GameObject GO :GOList){
+			int l1 = xPos, r1 = xPos+width, t1 = yPos, b1 = yPos+height;
+			int l2 = GO.xPos, r2 = GO.xPos+GO.width, t2 = GO.yPos, b2 = GO.yPos+GO.height;
+			if(t2 == b1 && r1 > l2 && l1 < r2){ 				
+				System.out.println("Standing on platform!");
+				return true;
+			}
+			
+		}
+		System.out.println("Not standing..");
+		return false;
+		
+	}
 	
 }

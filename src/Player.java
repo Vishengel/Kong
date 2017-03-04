@@ -1,10 +1,16 @@
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+
+import javax.swing.AbstractAction;
+import javax.swing.Timer;
 
 public class Player extends MovingObject{
 	private boolean hasPowerUp = false, isClimbing = false, goLeft, goRight, goUp, goDown, jump;
-	private boolean keysDown[] = new boolean[255];	
-    
+	private boolean keysDown[] = new boolean[255];	 
+	private boolean jumping;
+	private int maxJumpHeight = 100;
+    private int jumpY;
 	public Player(int x, int y, int h, int w, ArrayList<GameObject> GOList) {
 		super(x, y, h, w, GOList);
 		xVel = 5;
@@ -12,7 +18,11 @@ public class Player extends MovingObject{
 		killOnCollision = false;
 		color = Color.blue;
 		action = -1;
+				
+		
+		
 	}
+	
 	
 	public void act(){
 		// There are two control schemes: WASD + shift and arrows + space bar
@@ -22,7 +32,18 @@ public class Player extends MovingObject{
 		goUp = keysDown[87] || keysDown[38];
 		goDown = keysDown[83] || keysDown[40];
 		jump = keysDown[16] || keysDown[32];
-				
+		
+		//if the jump key is down and the player is currently standing on a platform, start jumping
+		if(jump && !jumping && standing()){
+			jumping = true;
+			jumpY = yPos;
+			System.out.println("Jumping!");
+		}
+		//if player has reached maximum jump height, fall down again
+		if(jumpY - yPos >= maxJumpHeight){
+			jumping = false;
+		}
+						
 		dx = 0;
 		dy = 0;
 		
@@ -30,26 +51,9 @@ public class Player extends MovingObject{
 		
 		if (!isClimbing) {
 			// Temporary: only moves up
-			dy += (jump ? yVel : 0.0);
+			dy +=  jumping ? -gravity :(standing() ? 0 : gravity);
 		} 
 		
-		/*
-		
-		
-		// 1: move right  0: move left 
-		switch(action){
-		case 1:
-			dx = -xVel;
-			break;
-		case 2:
-			dx = xVel;
-			break;
-		case 3:
-			dy = yVel;
-		case 4:
-			break;
-		}
-		*/
 		xPos += dx;
 		yPos += dy;
 		
@@ -58,7 +62,7 @@ public class Player extends MovingObject{
 		if(checkCollisions(GOList)) {
 			xPos -= dx;
 			yPos -= dy;
-		}
+		} 		
 	}
 	
 	public boolean checkCollisions(ArrayList<GameObject> GOList) {
@@ -68,11 +72,11 @@ public class Player extends MovingObject{
 			// Store the left side, right side, top and bottom coordinates of the other object
 			// Only works for two rectangular objects
 			int l2 = GO.xPos, r2 = GO.xPos+GO.width, t2 = GO.yPos, b2 = GO.yPos+GO.height;
-			if (!(l1>=r2 || l2>=r1 || t1>=b2 || t2>=b1)) {
+			if (!(l1>=r2 || l2>=r1 || t1>=b2 || t2>=b1) && t2 < b1) {
 				System.out.println("Collision");
 				return true;
 			} else {
-				System.out.println("No collision");
+				//System.out.println("No collision");
 			}
 		}
 		// The player is not in collision with any other object

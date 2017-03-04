@@ -41,7 +41,7 @@ public class GameModel extends Observable implements constants {
 		GOList = new ArrayList<GameObject>();
 		
 		//create platforms		
-		GOList.add(new Platform(50-constants.platform_WIDTH,580-constants.platform_HEIGHT,constants.platform_HEIGHT,constants.platform_WIDTH));
+		//GOList.add(new Platform(50-constants.platform_WIDTH,580-constants.platform_HEIGHT,constants.platform_HEIGHT,constants.platform_WIDTH));
 		
 		int xStart = 50;
 		for (int i=0; i<6; i++) {
@@ -50,11 +50,13 @@ public class GameModel extends Observable implements constants {
 		}
 		
 		GOList.add(new Platform(xStart,580-constants.platform_HEIGHT,constants.platform_HEIGHT,constants.platform_WIDTH));
+		
 		xStart = 50;
-		for (int i=0; i<6; i++) {
+		/*for (int i=0; i<6; i++) {
 			GOList.add(new Platform(xStart,510,constants.platform_HEIGHT,constants.platform_WIDTH));
 			xStart += constants.platform_WIDTH;
 		}
+		*/
 		//create ladders
 		
 		
