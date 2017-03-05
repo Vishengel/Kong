@@ -19,12 +19,12 @@ public class GamePanel extends JPanel implements Observer {
          
         for (GameObject object : model.getGOList()){
         	g.setColor(object.getColor());
-            g.fillRect(object.getXPos(), object.getYPos(), object.getWidth(), object.getHeight());
+            g.fillRect((int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight());
         }
         
         for (MovingObject object : model.getMOList()){
         	g.setColor(object.getColor());
-            g.fillRect(object.getXPos(), object.getYPos(), object.getWidth(), object.getHeight());
+            g.fillRect((int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight());
         }
     }
 	

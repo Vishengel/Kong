@@ -2,16 +2,16 @@ import java.util.ArrayList;
 
 public abstract class MovingObject extends GameObject{
 	//These values represent the velocity in the x and y plane
-	protected int xVel;
-	protected int yVel;
+	protected float xVel;
+	protected float yVel;
 	//these values represent changes in x and y plane
-	protected int dx;
-	protected int dy;
+	protected float dx;
+	protected float dy;
 	//This value is true if the moving object is colliding with another object
 	protected boolean hasCollision = false;
 	protected boolean killOnCollision;
 	
-	protected int gravity = 9;
+	protected float gravity = 2;
 	
 	//represents the action that the object can take
 	protected int action;
@@ -31,16 +31,16 @@ public abstract class MovingObject extends GameObject{
 	public abstract boolean up();
 	public abstract boolean down();	
 	
-	public int getXVel(){
+	public float getXVel(){
 		return xVel;
 	}
-	public void setXVel(int x){
+	public void setXVel(float x){
 		xVel = x;
 	}
-	public int getYVel(){
+	public float getYVel(){
 		return xVel;
 	}
-	public void setYVel(int y){
+	public void setYVel(float y){
 		yVel = y;
 	}
 	public int getAction(){
@@ -52,10 +52,12 @@ public abstract class MovingObject extends GameObject{
 	//check if object is standing on a platform
 	public boolean standing(){
 		for(GameObject GO :GOList){
-			int l1 = xPos, r1 = xPos+width, t1 = yPos, b1 = yPos+height;
-			int l2 = GO.xPos, r2 = GO.xPos+GO.width, t2 = GO.yPos, b2 = GO.yPos+GO.height;
-			if((b1 <= b2 && b1 >= t2) && r1 > l2 && l1 < r2){ 				
-				System.out.println("Standing on platform!");
+			float l1 = xPos, r1 = xPos+width, t1 = yPos, b1 = yPos+height;
+			float l2 = GO.xPos, r2 = GO.xPos+GO.width, t2 = GO.yPos, b2 = GO.yPos+GO.height;
+			if((b1 <= b2 && b1 >= t2) && r1 > l2 && l1 < r2){ 
+				//make object stand exactly on top of the platform 
+				yPos = t2 - height;
+				//System.out.println("Standing on platform!");
 				return true;
 			}
 			
@@ -65,4 +67,4 @@ public abstract class MovingObject extends GameObject{
 		
 	}
 	
-}
+} 

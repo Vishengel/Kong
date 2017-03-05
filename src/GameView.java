@@ -42,10 +42,10 @@ public class GameView extends JFrame {
 		//initView();
 		//draw each game object
 		for(GameObject go : GOList){
-			int x = go.getXPos();
-			int y = go.getYPos();
-			int height = go.getHeight();
-			int width = go.getWidth();
+			float x = go.getXPos();
+			float y = go.getYPos();
+			float height = go.getHeight();
+			float width = go.getWidth();
 			/*
 			for(int i = y; i < y + height; i++){
 				for(int j = x; j < x + width; j++){
@@ -56,10 +56,10 @@ public class GameView extends JFrame {
 		} 
 		//draw each moving object			
 		for(MovingObject mo : MOList){
-			int x = mo.getXPos();
-			int y = mo.getYPos();
-			int height = mo.getHeight();
-			int width = mo.getWidth();
+			float x = mo.getXPos();
+			float y = mo.getYPos();
+			float height = mo.getHeight();
+			float width = mo.getWidth();
 			/*
 			for(int i = y; i < y + height; i++){
 				for(int j = x; j < x + width; j++){

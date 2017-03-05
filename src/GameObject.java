@@ -1,10 +1,10 @@
 import java.awt.Color;
 
 public abstract class GameObject {
-	protected int xPos;
-	protected int yPos;
-	protected int height;
-	protected int width;
+	protected float xPos;
+	protected float yPos;
+	protected float height;
+	protected float width;
 	//insert here some variable that represents what the object looks like
 	char symbol;
 	//The color of the object
@@ -18,22 +18,22 @@ public abstract class GameObject {
 		
 	}
 	
-	public int getXPos(){
+	public float getXPos(){
 		return xPos;
 	}
-	public void setXPos(int x){
+	public void setXPos(float x){
 		xPos = x;
 	}
-	public int getYPos(){
+	public float getYPos(){
 		return yPos;
 	}
-	public void setYPos(int y){
+	public void setYPos(float y){
 		yPos = y;
 	}
-	public int getHeight(){
+	public float getHeight(){
 		return height;
 	}
-	public int getWidth(){
+	public float getWidth(){
 		return width;
 	}
 	public char getSymbol(){
