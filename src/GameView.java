@@ -26,6 +26,7 @@ public class GameView extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
         setSize(width,height);
+        setResizable(false);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
          
@@ -35,7 +36,7 @@ public class GameView extends JFrame {
 	}
 	
 	public GameView(GameModel model) {
-		this(model, 640, 680);
+		this(model, constants.SCREEN_X, constants.SCREEN_Y);
 	}
 	// Not used anymore
 	public void drawView(ArrayList<GameObject> GOList, ArrayList<MovingObject> MOList) {

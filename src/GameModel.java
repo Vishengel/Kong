@@ -43,18 +43,31 @@ public class GameModel extends Observable implements constants {
 		//create platforms		
 		//GOList.add(new Platform(50-constants.platform_WIDTH,580-constants.platform_HEIGHT,constants.platform_HEIGHT,constants.platform_WIDTH));
 		
-		int xStart = 50;
-		for (int i=0; i<6; i++) {
-			GOList.add(new Platform(xStart,580,constants.platform_HEIGHT,constants.platform_WIDTH));
-			xStart += constants.platform_WIDTH;
+		//bottom layer first half
+		for(int i = 0; i < constants.SCREEN_X /2; i = i + constants.platform_WIDTH){
+			GOList.add(new Platform(50 + i,constants.SCREEN_Y - 50,constants.platform_HEIGHT,constants.platform_WIDTH));
 		}
 		
-		GOList.add(new Platform(xStart,580-constants.platform_HEIGHT,constants.platform_HEIGHT,constants.platform_WIDTH));
+		//bottom layer second half 
+		int y = constants.SCREEN_Y - 50;
+		for(int i = constants.SCREEN_X /2; i < constants.SCREEN_X - 50; i = i + constants.platform_WIDTH){
+			GOList.add(new Platform(i,y,constants.platform_HEIGHT,constants.platform_WIDTH));
+			y = y - 2;
+		}
 		
-		xStart = 50;
-		for (int i=0; i<6; i++) {
-			GOList.add(new Platform(xStart,510,constants.platform_HEIGHT,constants.platform_WIDTH));
-			xStart += constants.platform_WIDTH;
+		//second layer
+		int x = constants.SCREEN_X - 100;
+		y = constants.SCREEN_Y - 150;
+		for(int i = x; i > 50; i = i - constants.platform_WIDTH){
+			GOList.add(new Platform(i,y,constants.platform_HEIGHT,constants.platform_WIDTH));
+			y = y - 2;
+		}
+		
+		//third layer
+		y = constants.SCREEN_Y - 270;
+		for(int i = 100; i < constants.SCREEN_X - 50; i = i + constants.platform_WIDTH){
+			GOList.add(new Platform(i,y,constants.platform_HEIGHT,constants.platform_WIDTH));
+			y = y - 2;
 		}
 		
 		//create ladders

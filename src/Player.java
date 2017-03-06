@@ -9,7 +9,7 @@ public class Player extends MovingObject{
 	private boolean hasPowerUp = false, isClimbing = false, goLeft, goRight, goUp, goDown, jump;
 	private boolean keysDown[] = new boolean[255];	 
 	private boolean jumping;
-	private float jumpHeight = 5;
+	private float jumpHeight = 4;
     private float time;
 	public Player(int x, int y, int h, int w, ArrayList<GameObject> GOList) {
 		super(x, y, h, w, GOList);
