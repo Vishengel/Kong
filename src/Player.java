@@ -1,28 +1,62 @@
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
+import javax.swing.AbstractAction;
+import javax.swing.Timer;
+
 public class Player extends MovingObject{
-	private boolean hasPowerUp = false, isStanding = false, isClimbing = false, goLeft, goRight, goUp, goDown, jump;
-	private boolean keysDown[] = new boolean[255];
-	private int gravity = 2, jumpSpeed = 5;
+
+	private boolean hasPowerUp = false, isClimbing = false, goLeft, goRight, goUp, goDown, jump;
+	private boolean keysDown[] = new boolean[255];	 
+	private boolean jumping;
+	private float jumpHeight = 4;
+    private float time;
     
 	public Player(int x, int y, int h, int w, ArrayList<GameObject> GOList) {
 		super(x, y, h, w, GOList);
-		xVel = 5;
-		yVel = 5;
+
+		xVel = 5f;
+		yVel = 0;
+
 		killOnCollision = false;
 		color = Color.blue;
 		action = -1;
+		time = 0;
+		AbstractAction gravityTimer = new AbstractAction(){
+			public void actionPerformed(ActionEvent e){
+				System.out.println(time);
+				if(standing()){
+					time = 0;
+					jumping = false;
+				}
+				else{
+					time++;
+				}
+			}
+		};
+		new Timer(150, gravityTimer).start();
+		
+		
 	}
 	
+	
 	public void act(){
+
 		readInput();
 		
 		dx = 0;
 		dy = 0;
+		//if the jump key is down and the player is currently standing on a platform and not
+		// already jumping, start jumping
+		if(jump && !jumping && standing()){
+			jumping = true;				
+		}
+		
 		
 		dx += (goRight ? xVel : 0) - (goLeft ? xVel : 0);
 		
+		/*
 		if (isClimbing) {
 			dy += (goDown ? yVel : 0) - (goUp ? yVel : 0);
 		}
@@ -32,24 +66,22 @@ public class Player extends MovingObject{
 			// Temporary: only moves up
 			dy += (jump ? yVel : 0);
 		} 
-		
-		/*
-		// 1: move right  0: move left 
-		switch(action){
-		case 1:
-			dx = -xVel;
-			break;
-		case 2:
-			dx = xVel;
-			break;
-		case 3:
-			dy = yVel;
-		case 4:
-			break;
-		}
 		*/
+		dy = gravity * time;
+
+
+
+		//apply vertical force if jumping
+		if(jumping){ 
+			yPos += -jumpHeight;
+		}
 		
-		// First, we try to move on the x-axis
+		
+		if(standing()){
+			dy = 0;
+			jumping = false;
+		}
+		
 		xPos += dx;
 		
 		if(checkCollisions(GOList)) {
@@ -64,35 +96,33 @@ public class Player extends MovingObject{
 			// If the movement on the y-axis would result in a collision, we do not move
 			yPos -= dy;
 		}
-		
+
+			
 		// If the next move would make the player collide with any other object,
 		// do not make the move
 		if(checkCollisions(GOList)) {
 			xPos -= dx;
-			yPos -= dy;
-		}
+			//yPos -= dy;
+		} 	
+		
 	}
 	
 	public boolean checkCollisions(ArrayList<GameObject> GOList) {
 		for(GameObject GO : GOList) {
 			// Store the left side, right side, top and bottom coordinates of the player
-			int l1 = xPos, r1 = xPos+width, t1 = yPos, b1 = yPos+height;
+			float l1 = xPos, r1 = xPos+width, t1 = yPos, b1 = yPos+height;
 			// Store the left side, right side, top and bottom coordinates of the other object
 			// Only works for two rectangular objects
-			int l2 = GO.xPos, r2 = GO.xPos+GO.width, t2 = GO.yPos, b2 = GO.yPos+GO.height;
-			if (!(l1>=r2 || l2>=r1 || t1>=b2 || t2>=b1)) {
-				// If none of the statements are true, the player is in collision with something
-				if (b1>=t2) {
-					// If this is the case, the player is standing on something
-					System.out.println("Standing");
-					isStanding = true;
-				} else {
-					isStanding = false;
-				}
+
+			float l2 = GO.xPos, r2 = GO.xPos+GO.width, t2 = GO.yPos, b2 = GO.yPos+GO.height;
+			//System.out.println(b1);
+			//System.out.println(b2);
+			if (!(l1>=r2 || l2>=r1 || t1>=b2 || t2>=b1) && t2 < b1 && b1 > b2) {
+
 				System.out.println("Collision");
 				return true;
 			} else {
-				System.out.println("No collision");
+				//System.out.println("No collision");
 			}
 		}
 		// The player is not in collision with any other object

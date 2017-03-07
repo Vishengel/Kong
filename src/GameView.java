@@ -26,6 +26,7 @@ public class GameView extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
         setSize(width,height);
+        setResizable(false);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
          
@@ -35,17 +36,17 @@ public class GameView extends JFrame {
 	}
 	
 	public GameView(GameModel model) {
-		this(model, 640, 680);
+		this(model, constants.SCREEN_X, constants.SCREEN_Y);
 	}
 	// Not used anymore
 	public void drawView(ArrayList<GameObject> GOList, ArrayList<MovingObject> MOList) {
 		//initView();
 		//draw each game object
 		for(GameObject go : GOList){
-			int x = go.getXPos();
-			int y = go.getYPos();
-			int height = go.getHeight();
-			int width = go.getWidth();
+			float x = go.getXPos();
+			float y = go.getYPos();
+			float height = go.getHeight();
+			float width = go.getWidth();
 			/*
 			for(int i = y; i < y + height; i++){
 				for(int j = x; j < x + width; j++){
@@ -56,10 +57,10 @@ public class GameView extends JFrame {
 		} 
 		//draw each moving object			
 		for(MovingObject mo : MOList){
-			int x = mo.getXPos();
-			int y = mo.getYPos();
-			int height = mo.getHeight();
-			int width = mo.getWidth();
+			float x = mo.getXPos();
+			float y = mo.getYPos();
+			float height = mo.getHeight();
+			float width = mo.getWidth();
 			/*
 			for(int i = y; i < y + height; i++){
 				for(int j = x; j < x + width; j++){

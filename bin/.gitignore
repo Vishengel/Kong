@@ -1,8 +1,12 @@
 /Barrel.class
 /Flame.class
 /GameController$1.class
+<<<<<<< HEAD
 /GameController$InputController.class
 /GameController.class
 /GameModel.class
 /GameObject.class
 /GamePanel.class
+=======
+/Player$1.class
+>>>>>>> branch 'jelle' of https://github.com/Vishengel/Kong.git
