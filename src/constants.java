@@ -1,8 +1,11 @@
 
 public interface constants {
+	//game constants
+	float GRAVITY = 0.5f;
+	
 	//player constants
 	int PLAYER_START_X = 90;
-	int PLAYER_START_Y = 545;
+	int PLAYER_START_Y = 245;
 	int PLAYER_HEIGHT = 35;
 	int PLAYER_WIDTH = 20;
 	

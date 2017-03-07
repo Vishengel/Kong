@@ -1,4 +1,8 @@
-/GamePanel.class
-/GameController$InputController.class
-/InputController.class
+/Barrel.class
+/Flame.class
 /GameController$1.class
+/GameController$InputController.class
+/GameController.class
+/GameModel.class
+/GameObject.class
+/GamePanel.class
