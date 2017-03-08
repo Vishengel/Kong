@@ -31,6 +31,7 @@ public abstract class MovingObject extends GameObject{
 			dy = 0;
 		}
 		dy = gravity * time;	
+		
 	}
 	
 	//each subclass of this class implements its own version of the act, movement and collision

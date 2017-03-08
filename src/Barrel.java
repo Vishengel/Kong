@@ -4,13 +4,14 @@ public class Barrel extends MovingObject{
 	//false : left   true : right
 	private boolean direction;
 	private boolean moveDownLadder;
+	//keep track of the distance fallen in order to change direction 
 	private int distanceFallen = 0;
 	
 	public Barrel(int x, int y, int h, int w, ArrayList<GameObject> GOList, boolean d) {
 		super(x, y, h, w, GOList);
 		symbol = 'O';
 		killOnCollision = true;
-		direction = false;
+		direction = true;
 		xVel = 6;
 		color = color.orange;
 		pointAwarded = false;
@@ -39,7 +40,10 @@ public class Barrel extends MovingObject{
 			}
 		}
 		else{
-			dx = 0f;
+			//Only let a barrel pause in its horizontal movement if it falls a long distance
+			if(distanceFallen > 0){
+				dx = 0f;
+			}
 		}
 		
 		
