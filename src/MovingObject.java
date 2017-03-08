@@ -23,9 +23,16 @@ public abstract class MovingObject extends GameObject{
 		this.GOList = GOList;
 	}
 	
+	public void act(int time){
+		if(standing()){
+			dy = 0;
+		}
+		dy = gravity * time;
+		
+	}
+	
 	//each subclass of this class implements its own version of the act, movement and collision
-	public abstract void act();
-	public abstract boolean checkCollisions(ArrayList<GameObject> GOList);
+	//public abstract boolean checkCollisions(ArrayList<GameObject> GOList);
 	public abstract boolean left();
 	public abstract boolean right();
 	public abstract boolean up();
@@ -62,9 +69,30 @@ public abstract class MovingObject extends GameObject{
 			}
 			
 		}
-		System.out.println("Not standing..");
+		//System.out.println("Not standing..");
 		return false;
 		
 	}
-	
+	public boolean checkCollisions(ArrayList<GameObject> GOList) {
+		for(GameObject GO : GOList) {
+			// Store the left side, right side, top and bottom coordinates of the player
+			float l1 = xPos, r1 = xPos+width, t1 = yPos, b1 = yPos+height;
+			// Store the left side, right side, top and bottom coordinates of the other object
+			// Only works for two rectangular objects
+
+			float l2 = GO.xPos, r2 = GO.xPos+GO.width, t2 = GO.yPos, b2 = GO.yPos+GO.height;
+			//System.out.println(b1);
+			//System.out.println(b2);
+			if (!(l1>=r2 || l2>=r1 || t1>=b2 || t2>=b1) && t2 < b1 && b1 > b2) {
+
+				System.out.println("Collision");
+				return true;
+			} else {
+				//System.out.println("No collision");
+			}
+		}	
+		
+		// The player is not in collision with any other object
+		return false;
+	}
 } 

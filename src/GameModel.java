@@ -1,10 +1,15 @@
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Observer;
 import java.util.Observable;
 
+import javax.swing.AbstractAction;
+import javax.swing.Timer;
+
 public class GameModel extends Observable implements constants {
 	private int score = 0;
 	private int lives = 3;
+	private ArrayList<Integer> gravityTimes;
 	private boolean gameOver = false; 
 	private ArrayList<GameObject> GOList;
 	private ArrayList<MovingObject> MOList;
@@ -12,13 +17,44 @@ public class GameModel extends Observable implements constants {
 	
 	public GameModel(){
 		initGame();
+		gravityTimes = new ArrayList<Integer>();
+		for(int i = 0; i < MOList.size(); i++){
+			gravityTimes.add(i, 0);		
+		}
+		AbstractAction gravityTimer = new AbstractAction(){
+			public void actionPerformed(ActionEvent e){
+				for(int i = 0; i < MOList.size(); i++){
+					MovingObject MO = MOList.get(i);
+					if(MO.standing()){
+						gravityTimes.set(i, 0);
+						if(MO instanceof Player){
+							((Player) MOList.get(i)).setJump(false);
+						}
+						
+					}
+					else{
+						gravityTimes.set(i, (gravityTimes.get(i)) + 1) ;
+					}
+					
+				}
+				//System.out.println(gravityTimes);
+				
+				
+			}
+		};
+		new Timer(150, gravityTimer).start();
 	}
 	
 	
 	//main game loop
 	public void runGame(){
-		for(MovingObject mo : MOList){
-				mo.act();
+		for(int i = 0; i < MOList.size(); i++){
+				MOList.get(i).act(gravityTimes.get(i));
+				//if player is hit, reset objects
+				if(mario.isKilled()){
+					MOList.clear();
+					initMovingObjects();
+				}
 		}
 		setChanged();
 		notifyObservers();
@@ -64,11 +100,20 @@ public class GameModel extends Observable implements constants {
 		}
 		
 		//third layer
-		y = constants.SCREEN_Y - 270;
+		y = constants.SCREEN_Y - 300;
 		for(int i = 100; i < constants.SCREEN_X - 50; i = i + constants.platform_WIDTH){
 			GOList.add(new Platform(i,y,constants.platform_HEIGHT,constants.platform_WIDTH));
 			y = y - 2;
 		}
+		
+		//upper layer?
+		x = constants.SCREEN_X - 100;
+		y = constants.SCREEN_Y - 450;
+		for(int i = x; i > 50; i = i - constants.platform_WIDTH){
+			GOList.add(new Platform(i,y,constants.platform_HEIGHT,constants.platform_WIDTH));
+			y = y - 2;
+		}
+		
 		
 		//create ladders
 		
@@ -81,10 +126,12 @@ public class GameModel extends Observable implements constants {
 		//initialize player
 		mario = new Player(constants.PLAYER_START_X,constants.PLAYER_START_Y,constants.PLAYER_HEIGHT,constants.PLAYER_WIDTH, GOList);	
 		//add possible initial barrels or flames
-		//Barrel b = new Barrel(15,48,2,2, 0);
+		Barrel b = new Barrel(constants.BARREL_START_X,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WEIGHT, GOList, true);
+		Barrel b2 = new Barrel(constants.BARREL_START_X + 50,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WEIGHT, GOList, true);
 		//add objects to list of moving objects
 		MOList.add(mario);		
-		//MOList.add(b);
+		MOList.add(b);
+		MOList.add(b2);
 	}
 	
 	public void setPlayerAction(int action){
