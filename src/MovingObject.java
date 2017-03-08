@@ -13,6 +13,8 @@ public abstract class MovingObject extends GameObject{
 	
 	protected float gravity = 2;
 	
+	
+	
 	//represents the action that the object can take
 	protected int action;
 	

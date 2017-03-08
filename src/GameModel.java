@@ -15,12 +15,11 @@ public class GameModel extends Observable implements constants {
 	private ArrayList<MovingObject> MOList;
 	private Player mario;
 	
+	protected int spawnTime = 2;
+	protected int spawnTimer = 0;
+	
 	public GameModel(){
 		initGame();
-		gravityTimes = new ArrayList<Integer>();
-		for(int i = 0; i < MOList.size(); i++){
-			gravityTimes.add(i, 0);		
-		}
 		AbstractAction gravityTimer = new AbstractAction(){
 			public void actionPerformed(ActionEvent e){
 				for(int i = 0; i < MOList.size(); i++){
@@ -34,15 +33,24 @@ public class GameModel extends Observable implements constants {
 					}
 					else{
 						gravityTimes.set(i, (gravityTimes.get(i)) + 1) ;
-					}
-					
-				}
-				//System.out.println(gravityTimes);
-				
-				
+					}		
+				}						
 			}
 		};
 		new Timer(150, gravityTimer).start();
+		
+		AbstractAction spawner = new AbstractAction(){
+			public void actionPerformed(ActionEvent e){
+				if(spawnTimer == spawnTime){
+					//create new barrel
+					gravityTimes.add(0);
+					MOList.add(new Barrel(constants.BARREL_START_X,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WEIGHT, GOList, true));
+					spawnTimer = 0;
+				}
+				spawnTimer++;		
+			}
+		};
+		new Timer(1000, spawner).start();
 	}
 	
 	
@@ -55,6 +63,7 @@ public class GameModel extends Observable implements constants {
 				if(MOList.get(0).checkMOCollision(MOList)){
 					System.out.println("MARIO IS DEAD!!!!!");
 					MOList.clear();
+					gravityTimes.clear();
 					initMovingObjects();
 				} 
 				//If object falls out of the game screen, delete it
@@ -128,6 +137,7 @@ public class GameModel extends Observable implements constants {
 	}
 
 	private void initMovingObjects() {
+		gravityTimes = new ArrayList<Integer>();
 		//initialize list
 		MOList = new ArrayList<MovingObject>();
 		//initialize player
@@ -139,6 +149,11 @@ public class GameModel extends Observable implements constants {
 		MOList.add(mario);		
 		MOList.add(b);
 		MOList.add(b2);
+		
+		//initalize the gravity timers of the moving objects
+		for(int i = 0; i < MOList.size(); i++){
+			gravityTimes.add(0);
+		}
 	}
 	
 	public void setPlayerAction(int action){
