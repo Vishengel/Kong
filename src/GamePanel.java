@@ -19,7 +19,11 @@ public class GamePanel extends JPanel implements Observer {
 		this.model = model;
 		this.model.addObserver(this);
 		
-		image = ImageIO.read(new File("mario_lives.png"));
+		try {
+			image = ImageIO.read(new File("mario_lives.png"));
+		} catch (Exception e) {
+			System.out.println("Image not found");
+		}
 		
 	}
 	
