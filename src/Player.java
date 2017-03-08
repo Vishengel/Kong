@@ -10,7 +10,8 @@ public class Player extends MovingObject{
 	private boolean hasPowerUp = false, isClimbing = false, goLeft, goRight, goUp, goDown, jump;
 	private boolean keysDown[] = new boolean[255];	 
 	private boolean jumping;
-	private float jumpHeight = 4;
+	private float jumpHeight = 10;
+	private float jumpForce;
     private float time;
     
 	public Player(int x, int y, int h, int w, ArrayList<GameObject> GOList) {
@@ -23,6 +24,7 @@ public class Player extends MovingObject{
 		color = Color.blue;
 		action = -1;
 		time = 0;
+		/*
 		AbstractAction gravityTimer = new AbstractAction(){
 			public void actionPerformed(ActionEvent e){
 				System.out.println(time);
@@ -36,7 +38,7 @@ public class Player extends MovingObject{
 			}
 		};
 		new Timer(150, gravityTimer).start();
-		
+		*/
 		
 	}
 	
@@ -50,7 +52,8 @@ public class Player extends MovingObject{
 		//if the jump key is down and the player is currently standing on a platform and not
 		// already jumping, start jumping
 		if(jump && !jumping && standing()){
-			jumping = true;				
+			jumping = true;			
+			jumpForce = jumpHeight;
 		}
 		
 		
@@ -67,18 +70,20 @@ public class Player extends MovingObject{
 			dy += (jump ? yVel : 0);
 		} 
 		*/
-		dy = gravity * time;
-
+		if (!standing() && !jumping) {
+			dy += 4;
+		}
 
 
 		//apply vertical force if jumping
 		if(jumping){ 
-			yPos += -jumpHeight;
+			dy -= jumpForce;
+			jumpForce -= 0.5;
 		}
 		
 		
 		if(standing()){
-			dy = 0;
+			//dy = 0;
 			jumping = false;
 		}
 		
@@ -96,14 +101,6 @@ public class Player extends MovingObject{
 			// If the movement on the y-axis would result in a collision, we do not move
 			yPos -= dy;
 		}
-
-			
-		// If the next move would make the player collide with any other object,
-		// do not make the move
-		if(checkCollisions(GOList)) {
-			xPos -= dx;
-			//yPos -= dy;
-		} 	
 		
 	}
 	
