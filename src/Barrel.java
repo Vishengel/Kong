@@ -9,7 +9,7 @@ public class Barrel extends MovingObject{
 	public Barrel(int x, int y, int h, int w, ArrayList<GameObject> GOList, boolean d) {
 		super(x, y, h, w, GOList);
 		symbol = 'O';
-		killOnCollision = true;
+		killOnCollision = false;
 		direction = false;
 		xVel = 6;
 		color = color.orange;

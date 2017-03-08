@@ -42,7 +42,10 @@ public class Player extends MovingObject{
 		if(jump && !jumping && standing()){
 			jumping = true;			
 		}
-		
+		if((collidingWith instanceof Ladder) ) {
+			isClimbing = true;
+			System.out.println(isClimbing);
+		} 
 		
 		dx += (goRight ? xVel : 0) - (goLeft ? xVel : 0);
 		
@@ -64,7 +67,7 @@ public class Player extends MovingObject{
 		
 		xPos += dx;
 		
-		if(checkWallCollisions(GOList)) {
+		if(checkWallCollisions(GOList) && collidingWith.isSolid()) {
 			// If the movement on the x-axis would result in a collision, we do not move
 			xPos -= dx;
 		}
@@ -72,7 +75,7 @@ public class Player extends MovingObject{
 		// Next, we try to move on the y-axis
 		yPos += dy;
 		
-		if(checkWallCollisions(GOList)) {
+		if(checkWallCollisions(GOList) && collidingWith.isSolid()) {
 			// If the movement on the y-axis would result in a collision, we do not move
 			yPos -= dy;
 		}

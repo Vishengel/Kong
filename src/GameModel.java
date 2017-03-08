@@ -48,7 +48,7 @@ public class GameModel extends Observable implements constants {
 	
 	//main game loop
 	public void runGame(){
-		System.out.println(gravityTimes);
+		//System.out.println(gravityTimes);
 		for(int i = 0; i < MOList.size(); i++){
 				MOList.get(i).act(gravityTimes.get(i));
 				//if player is hit, reset objects
@@ -91,9 +91,6 @@ public class GameModel extends Observable implements constants {
 			GOList.add(new Platform(50 + i,constants.SCREEN_Y - 50,constants.platform_HEIGHT,constants.platform_WIDTH));
 		}
 		
-		for(int i = 0; i < 8*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
-			GOList.add(new Ladder(500,610-i,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
-		}
 		
 		//bottom layer second half 
 		int y = constants.SCREEN_Y - 50;
@@ -109,6 +106,9 @@ public class GameModel extends Observable implements constants {
 			GOList.add(new Platform(i,y,constants.platform_HEIGHT,constants.platform_WIDTH));
 			y = y - 2;
 		}
+		
+		GOList.add(new Ladder(500,constants.SCREEN_Y - 172,11*constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
+		
 		
 		//third layer
 		y = constants.SCREEN_Y - 300;

@@ -9,6 +9,7 @@ public abstract class GameObject {
 	char symbol;
 	//The color of the object
 	protected Color color;
+	protected boolean isSolid;
 	
 	public GameObject(int x, int y, int h, int w){
 		xPos = x;
@@ -42,5 +43,9 @@ public abstract class GameObject {
 	
 	public Color getColor(){
 		return color;
+	}
+	
+	public boolean isSolid(){
+		return isSolid;
 	}
 }

@@ -11,6 +11,8 @@ public abstract class MovingObject extends GameObject{
 	protected boolean hasCollision = false;
 	protected boolean killOnCollision;
 	
+	protected GameObject collidingWith;
+	
 	protected float gravity = 2;
 	
 	//represents the action that the object can take
@@ -25,10 +27,12 @@ public abstract class MovingObject extends GameObject{
 	}
 	
 	public void act(int time){
+		
+		dy = gravity * time;
+		
 		if(standing()){
 			dy = 0;
 		}
-		dy = gravity * time;	
 	}
 	
 	//each subclass of this class implements its own version of the act, movement and collision
@@ -61,15 +65,17 @@ public abstract class MovingObject extends GameObject{
 		for(GameObject GO :GOList){
 			float l1 = xPos, r1 = xPos+width, t1 = yPos, b1 = yPos+height;
 			float l2 = GO.xPos, r2 = GO.xPos+GO.width, t2 = GO.yPos, b2 = GO.yPos+GO.height;
-			if((b1 <= b2 && b1 >= t2) && r1 > l2 && l1 < r2){ 
+			if((b1 <= b2 && b1 >= t2) && r1 > l2 && l1 < r2 && GO.isSolid()){ 
 				//make object stand exactly on top of the platform 
 				yPos = t2 - height;
 				//System.out.println("Standing on platform!");
+				
 				return true;
 			}
 			
 		}
 		//System.out.println("Not standing..");
+		
 		return false;
 		
 	}
@@ -87,12 +93,13 @@ public abstract class MovingObject extends GameObject{
 			//System.out.println(b1);
 			//System.out.println(b2);
 			if (!(l1>=r2 || l2>=r1 || t1>=b2 || t2>=b1) && t2 < b1 && b1 > b2) {
-
+				collidingWith = GO;
 				//System.out.println("Collision");
 				return true;
 			}
 		}	
 		// The player is not in collision with any other object
+		collidingWith = null;
 		return false;
 	}
 	
