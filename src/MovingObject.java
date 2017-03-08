@@ -21,14 +21,14 @@ public abstract class MovingObject extends GameObject{
 	public MovingObject(int x, int y, int h, int w, ArrayList<GameObject> GOList) {
 		super(x, y, h, w);	
 		this.GOList = GOList;
+		
 	}
 	
 	public void act(int time){
 		if(standing()){
 			dy = 0;
 		}
-		dy = gravity * time;
-		
+		dy = gravity * time;	
 	}
 	
 	//each subclass of this class implements its own version of the act, movement and collision
@@ -73,7 +73,10 @@ public abstract class MovingObject extends GameObject{
 		return false;
 		
 	}
-	public boolean checkCollisions(ArrayList<GameObject> GOList) {
+	
+	
+	
+	public boolean checkWallCollisions(ArrayList<GameObject> GOList) {
 		for(GameObject GO : GOList) {
 			// Store the left side, right side, top and bottom coordinates of the player
 			float l1 = xPos, r1 = xPos+width, t1 = yPos, b1 = yPos+height;
@@ -85,14 +88,31 @@ public abstract class MovingObject extends GameObject{
 			//System.out.println(b2);
 			if (!(l1>=r2 || l2>=r1 || t1>=b2 || t2>=b1) && t2 < b1 && b1 > b2) {
 
-				System.out.println("Collision");
+				//System.out.println("Collision");
 				return true;
-			} else {
-				//System.out.println("No collision");
 			}
 		}	
-		
 		// The player is not in collision with any other object
 		return false;
+	}
+	
+	public boolean checkMOCollision(ArrayList<MovingObject> MOList) {
+		for(int i = 1; i < MOList.size(); i++) {
+			MovingObject MO = MOList.get(i);
+			// Store the left side, right side, top and bottom coordinates of the player
+			float l1 = xPos, r1 = xPos+width, t1 = yPos, b1 = yPos+height;
+			// Store the left side, right side, top and bottom coordinates of the other object
+			// Only works for two rectangular objects
+
+			float l2 = MO.xPos, r2 = MO.xPos+MO.width, t2 = MO.yPos, b2 = MO.yPos+MO.height;
+			//System.out.println(b1);
+			//System.out.println(b2);
+			if (!(l1>=r2 || l2>=r1 || t1>=b2 || t2>=b1)) {
+				return MO.killOnCollision;
+			}	
+		}
+		// The player is not in collision with any other object
+		return false;
+		
 	}
 } 

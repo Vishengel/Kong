@@ -15,8 +15,8 @@ public interface constants {
 	//barrel constants
 	int BARREL_START_X = 60;
 	int BARREL_START_Y = 40;
-	int BARREL_HEIGHT = 15;
-	int BARREL_WEIGHT = 15;
+	int BARREL_HEIGHT = 20;
+	int BARREL_WEIGHT = 20;
 	
 	
 	
