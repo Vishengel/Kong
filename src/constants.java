@@ -15,15 +15,11 @@ public interface constants {
 	//barrel constants
 	int BARREL_START_X = 60;
 	int BARREL_START_Y = 40;
+	
 	int BARREL_HEIGHT = 15;
 	int BARREL_WEIGHT = 15;
 	
-	
-	
 	//flame constants
-	
-	
-	
 	
 	
 	//platform constants
@@ -31,4 +27,6 @@ public interface constants {
 	int platform_WIDTH = 30;
 	
 	//ladder constants
+	int LADDER_WIDTH = 15;
+	int LADDER_HEIGHT = 10;
 }

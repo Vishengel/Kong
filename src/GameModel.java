@@ -84,6 +84,10 @@ public class GameModel extends Observable implements constants {
 			GOList.add(new Platform(50 + i,constants.SCREEN_Y - 50,constants.platform_HEIGHT,constants.platform_WIDTH));
 		}
 		
+		for(int i = 0; i < 8*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
+			GOList.add(new Ladder(500,610-i,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
+		}
+		
 		//bottom layer second half 
 		int y = constants.SCREEN_Y - 50;
 		for(int i = constants.SCREEN_X /2; i < constants.SCREEN_X - 50; i = i + constants.platform_WIDTH){
