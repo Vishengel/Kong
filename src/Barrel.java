@@ -13,6 +13,7 @@ public class Barrel extends MovingObject{
 		direction = false;
 		xVel = 6;
 		color = color.orange;
+		pointAwarded = false;
 		
 	}
 	
@@ -71,5 +72,6 @@ public class Barrel extends MovingObject{
 	public boolean jump() {
 		return false;
 	}
+	
 
 }

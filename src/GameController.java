@@ -1,6 +1,7 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 import java.util.Scanner;
 
 import javax.swing.AbstractAction;
@@ -15,7 +16,7 @@ public class GameController {
 	private Scanner reader;
 	private InputController inputController = new InputController();
 	
-	public void start(){
+	public void start() throws IOException{
 		//create game model and view
 		model = new GameModel();
 		view = new GameView(model);

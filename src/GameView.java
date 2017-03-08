@@ -1,6 +1,9 @@
 import java.util.ArrayList;
+
 import javax.swing.*;
+
 import java.awt.*;
+import java.io.IOException;
 
 public class GameView extends JFrame {
 	//temporary 2D array that shows the game world with ASCII characters
@@ -10,7 +13,7 @@ public class GameView extends JFrame {
 	//private int worldHeight = 50;
 	
 	//draw a temporary view for debugging and being able to see what's going on
-	public GameView(GameModel model, int width, int height){
+	public GameView(GameModel model, int width, int height) throws IOException{
 		//init game world array
 		/*
 			gameWorld = new char[worldWidth][worldHeight];
@@ -35,7 +38,7 @@ public class GameView extends JFrame {
         add(gamePanel);
 	}
 	
-	public GameView(GameModel model) {
+	public GameView(GameModel model) throws IOException {
 		this(model, constants.SCREEN_X, constants.SCREEN_Y);
 	}
 	// Not used anymore
