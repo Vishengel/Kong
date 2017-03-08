@@ -12,7 +12,7 @@ public class Player extends MovingObject{
 	private boolean jumping;
 	private float jumpHeight = 4;
 	private boolean isKilled = false;
-    
+
     
 	public Player(int x, int y, int h, int w, ArrayList<GameObject> GOList) {
 		super(x, y, h, w, GOList);
@@ -23,8 +23,6 @@ public class Player extends MovingObject{
 		killOnCollision = false;
 		color = Color.blue;
 		action = -1;
-		
-		
 		
 	}
 	
@@ -44,7 +42,7 @@ public class Player extends MovingObject{
 		//if the jump key is down and the player is currently standing on a platform and not
 		// already jumping, start jumping
 		if(jump && !jumping && standing()){
-			jumping = true;				
+			jumping = true;			
 		}
 		
 		
@@ -61,12 +59,10 @@ public class Player extends MovingObject{
 			dy += (jump ? yVel : 0);
 		} 
 		*/
-		
 		//apply vertical force if jumping
 		if(jumping){ 
 			dy += -jumpHeight;
 		}
-				
 		
 		xPos += dx;
 		
@@ -82,14 +78,6 @@ public class Player extends MovingObject{
 			// If the movement on the y-axis would result in a collision, we do not move
 			yPos -= dy;
 		}
-
-			
-		// If the next move would make the player collide with any other object,
-		// do not make the move
-		if(checkCollisions(GOList)) {
-			xPos -= dx;
-			//yPos -= dy;
-		} 	
 		
 	}
 	
