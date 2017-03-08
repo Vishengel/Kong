@@ -12,6 +12,8 @@ public class Barrel extends MovingObject{
 		killOnCollision = true;
 		direction = false;
 		xVel = 6;
+		color = color.orange;
+		
 	}
 	
 	public void act(int time) {

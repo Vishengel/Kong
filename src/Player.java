@@ -23,6 +23,7 @@ public class Player extends MovingObject{
 		killOnCollision = false;
 		color = Color.blue;
 		action = -1;
+		symbol = 'x';
 		
 	}
 	
@@ -30,10 +31,7 @@ public class Player extends MovingObject{
 		dx = 0;
 		dy = 0;
 		
-		/*if(){
-			isKilled = true;
-			break;
-		}*/
+		
 		//call the super act function for gravity and standing on platform
 		super.act(time);
 		readInput();
@@ -66,7 +64,7 @@ public class Player extends MovingObject{
 		
 		xPos += dx;
 		
-		if(checkCollisions(GOList)) {
+		if(checkWallCollisions(GOList)) {
 			// If the movement on the x-axis would result in a collision, we do not move
 			xPos -= dx;
 		}
@@ -74,7 +72,7 @@ public class Player extends MovingObject{
 		// Next, we try to move on the y-axis
 		yPos += dy;
 		
-		if(checkCollisions(GOList)) {
+		if(checkWallCollisions(GOList)) {
 			// If the movement on the y-axis would result in a collision, we do not move
 			yPos -= dy;
 		}
