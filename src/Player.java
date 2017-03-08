@@ -10,7 +10,7 @@ public class Player extends MovingObject{
 	private boolean hasPowerUp = false, isClimbing = false, goLeft, goRight, goUp, goDown, jump;
 	private boolean keysDown[] = new boolean[255];	 
 	private boolean jumping;
-	private float jumpHeight = 4;
+	private float jumpHeight = 3.6f;
 	private boolean isKilled = false;
 
     
@@ -60,6 +60,7 @@ public class Player extends MovingObject{
 		//apply vertical force if jumping
 		if(jumping){ 
 			dy += -jumpHeight;
+			//out.println(dy);
 		}
 		
 		xPos += dx;
