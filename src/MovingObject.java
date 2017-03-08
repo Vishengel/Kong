@@ -12,7 +12,7 @@ public abstract class MovingObject extends GameObject{
 	protected boolean killOnCollision;
 	
 	protected float gravity = 2;
-	
+	protected boolean pointAwarded = true;
 	
 	
 	//represents the action that the object can take
@@ -116,5 +116,11 @@ public abstract class MovingObject extends GameObject{
 		// The player is not in collision with any other object
 		return false;
 		
+	}
+	public void setPointAwarded(){
+		pointAwarded = true;
+	}
+	public boolean pointAwarded(){
+		return pointAwarded;
 	}
 } 

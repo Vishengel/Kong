@@ -56,20 +56,32 @@ public class GameModel extends Observable implements constants {
 	
 	//main game loop
 	public void runGame(){
-		System.out.println(gravityTimes);
+		//System.out.println(gravityTimes);
 		for(int i = 0; i < MOList.size(); i++){
+				//make all moving objects act/move
 				MOList.get(i).act(gravityTimes.get(i));
-				//if player is hit, reset objects
-				if(MOList.get(0).checkMOCollision(MOList)){
+				//if player is hit, reset objects and subtract a life
+				if(mario.checkMOCollision(MOList)){
 					System.out.println("MARIO IS DEAD!!!!!");
 					MOList.clear();
 					gravityTimes.clear();
 					initMovingObjects();
+					lives--;
 				} 
 				//If object falls out of the game screen, delete it
-				if(MOList.get(i).getYPos() >= constants.SCREEN_Y){
+				else if(MOList.get(i).getYPos() >= constants.SCREEN_Y){
 					MOList.remove(i);
 					gravityTimes.remove(i);
+				}
+				
+				//If mario jumps over a barrel, increment score by 100
+				else if(MOList.get(i).getYPos() >= mario.getYPos()  && MOList.get(i).getYPos() <= mario.getYPos() + 100 && 
+					mario.getXPos() >= MOList.get(i).getXPos()	&&
+					mario.getXPos() <= MOList.get(i).getXPos()+MOList.get(i).getWidth() &&
+					!(MOList.get(i).pointAwarded)){
+					
+					MOList.get(i).setPointAwarded();
+					score += 100;
 				}
 		}
 		setChanged();
@@ -104,7 +116,7 @@ public class GameModel extends Observable implements constants {
 		int y = constants.SCREEN_Y - 50;
 		for(int i = constants.SCREEN_X /2; i < constants.SCREEN_X - 50; i = i + constants.platform_WIDTH){
 			GOList.add(new Platform(i,y,constants.platform_HEIGHT,constants.platform_WIDTH));
-			y = y - 2;
+			y = y - 1;
 		}
 		
 		//second layer
@@ -112,14 +124,14 @@ public class GameModel extends Observable implements constants {
 		y = constants.SCREEN_Y - 150;
 		for(int i = x; i > 50; i = i - constants.platform_WIDTH){
 			GOList.add(new Platform(i,y,constants.platform_HEIGHT,constants.platform_WIDTH));
-			y = y - 2;
+			y = y - 1;
 		}
 		
 		//third layer
 		y = constants.SCREEN_Y - 300;
 		for(int i = 100; i < constants.SCREEN_X - 50; i = i + constants.platform_WIDTH){
 			GOList.add(new Platform(i,y,constants.platform_HEIGHT,constants.platform_WIDTH));
-			y = y - 2;
+			y = y - 1;
 		}
 		
 		//upper layer?
@@ -127,7 +139,7 @@ public class GameModel extends Observable implements constants {
 		y = constants.SCREEN_Y - 450;
 		for(int i = x; i > 50; i = i - constants.platform_WIDTH){
 			GOList.add(new Platform(i,y,constants.platform_HEIGHT,constants.platform_WIDTH));
-			y = y - 2;
+			y = y - 1;
 		}
 		
 		
@@ -177,8 +189,12 @@ public class GameModel extends Observable implements constants {
 	public boolean isGameOver(){
 		return gameOver;
 	}
-	
-	
+	public int getLives(){
+		return lives;
+	}
+	public int getScore(){
+		return score;
+	}
 
 	
 	
