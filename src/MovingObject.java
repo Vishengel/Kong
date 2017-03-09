@@ -35,6 +35,7 @@ public abstract class MovingObject extends GameObject{
 		if(standing()){
 			dy = 0;
 		}
+	
 	}
 	
 	//each subclass of this class implements its own version of the act, movement and collision

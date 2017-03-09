@@ -14,7 +14,7 @@ public class GameModel extends Observable implements constants {
 	private ArrayList<GameObject> GOList;
 	private ArrayList<MovingObject> MOList;
 	private Player mario;
-	
+	//hoi
 	protected int spawnTime = 2;
 	protected int spawnTimer = 0;
 	
@@ -44,19 +44,19 @@ public class GameModel extends Observable implements constants {
 				if(spawnTimer == spawnTime){
 					//create new barrel
 					gravityTimes.add(0);
-					MOList.add(new Barrel(constants.BARREL_START_X,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WEIGHT, GOList, true));
+					MOList.add(new Barrel(constants.BARREL_START_X,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, GOList, true));
 					spawnTimer = 0;
 				}
 				spawnTimer++;		
 			}
 		};
-		new Timer(1000, spawner).start();
+		new Timer(500, spawner).start();
 	}
 	
 	
 	//main game loop
 	public void runGame(){
-		//System.out.println(gravityTimes);
+		System.out.println(gravityTimes.get(0));
 		for(int i = 0; i < MOList.size(); i++){
 				//make all moving objects act/move
 				MOList.get(i).act(gravityTimes.get(i));
@@ -123,7 +123,7 @@ public class GameModel extends Observable implements constants {
 		//second layer
 		int x = constants.SCREEN_X - 100;
 		y = constants.SCREEN_Y - 150;
-		for(int i = x; i > 50; i = i - constants.platform_WIDTH){
+		for(int i = x - 20; i > 35; i = i - constants.platform_WIDTH){
 			GOList.add(new Platform(i,y,constants.platform_HEIGHT,constants.platform_WIDTH));
 			y = y - 1;
 		}
@@ -141,7 +141,7 @@ public class GameModel extends Observable implements constants {
 		//upper layer?
 		x = constants.SCREEN_X - 100;
 		y = constants.SCREEN_Y - 450;
-		for(int i = x; i > 50; i = i - constants.platform_WIDTH){
+		for(int i = x - 20; i > 50; i = i - constants.platform_WIDTH){
 			GOList.add(new Platform(i,y,constants.platform_HEIGHT,constants.platform_WIDTH));
 			y = y - 1;
 		}
@@ -159,12 +159,12 @@ public class GameModel extends Observable implements constants {
 		//initialize player
 		mario = new Player(constants.PLAYER_START_X,constants.PLAYER_START_Y,constants.PLAYER_HEIGHT,constants.PLAYER_WIDTH, GOList);	
 		//add possible initial barrels or flames
-		Barrel b = new Barrel(constants.BARREL_START_X,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WEIGHT, GOList, true);
-		Barrel b2 = new Barrel(constants.BARREL_START_X + 50,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WEIGHT, GOList, true);
+		//Barrel b = new Barrel(constants.BARREL_START_X,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WEIGHT, GOList, true);
+		//Barrel b2 = new Barrel(constants.BARREL_START_X + 50,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WEIGHT, GOList, true);
 		//add objects to list of moving objects
 		MOList.add(mario);		
-		MOList.add(b);
-		MOList.add(b2);
+		//MOList.add(b);
+		//MOList.add(b2);
 		
 		//initalize the gravity timers of the moving objects
 		for(int i = 0; i < MOList.size(); i++){
