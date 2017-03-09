@@ -56,7 +56,7 @@ public class GameModel extends Observable implements constants {
 	
 	//main game loop
 	public void runGame(){
-		//System.out.println(gravityTimes);
+		System.out.println(gravityTimes.get(0));
 		for(int i = 0; i < MOList.size(); i++){
 				//make all moving objects act/move
 				MOList.get(i).act(gravityTimes.get(i));
@@ -122,7 +122,7 @@ public class GameModel extends Observable implements constants {
 		//second layer
 		int x = constants.SCREEN_X - 100;
 		y = constants.SCREEN_Y - 150;
-		for(int i = x - 20; i > 50; i = i - constants.platform_WIDTH){
+		for(int i = x - 20; i > 35; i = i - constants.platform_WIDTH){
 			GOList.add(new Platform(i,y,constants.platform_HEIGHT,constants.platform_WIDTH));
 			y = y - 1;
 		}

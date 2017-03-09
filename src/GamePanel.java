@@ -24,15 +24,14 @@ public class GamePanel extends JPanel implements Observer {
 		this.model = model;
 		this.model.addObserver(this);
 		
-		//life = ImageIO.read(new File("mario_lives.png"));
-		//barrel = ImageIO.read(new File("\\images\\barrel.png"));
+		
 	}
 	
 	 public void paintComponent(Graphics g){
 		super.paintComponent(g); 
 		
 		//draw the Konger himself
-		g.drawImage(kong, 45,120,100,100, null);
+		g.drawImage(kong, 60,120,100,100, null);
 		
         for (GameObject object : model.getGOList()){
         	if(object instanceof Platform){
