@@ -14,49 +14,38 @@ public class GameModel extends Observable implements constants {
 	private ArrayList<GameObject> GOList;
 	private ArrayList<MovingObject> MOList;
 	private Player mario;
-	//hoi
+	
 	protected int spawnTime = 2;
 	protected int spawnTimer = 0;
 	
 	public GameModel(){
 		initGame();
-		AbstractAction gravityTimer = new AbstractAction(){
-			public void actionPerformed(ActionEvent e){
-				for(int i = 0; i < MOList.size(); i++){
-					MovingObject MO = MOList.get(i);
-					if(MO.standing()){
-						gravityTimes.set(i, 0);
-						if(MO instanceof Player){
-							((Player) MOList.get(i)).setJump(false);
-						}
-						
-					}
-					else{
-						gravityTimes.set(i, (gravityTimes.get(i)) + 1) ;
-					}		
-				}						
+	}
+	
+	public void spawnBarrel(){
+		gravityTimes.add(0);
+		MOList.add(new Barrel(constants.BARREL_START_X,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, GOList, true));
+		spawnTimer = 0;
+	}
+	public void incrementTime(){
+		for(int i = 0; i < MOList.size(); i++){
+			MovingObject MO = MOList.get(i);
+			if(MO.standing()){
+				gravityTimes.set(i, 0);
+				if(MO instanceof Player){
+					((Player) MOList.get(i)).setJump(false);
+				}			
 			}
-		};
-		new Timer(150, gravityTimer).start();
-		
-		AbstractAction spawner = new AbstractAction(){
-			public void actionPerformed(ActionEvent e){
-				if(spawnTimer == spawnTime){
-					//create new barrel
-					gravityTimes.add(0);
-					MOList.add(new Barrel(constants.BARREL_START_X,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, GOList, true));
-					spawnTimer = 0;
-				}
-				spawnTimer++;		
-			}
-		};
-		new Timer(500, spawner).start();
+			else{
+				gravityTimes.set(i, (gravityTimes.get(i)) + 1) ;
+			}		
+		}	
 	}
 	
 	
 	//main game loop
 	public void runGame(){
-		System.out.println(gravityTimes.get(0));
+		//System.out.println(gravityTimes);
 		for(int i = 0; i < MOList.size(); i++){
 				//make all moving objects act/move
 				MOList.get(i).act(gravityTimes.get(i));
