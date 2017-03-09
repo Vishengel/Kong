@@ -56,7 +56,7 @@ public class GameModel extends Observable implements constants {
 	
 	//main game loop
 	public void runGame(){
-		System.out.println(gravityTimes.get(0));
+		//System.out.println(gravityTimes.get(0));
 		for(int i = 0; i < MOList.size(); i++){
 				//make all moving objects act/move
 				MOList.get(i).act(gravityTimes.get(i));
@@ -107,6 +107,11 @@ public class GameModel extends Observable implements constants {
 		//create platforms		
 		//GOList.add(new Platform(50-constants.platform_WIDTH,580-constants.platform_HEIGHT,constants.platform_HEIGHT,constants.platform_WIDTH));
 		
+		//GOList.add(new Ladder(500,constants.SCREEN_Y - 172,11*constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
+		for(int i = 0; i < 8*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
+			GOList.add(new Ladder(500,612-i,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
+		}
+		
 		//bottom layer first half
 		for(int i = 0; i < constants.SCREEN_X /2; i = i + constants.platform_WIDTH){
 			GOList.add(new Platform(50 + i,constants.SCREEN_Y - 50,constants.platform_HEIGHT,constants.platform_WIDTH));
@@ -127,9 +132,6 @@ public class GameModel extends Observable implements constants {
 			GOList.add(new Platform(i,y,constants.platform_HEIGHT,constants.platform_WIDTH));
 			y = y - 1;
 		}
-		
-		GOList.add(new Ladder(500,constants.SCREEN_Y - 172,11*constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
-		
 		
 		//third layer
 		y = constants.SCREEN_Y - 300;

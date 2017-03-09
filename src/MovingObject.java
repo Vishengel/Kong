@@ -29,13 +29,12 @@ public abstract class MovingObject extends GameObject{
 	}
 	
 	public void act(int time){
-		
 		dy = gravity * time;
-		
+		/*
 		if(standing()){
 			dy = 0;
 		}
-	
+		*/
 	}
 	
 	//each subclass of this class implements its own version of the act, movement and collision

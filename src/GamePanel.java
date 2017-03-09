@@ -16,6 +16,7 @@ public class GamePanel extends JPanel implements Observer {
 	Image kong = new ImageIcon(getClass().getResource("images/konky_dong.gif")).getImage();
 	Image barrel = new ImageIcon(getClass().getResource("images/barrel.png")).getImage();
 	Image platform = new ImageIcon(getClass().getResource("images/platform.png")).getImage();
+	Image ladder = new ImageIcon(getClass().getResource("images/ladder.png")).getImage();
 	
 	public GamePanel(GameModel model) throws IOException {
 		setOpaque(true);
@@ -36,9 +37,13 @@ public class GamePanel extends JPanel implements Observer {
         for (GameObject object : model.getGOList()){
         	if(object instanceof Platform){
         		g.drawImage(platform,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
+    		}
+        	
+        	if(object instanceof Ladder) {
+        		g.drawImage(ladder,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
+        	}
         		//g.setColor(object.getColor());
         		//g.fillRect((int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight());
-        	}
         }
         g.setColor(Color.WHITE);
         g.drawString("Score: " + model.getScore(), 500, 50); 

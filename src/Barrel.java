@@ -12,7 +12,7 @@ public class Barrel extends MovingObject{
 		symbol = 'O';
 		killOnCollision = false;
 		direction = true;
-		xVel = 6;
+		xVel = 4;
 		color = color.orange;
 		pointAwarded = false;
 		
@@ -20,6 +20,8 @@ public class Barrel extends MovingObject{
 	
 	public void act(int time) {
 		super.act(time);
+		
+		dy = gravity * time;
 		
 		//if falling for longer than 2 time units, change direction
 		if(distanceFallen > 50 && standing()){

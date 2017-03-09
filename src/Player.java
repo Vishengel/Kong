@@ -30,8 +30,7 @@ public class Player extends MovingObject{
 	public void act(int time){
 		dx = 0;
 		dy = 0;
-		
-		
+			
 		//call the super act function for gravity and standing on platform
 		super.act(time);
 		readInput();
@@ -41,9 +40,9 @@ public class Player extends MovingObject{
 		// already jumping, start jumping
 		if(jump && !jumping && standing()){
 			jumping = true;	
-			System.out.println("Before jump:" + yPos);
+			//System.out.println("Before jump:" + yPos);
 			dy += -jumpHeight;
-			System.out.println("After jump:" + (yPos + dy) );
+			//System.out.println("After jump:" + (yPos + dy) );
 		}
 		if((collidingWith instanceof Ladder) ) {
 			isClimbing = true;
@@ -75,13 +74,14 @@ public class Player extends MovingObject{
 			// If the movement on the x-axis would result in a collision, we do not move
 			xPos -= dx;
 		}
-		
 		// Next, we try to move on the y-axis
 		yPos += dy;
 		
 		if(checkWallCollisions(GOList) && collidingWith.isSolid()) {
 			// If the movement on the y-axis would result in a collision, we do not move
+			System.out.println(yPos);
 			yPos -= dy;
+			System.out.println(yPos);
 		}
 		
 	}
