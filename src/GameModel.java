@@ -14,7 +14,7 @@ public class GameModel extends Observable implements constants {
 	private ArrayList<GameObject> GOList;
 	private ArrayList<MovingObject> MOList;
 	private Player mario;
-	
+	//hoi
 	protected int spawnTime = 2;
 	protected int spawnTimer = 0;
 	
