@@ -10,8 +10,9 @@ public abstract class MovingObject extends GameObject{
 	//This value is true if the moving object is colliding with another object
 	protected boolean hasCollision = false;
 	protected boolean killOnCollision;
+	protected boolean isClimbing = false;
 	
-	protected GameObject collidingWith;
+	protected GameObject collidingWithLadder;
 	
 	protected float gravity = 2;
 	protected boolean pointAwarded = true;
@@ -29,12 +30,9 @@ public abstract class MovingObject extends GameObject{
 	}
 	
 	public void act(int time){
-		dy = gravity * time;
-		/*
-		if(standing()){
-			dy = 0;
+		if (!standing() && !isClimbing) {
+			dy = gravity * time;
 		}
-		*/
 	}
 	
 	//each subclass of this class implements its own version of the act, movement and collision
@@ -64,7 +62,10 @@ public abstract class MovingObject extends GameObject{
 	}
 	//check if object is standing on a platform
 	public boolean standing(){
-		for(GameObject GO :GOList){
+		for(GameObject GO : GOList){
+			if (!(GO instanceof Platform)) {
+				continue;
+			}
 			float l1 = xPos, r1 = xPos+width, t1 = yPos, b1 = yPos+height;
 			float l2 = GO.xPos, r2 = GO.xPos+GO.width, t2 = GO.yPos, b2 = GO.yPos+GO.height;
 			if((b1 <= b2 && b1 >= t2) && r1 > l2 && l1 < r2 && GO.isSolid()){ 
@@ -95,13 +96,16 @@ public abstract class MovingObject extends GameObject{
 			//System.out.println(b1);
 			//System.out.println(b2);
 			if (!(l1>=r2 || l2>=r1 || t1>=b2 || t2>=b1) && t2 < b1 && b1 > b2) {
-				collidingWith = GO;
+				if (GO instanceof Ladder) {
+					collidingWithLadder = GO;
+				}
 				//System.out.println("Collision");
 				return true;
 			}
 		}	
-		// The player is not in collision with any other object
-		collidingWith = null;
+		// The player is not in collision with a ladder
+		collidingWithLadder = null;
+		
 		return false;
 	}
 	

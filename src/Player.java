@@ -7,7 +7,7 @@ import javax.swing.Timer;
 
 public class Player extends MovingObject{
 
-	private boolean hasPowerUp = false, isClimbing = false, goLeft, goRight, goUp, goDown, jump;
+	private boolean hasPowerUp = false, goLeft, goRight, goUp, goDown, jump;
 	private boolean keysDown[] = new boolean[255];	 
 	private boolean jumping;
 	private float jumpHeight = 3.6f;
@@ -18,7 +18,7 @@ public class Player extends MovingObject{
 		super(x, y, h, w, GOList);
 
 		xVel = 5f;
-		yVel = 0;
+		yVel = 5f;
 
 		killOnCollision = false;
 		color = Color.blue;
@@ -44,18 +44,31 @@ public class Player extends MovingObject{
 			dy += -jumpHeight;
 			//System.out.println("After jump:" + (yPos + dy) );
 		}
-		if((collidingWith instanceof Ladder) ) {
+		
+		if (standing()) {
+			isClimbing = false;
+		}
+		
+		if((collidingWithLadder != null) ) {
+			if (goUp && (collidingWithLadder.getYPos() < yPos + height )) {
+				//System.out.println("Can go up");
+			}
+			if (goDown && (collidingWithLadder.getYPos() > yPos + height )) {
+				//System.out.println("Can go down");
+			}
 			isClimbing = true;
 			System.out.println(isClimbing);
 		} 
 		
+		
 		dx += (goRight ? xVel : 0) - (goLeft ? xVel : 0);
 		
-		/*
+		
 		if (isClimbing) {
+			System.out.println(isClimbing);
 			dy += (goDown ? yVel : 0) - (goUp ? yVel : 0);
 		}
-		
+		/*
 		//The player can only jump while not climbing a ladder and while standing on an object
 		if (!isClimbing && isStanding) {
 			// Temporary: only moves up
@@ -70,14 +83,14 @@ public class Player extends MovingObject{
 		
 		xPos += dx;
 		
-		if(checkWallCollisions(GOList) && collidingWith.isSolid()) {
+		if(checkWallCollisions(GOList) && collidingWithLadder == null) {
 			// If the movement on the x-axis would result in a collision, we do not move
 			xPos -= dx;
 		}
 		// Next, we try to move on the y-axis
 		yPos += dy;
 		
-		if(checkWallCollisions(GOList) && collidingWith.isSolid()) {
+		if(checkWallCollisions(GOList) && collidingWithLadder == null) {
 			// If the movement on the y-axis would result in a collision, we do not move
 			System.out.println(yPos);
 			yPos -= dy;
