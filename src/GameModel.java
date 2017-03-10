@@ -14,9 +14,11 @@ public class GameModel extends Observable implements constants {
 	private ArrayList<GameObject> GOList;
 	private ArrayList<MovingObject> MOList;
 	private Player mario;
-	
+	private int timer = 0;
 	protected int spawnTime = 2;
 	protected int spawnTimer = 0;
+	
+	
 	
 	public GameModel(){
 		initGame();
@@ -44,14 +46,29 @@ public class GameModel extends Observable implements constants {
 	
 	
 	//main game loop
-	public void runGame(){
+	public void runGame() throws InterruptedException{
+		while(true){
+		timer++;
+		//handle gravity every 150 milliseconds
+		if(timer % 10 == 0){
+			incrementTime();	
+		}
+		//spawn a barrel every 450 milliseconds
+		if(timer % 30 == 0){
+			spawnBarrel();
+		} 
+		//reset timer eventually, to avoid overflow
+		if(timer > 1500){
+			timer = 0;
+		}
+		//System.out.println(timer);
 		//System.out.println(gravityTimes);
 		for(int i = 0; i < MOList.size(); i++){
 				//make all moving objects act/move
 				MOList.get(i).act(gravityTimes.get(i));
 				//if player is hit, reset objects and subtract a life
 				if(mario.checkMOCollision(MOList)){
-					System.out.println("MARIO IS DEAD!!!!!");
+					//System.out.println("MARIO IS DEAD!!!!!");
 					MOList.clear();
 					gravityTimes.clear();
 					initMovingObjects();
@@ -73,11 +90,14 @@ public class GameModel extends Observable implements constants {
 					score += 100;
 				}
 		}
-		setChanged();
-		notifyObservers();
+		Thread.sleep(15);
+	}
+		//setChanged();
+		//notifyObservers();
 	
 		//stopping condition
 		//gameOver = true; 
+		
 	}	
 	
 	//This function is called at the start of the game and runs the entire model

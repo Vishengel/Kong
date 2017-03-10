@@ -8,7 +8,7 @@ import java.io.IOException;
 public class GameView extends JFrame {
 	//temporary 2D array that shows the game world with ASCII characters
 	private char[][] gameWorld;
-	private GamePanel gamePanel;
+	 GamePanel gamePanel;
 	//private int worldWidth = 50;
 	//private int worldHeight = 50;
 	
