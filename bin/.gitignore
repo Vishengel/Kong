@@ -1,4 +1,26 @@
-/GamePanel.class
-/GameController$InputController.class
-/InputController.class
+/Barrel.class
+/Flame.class
 /GameController$1.class
+<<<<<<< HEAD
+/GameController$InputController.class
+/GameController.class
+/GameModel.class
+/GameObject.class
+/GamePanel.class
+=======
+/Player$1.class
+>>>>>>> branch 'jelle' of https://github.com/Vishengel/Kong.git
+/GameModel$1.class
+/GameModel$2.class
+/mario_lives.png
+/konky_dong.gif
+/barrel.png
+/Copy of barrel.png
+/images/
+/GameModel$3.class
+<<<<<<< HEAD
+/Peach.class
+=======
+/GameController$2.class
+/InputController.class
+>>>>>>> refs/heads/paul

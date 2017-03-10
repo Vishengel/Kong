@@ -1,6 +1,7 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 import java.util.Scanner;
 
 import javax.swing.AbstractAction;
@@ -9,25 +10,44 @@ import javax.swing.Timer;
 
 
 public class GameController {
+	
 	private GameModel model;
 	private GameView  view;
 	//for use input
 	private Scanner reader;
 	private InputController inputController = new InputController();
-	
-	public void start(){
+	//private int timer = 0;
+	private Thread thread;
+	public void start() throws IOException{
 		//create game model and view
 		model = new GameModel();
+		
 		view = new GameView(model);
 		reader = new Scanner(System.in);
 		
 		view.drawView(model.getGOList(), model.getMOList());
 		view.addKeyListener(inputController);
 		
+		//make a thread that controls game model logic
+		thread = new Thread(){
+		    public void run(){	
+		      try {
+				model.runGame();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}    
+		    }
+		  };
+		  
+		thread.start();
+		
+		
+		
 		AbstractAction FPSTimer = new AbstractAction(){
 			public void actionPerformed(ActionEvent e){
-				model.runGame();
-			}
+				view.gamePanel.repaint();					
+			}			
 		};
 		new Timer(15, FPSTimer).start();
 		//view.add(view.getGamePanel());
@@ -61,35 +81,12 @@ public class GameController {
 			down[e.getKeyCode()] = true;
 			pressed[e.getKeyCode()] = true;
 			model.passKeysDownToPlayer(down);
-			
-			/*
-			if(e.getKeyChar() == 'a') {
-				 System.out.println("A pressed");
-				 model.setPlayerAction(1);
-				 
-	         }
-			if(e.getKeyChar() == 'd') {
-				 System.out.println("D pressed");
-				 model.setPlayerAction(2);
-	         }
-			*/
 		}
 
 		@Override
 		public void keyReleased(KeyEvent e) {
 			down[e.getKeyCode()]=false;
 			model.passKeysDownToPlayer(down);
-			/*
-			if(e.getKeyChar() == 'a') {
-				 System.out.println("A pressed");
-				 model.setPlayerAction(4);
-				 
-	         }
-			if(e.getKeyChar() == 'd') {
-				 System.out.println("D pressed");
-				 model.setPlayerAction(4);
-	         }
-	         */
 		}
 
 		@Override

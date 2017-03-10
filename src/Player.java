@@ -1,82 +1,110 @@
 import java.awt.Color;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 
+import javax.swing.AbstractAction;
+import javax.swing.Timer;
+
 public class Player extends MovingObject{
-	private boolean hasPowerUp = false, isClimbing = false, goLeft, goRight, goUp, goDown, jump;
-	private boolean keysDown[] = new boolean[255];	
+
+	private boolean hasPowerUp = false, goLeft, goRight, goUp, goDown, jump;
+	private boolean keysDown[] = new boolean[255];	 
+	private boolean jumping;
+	private float jumpHeight = 3.6f;
+	private boolean hasWon = false;
+	private boolean isKilled = false;
+
     
 	public Player(int x, int y, int h, int w, ArrayList<GameObject> GOList) {
 		super(x, y, h, w, GOList);
-		xVel = 5;
-		yVel = -5;
+
+		xVel = 5f;
+		yVel = 5f;
+
 		killOnCollision = false;
 		color = Color.blue;
 		action = -1;
+		symbol = 'x';
+		
 	}
 	
-	public void act(){
-		// There are two control schemes: WASD + shift and arrows + space bar
-		goLeft = keysDown[65] || keysDown[37];
-		goRight = keysDown[68] || keysDown[39];
-		//goUp and goDown will be implemented once ladders have been implemented as well
-		goUp = keysDown[87] || keysDown[38];
-		goDown = keysDown[83] || keysDown[40];
-		jump = keysDown[16] || keysDown[32];
-				
+	public void act(int time){
 		dx = 0;
 		dy = 0;
 		
-		dx += (goRight ? xVel : 0.0) - (goLeft ? xVel : 0.0);
+		//call the super act function for gravity and standing on platform
+		super.act(time);
+		readInput();
 		
-		if (!isClimbing) {
-			// Temporary: only moves up
-			dy += (jump ? yVel : 0.0);
+		
+		//if the jump key is down and the player is currently standing on a platform and not
+		// already jumping, start jumping
+		if(jump && !jumping && standing()){
+			jumping = true;	
+		}
+		
+		if (standing() || collidingWithLadder == null) {
+			isClimbing = false;
+		}
+		
+		if((collidingWithLadder != null) ) {
+			if (goUp && (collidingWithLadder.getYPos() < yPos + height )) {
+				//System.out.println("Can go up");
+			}
+			if (goDown && (collidingWithLadder.getYPos() > yPos + height )) {
+				//System.out.println("Can go down");
+			}
+			isClimbing = true;
+			System.out.println(isClimbing);
 		} 
 		
-		/*
+		
+		dx += (goRight ? xVel : 0) - (goLeft ? xVel : 0);
 		
 		
-		// 1: move right  0: move left 
-		switch(action){
-		case 1:
-			dx = -xVel;
-			break;
-		case 2:
-			dx = xVel;
-			break;
-		case 3:
-			dy = yVel;
-		case 4:
-			break;
+		if (isClimbing) {
+			System.out.println(isClimbing);
+			dy += (goDown ? yVel : 0) - (goUp ? yVel : 0);
 		}
-		*/
+
+		//apply vertical force if jumping
+		if(jumping){ 
+			dy += -jumpHeight;
+			//out.println(dy);
+		}
+		
 		xPos += dx;
+		
+		if(checkWallCollisions(GOList) && collidingWithLadder == null) {
+			// If the movement on the x-axis would result in a collision, we do not move
+			xPos -= dx;
+		}
+		// Next, we try to move on the y-axis
 		yPos += dy;
 		
-		// If the next move would make the player collide with any other object,
-		// do not make the move
-		if(checkCollisions(GOList)) {
-			xPos -= dx;
+		if(checkWallCollisions(GOList) && collidingWithLadder == null) {
+			// If the movement on the y-axis would result in a collision, we do not move
+			System.out.println(yPos);
 			yPos -= dy;
+			System.out.println(yPos);
 		}
+		
+		//If Mario is in collision with Peach, the game is over
+		if (collidingWithPeach) {
+			hasWon = true;
+		}
+		
 	}
 	
-	public boolean checkCollisions(ArrayList<GameObject> GOList) {
-		for(GameObject GO : GOList) {
-			// Store the left side, right side, top and bottom coordinates of the player
-			int l1 = xPos, r1 = xPos+width, t1 = yPos, b1 = yPos+height;
-			// Store the left side, right side, top and bottom coordinates of the other object
-			// Only works for two rectangular objects
-			int l2 = GO.xPos, r2 = GO.xPos+GO.width, t2 = GO.yPos, b2 = GO.yPos+GO.height;
-			if (!(l1>=r2 || l2>=r1 || t1>=b2 || t2>=b1)) {
-				System.out.println("Collision");
-				return true;
-			} else {
-				System.out.println("No collision");
-			}
-		}
-		// The player is not in collision with any other object
-		return false;
+	
+	
+	public void readInput() {
+		// There are two control schemes: WASD + shift and arrows + space bar
+		goLeft = keysDown[65] || keysDown[37];
+		goRight = keysDown[68] || keysDown[39];
+		goUp = keysDown[87] || keysDown[38];
+		goDown = keysDown[83] || keysDown[40];
+		jump = keysDown[16] || keysDown[32];
 	}
 	
 	public void setKeysDown(boolean[] down) {
@@ -102,4 +130,16 @@ public class Player extends MovingObject{
 	public boolean jump() {
 		return jump;
 	}
+	public void setJump(boolean b){
+		jumping = b;
+	}
+	
+	public boolean hasWon(){
+		return hasWon;
+	}
+	
+	public boolean isKilled(){
+		return isKilled;
+	}
+	
 }

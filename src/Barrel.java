@@ -4,16 +4,55 @@ public class Barrel extends MovingObject{
 	//false : left   true : right
 	private boolean direction;
 	private boolean moveDownLadder;
+	//keep track of the distance fallen in order to change direction 
+	private int distanceFallen = 0;
 	
 	public Barrel(int x, int y, int h, int w, ArrayList<GameObject> GOList, boolean d) {
 		super(x, y, h, w, GOList);
 		symbol = 'O';
-		killOnCollision = true;
-		direction = d;
+		killOnCollision = false;
+		direction = true;
+		xVel = 4;
+		color = color.orange;
+		pointAwarded = false;
+		
 	}
 	
-	public void act() {
+	public void act(int time) {
+		super.act(time);
 		
+		dy = gravity * time;
+		
+		//if falling for longer than 2 time units, change direction
+		if(distanceFallen > 50 && standing()){
+			direction = !direction;
+			//System.out.println(direction);
+			}
+		//System.out.println(distanceFallen);
+		
+		if(standing()){
+			//reset distance fallen
+			distanceFallen = 0;
+			
+			if(direction){
+				dx = xVel;
+			}
+			else{
+				dx = -xVel;
+			}
+		}
+		else{
+			//Only let a barrel pause in its horizontal movement if it falls a long distance
+			if(distanceFallen > 0){
+				dx = 0f;
+			}
+		}
+		
+		
+		
+		xPos += dx;
+		yPos += dy;
+		distanceFallen += dy;
 	}
 	
 	public boolean checkCollisions(ArrayList<GameObject> GOList) {
@@ -39,5 +78,6 @@ public class Barrel extends MovingObject{
 	public boolean jump() {
 		return false;
 	}
+	
 
 }

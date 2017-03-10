@@ -1,16 +1,19 @@
 import java.util.ArrayList;
+
 import javax.swing.*;
+
 import java.awt.*;
+import java.io.IOException;
 
 public class GameView extends JFrame {
 	//temporary 2D array that shows the game world with ASCII characters
 	private char[][] gameWorld;
-	private GamePanel gamePanel;
+	 GamePanel gamePanel;
 	//private int worldWidth = 50;
 	//private int worldHeight = 50;
 	
 	//draw a temporary view for debugging and being able to see what's going on
-	public GameView(GameModel model, int width, int height){
+	public GameView(GameModel model, int width, int height) throws IOException{
 		//init game world array
 		/*
 			gameWorld = new char[worldWidth][worldHeight];
@@ -26,6 +29,7 @@ public class GameView extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
         setSize(width,height);
+        setResizable(false);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
          
@@ -34,18 +38,18 @@ public class GameView extends JFrame {
         add(gamePanel);
 	}
 	
-	public GameView(GameModel model) {
-		this(model, 640, 680);
+	public GameView(GameModel model) throws IOException {
+		this(model, constants.SCREEN_X, constants.SCREEN_Y);
 	}
 	// Not used anymore
 	public void drawView(ArrayList<GameObject> GOList, ArrayList<MovingObject> MOList) {
 		//initView();
 		//draw each game object
 		for(GameObject go : GOList){
-			int x = go.getXPos();
-			int y = go.getYPos();
-			int height = go.getHeight();
-			int width = go.getWidth();
+			float x = go.getXPos();
+			float y = go.getYPos();
+			float height = go.getHeight();
+			float width = go.getWidth();
 			/*
 			for(int i = y; i < y + height; i++){
 				for(int j = x; j < x + width; j++){
@@ -56,10 +60,10 @@ public class GameView extends JFrame {
 		} 
 		//draw each moving object			
 		for(MovingObject mo : MOList){
-			int x = mo.getXPos();
-			int y = mo.getYPos();
-			int height = mo.getHeight();
-			int width = mo.getWidth();
+			float x = mo.getXPos();
+			float y = mo.getYPos();
+			float height = mo.getHeight();
+			float width = mo.getWidth();
 			/*
 			for(int i = y; i < y + height; i++){
 				for(int j = x; j < x + width; j++){
