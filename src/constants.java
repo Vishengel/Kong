@@ -1,6 +1,6 @@
 
 public interface constants {
-	
+
 	//game logic constants
 	int MAX_EPOCHS = 1000000;
 	

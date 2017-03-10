@@ -6,6 +6,7 @@ public class Ladder extends GameObject{
 		super(x, y, h, w);
 		color = Color.cyan;
 		isSolid = false;
+		name = "ladder";
 	}
 
 }
