@@ -15,6 +15,7 @@ public class GameController {
 	//for use input
 	private Scanner reader;
 	private InputController inputController = new InputController();
+	private int timer = 0;
 	
 	public void start() throws IOException{
 		//create game model and view
@@ -28,7 +29,23 @@ public class GameController {
 		AbstractAction FPSTimer = new AbstractAction(){
 			public void actionPerformed(ActionEvent e){
 				model.runGame();
-			}
+				
+				timer++;
+				//handle gravity every 150 milliseconds
+				if(timer % 10 == 0){
+					model.incrementTime();	
+				}
+				//spawn a barrel every 450 milliseconds
+				if(timer % 30 == 0){
+					model.spawnBarrel();
+				} 
+				//reset timer eventually, to avoid overflow
+				if(timer > 1500){
+					timer = 0;
+				}
+				//System.out.println(timer);
+				
+			}			
 		};
 		new Timer(15, FPSTimer).start();
 		//view.add(view.getGamePanel());
