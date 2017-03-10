@@ -13,7 +13,7 @@ public class Player extends MovingObject{
 	private float jumpHeight = 3.6f;
 	private boolean hasWon = false;
 	private boolean isKilled = false;
-
+	
     
 	public Player(int x, int y, int h, int w, ArrayList<GameObject> GOList) {
 		super(x, y, h, w, GOList);
@@ -26,12 +26,14 @@ public class Player extends MovingObject{
 		action = -1;
 		symbol = 'x';
 		
+		name = "player";
 	}
 	
 	public void act(int time){
 		dx = 0;
 		dy = 0;
-		
+		System.out.println("Standing on Ladder:" + isClimbing);
+		System.out.println("Standing on platform: " + standing);
 		//call the super act function for gravity and standing on platform
 		super.act(time);
 		readInput();
@@ -39,32 +41,17 @@ public class Player extends MovingObject{
 		
 		//if the jump key is down and the player is currently standing on a platform and not
 		// already jumping, start jumping
-		if(jump && !jumping && standing()){
+		if(jump && !jumping && standing){
 			jumping = true;	
 		}
 		
-		if (standing() || collidingWithLadder == null) {
-			isClimbing = false;
-		}
-		
-		if((collidingWithLadder != null) ) {
-			if (goUp && (collidingWithLadder.getYPos() < yPos + height )) {
-				//System.out.println("Can go up");
-			}
-			if (goDown && (collidingWithLadder.getYPos() > yPos + height )) {
-				//System.out.println("Can go down");
-			}
-			isClimbing = true;
-			System.out.println(isClimbing);
-		} 
 		
 		
 		dx += (goRight ? xVel : 0) - (goLeft ? xVel : 0);
 		
 		
 		if (isClimbing) {
-			System.out.println(isClimbing);
-			dy += (goDown ? yVel : 0) - (goUp ? yVel : 0);
+			dy += (goDown ? yVel/2 : 0) - (goUp ? yVel/2 : 0);
 		}
 
 		//apply vertical force if jumping
@@ -74,20 +61,8 @@ public class Player extends MovingObject{
 		}
 		
 		xPos += dx;
-		
-		if(checkWallCollisions(GOList) && collidingWithLadder == null) {
-			// If the movement on the x-axis would result in a collision, we do not move
-			xPos -= dx;
-		}
-		// Next, we try to move on the y-axis
 		yPos += dy;
-		
-		if(checkWallCollisions(GOList) && collidingWithLadder == null) {
-			// If the movement on the y-axis would result in a collision, we do not move
-			System.out.println(yPos);
-			yPos -= dy;
-			System.out.println(yPos);
-		}
+			
 		
 		//If Mario is in collision with Peach, the game is over
 		if (collidingWithPeach) {

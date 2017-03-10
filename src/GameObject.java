@@ -10,7 +10,7 @@ public abstract class GameObject {
 	//The color of the object
 	protected Color color;
 	protected boolean isSolid;
-	
+	protected String name;
 	public GameObject(int x, int y, int h, int w){
 		xPos = x;
 		yPos = y;
@@ -47,5 +47,8 @@ public abstract class GameObject {
 	
 	public boolean isSolid(){
 		return isSolid;
+	}
+	public String getName(){
+		return name;
 	}
 }

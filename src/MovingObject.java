@@ -12,12 +12,12 @@ public abstract class MovingObject extends GameObject{
 	protected boolean killOnCollision;
 	protected boolean isClimbing = false;
 	protected boolean collidingWithPeach = false;
-	
+	protected boolean standing = false;
 	protected GameObject collidingWithLadder;
 	
 	protected float gravity = 2;
 	protected boolean pointAwarded = true;
-	
+	protected boolean isKilled = false;
 	
 	//represents the action that the object can take
 	protected int action;
@@ -31,12 +31,12 @@ public abstract class MovingObject extends GameObject{
 	}
 	
 	public void act(int time){
-		if (standing()) {
+		//If standing on a platform or climbing, don't fall
+		if (standing || isClimbing) {
 			dy = 0;
 		}
-		if (!isClimbing) {
-			dy += gravity * time;
-		}
+		dy += gravity * time;
+		
 	}
 	
 	//each subclass of this class implements its own version of the act, movement and collision
@@ -64,8 +64,12 @@ public abstract class MovingObject extends GameObject{
 	public void setAction(int a){
 		action = a;
 	}
+	
+	
+	
+	
 	//check if object is standing on a platform
-	public boolean standing(){
+	/*public boolean standing(){
 		for(GameObject GO : GOList){
 			if (!(GO instanceof Platform)) {
 				continue;
@@ -75,6 +79,7 @@ public abstract class MovingObject extends GameObject{
 			if((b1 <= b2 && b1 >= t2) && r1 > l2 && l1 < r2 && GO.isSolid()){ 
 				//make object stand exactly on top of the platform 
 				yPos = t2 - height;
+				standing = true;
 				//System.out.println("Standing on platform!");
 				
 				return true;
@@ -86,9 +91,9 @@ public abstract class MovingObject extends GameObject{
 		return false;
 		
 	}
+	*/
 	
-	
-	
+	/*
 	public boolean checkWallCollisions(ArrayList<GameObject> GOList) {
 		for(GameObject GO : GOList) {
 			// Store the left side, right side, top and bottom coordinates of the player
@@ -116,8 +121,9 @@ public abstract class MovingObject extends GameObject{
 		
 		return false;
 	}
+	*/
 	
-	public boolean checkMOCollision(ArrayList<MovingObject> MOList) {
+	/*public boolean checkMOCollision(ArrayList<MovingObject> MOList) {
 		for(int i = 1; i < MOList.size(); i++) {
 			MovingObject MO = MOList.get(i);
 			// Store the left side, right side, top and bottom coordinates of the player
@@ -136,6 +142,7 @@ public abstract class MovingObject extends GameObject{
 		return false;
 		
 	}
+	*/
 	public void setPointAwarded(){
 		pointAwarded = true;
 	}

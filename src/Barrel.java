@@ -15,7 +15,7 @@ public class Barrel extends MovingObject{
 		xVel = 2;
 		color = color.orange;
 		pointAwarded = false;
-		
+		name = "player";
 	}
 	
 	public void act(int time) {
@@ -24,13 +24,13 @@ public class Barrel extends MovingObject{
 		dy = gravity * time;
 		
 		//if falling for longer than 2 time units, change direction
-		if(distanceFallen > 50 && standing()){
+		if(distanceFallen > 50 && standing){
 			direction = !direction;
 			//System.out.println(direction);
 			}
 		//System.out.println(distanceFallen);
 		
-		if(standing()){
+		if(standing){
 			//reset distance fallen
 			distanceFallen = 0;
 			

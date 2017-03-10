@@ -6,6 +6,7 @@ public class Platform extends GameObject{
 		super(x, y, h, w);
 		color = Color.red;
 		isSolid = true;
+		name = "platform";
 	}
 
 }

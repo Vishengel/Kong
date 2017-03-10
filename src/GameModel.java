@@ -35,7 +35,7 @@ public class GameModel extends Observable implements constants {
 	public void incrementTime(){
 		for(int i = 0; i < MOList.size(); i++){
 			MovingObject MO = MOList.get(i);
-			if(MO.standing()){
+			if(MO.standing || MO.isClimbing){
 				gravityTimes.set(i, 0);
 				if(MO instanceof Player){
 					((Player) MOList.get(i)).setJump(false);
@@ -61,7 +61,7 @@ public class GameModel extends Observable implements constants {
 			}
 			//spawn a barrel every 450 milliseconds
 			if(timer % barrelSpawnTime == 0){
-				spawnBarrel();
+				//spawnBarrel();
 			} 
 			//reset timer eventually, to avoid overflow
 			if(timer > 1500){
@@ -69,9 +69,13 @@ public class GameModel extends Observable implements constants {
 			}
 			//System.out.println(timer);
 			//System.out.println(gravityTimes);
+			
 			for(int i = 0; i < MOList.size(); i++){
 					//make all moving objects act/move
 					MOList.get(i).act(gravityTimes.get(i));
+					//check collisions and update moving object states
+					MovingObject MO = checkCollisions(MOList.get(i));
+					MOList.set(i, MO); 
 					if(mario.hasWon()) {
 						MOList.clear();
 						gravityTimes.clear();
@@ -79,13 +83,14 @@ public class GameModel extends Observable implements constants {
 						score+=1000;
 					}
 					//if player is hit, reset objects and subtract a life
-					if(mario.checkMOCollision(MOList)){
+					if(MOList.get(0).isKilled){
 						//System.out.println("MARIO IS DEAD!!!!!");
 						MOList.clear();
 						gravityTimes.clear();
 						initMovingObjects();
 						lives--;
 					} 
+					
 					//If object falls out of the game screen, delete it
 					else if(MOList.get(i).getYPos() >= constants.SCREEN_Y){
 						MOList.remove(i);
@@ -120,7 +125,70 @@ public class GameModel extends Observable implements constants {
 		initMovingObjects();
 		
 	}
-
+	
+	public boolean isColliding(GameObject o1, GameObject o2){
+		float l1 = o1.getXPos(), r1 = l1+o1.getWidth(), t1 = o1.getYPos(), b1 = t1+o1.getHeight();
+		float l2 = o2.xPos, r2 = o2.xPos+o2.width, t2 = o2.yPos, b2 = o2.yPos+o2.height;
+		if(b1 <= b2 && b1 >= t2 && r1 > l2 && l1 < r2){
+			return true;
+		}
+		return false;
+	}
+	
+	//check collisions of moving objects with other objects such as platforms 
+	public MovingObject checkCollisions(MovingObject MO){
+		//For every moving object, check if it is standing on a platform
+		MO.standing = false;
+		MO.isClimbing = false;
+		
+		for(GameObject GO : GOList){
+			boolean isColliding = isColliding(MO,GO);
+			
+			//check climbing
+			if(!MO.isClimbing){
+				if(GO.getName() == "ladder" && isColliding){
+					MO.isClimbing = true;
+					break;
+				}
+				if(GO.getName() == "ladder" && !isColliding){
+					MO.isClimbing = false;
+				}
+			}
+			//check standing
+			if(!MO.standing){
+				if(GO.getName() == "platform" && isColliding){ 
+					//make object stand exactly on top of the platform 
+					MO.standing = true;
+					//make object stand exactly on top of the platform, unless climbing on ladder
+					if(!MO.isClimbing){
+						MO.setYPos(GO.getYPos() - MO.getHeight());
+					}
+					//System.out.println("Standing on platform!");
+									
+				}
+				
+				if(GO.getName() == "platform" && !isColliding){		
+					MO.standing = false;
+					//System.out.println("Not standing..");
+				}
+			}
+			
+			
+		}	
+		if(MO.isClimbing){
+			MO.standing = false;
+		}
+		
+		//check if moving objects touch each other, but make sure an object isn't checked with itself
+		for(MovingObject MO2 : MOList){
+			if(MO != MO2 && isColliding(MO,MO2)){
+				MO.isKilled = true;						
+			}
+		}
+		return MO;
+	} 
+		
+	
 	private void initObjects() {
 		//initialize list
 		GOList = new ArrayList<GameObject>();
