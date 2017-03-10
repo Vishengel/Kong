@@ -13,7 +13,9 @@ public class GamePanel extends JPanel implements Observer {
 	private GameModel model;
 	//BufferedImage life;
 	//BufferedImage barrel;
+	Image mario = new ImageIcon(getClass().getResource("images/mario.png")).getImage();
 	Image kong = new ImageIcon(getClass().getResource("images/konky_dong.gif")).getImage();
+	Image peach = new ImageIcon(getClass().getResource("images/peach.png")).getImage();
 	Image barrel = new ImageIcon(getClass().getResource("images/barrel.png")).getImage();
 	Image platform = new ImageIcon(getClass().getResource("images/platform.png")).getImage();
 	Image ladder = new ImageIcon(getClass().getResource("images/ladder.png")).getImage();
@@ -30,7 +32,7 @@ public class GamePanel extends JPanel implements Observer {
 	
 	 public void paintComponent(Graphics g){
 		super.paintComponent(g); 
-		
+				
 		//draw the Konger himself
 		g.drawImage(kong, 60,120,100,100, null);
 		
@@ -42,8 +44,11 @@ public class GamePanel extends JPanel implements Observer {
         	if(object instanceof Ladder) {
         		g.drawImage(ladder,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
         	}
-        		//g.setColor(object.getColor());
-        		//g.fillRect((int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight());
+        	
+        	if(object instanceof Peach) {
+        		g.drawImage(peach,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
+        	}
+     
         }
         g.setColor(Color.WHITE);
         g.drawString("Score: " + model.getScore(), 500, 50); 
@@ -54,8 +59,7 @@ public class GamePanel extends JPanel implements Observer {
         		g.drawImage(barrel,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
         	}
             if(object instanceof Player){
-            	g.setColor(object.getColor());
-            	g.fillRect((int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight());	
+            	g.drawImage(mario, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);	
             }
         }
        /* for(int i = 0; i < model.getLives(); i++){    	

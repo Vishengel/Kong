@@ -12,6 +12,13 @@ public interface constants {
 	int PLAYER_HEIGHT = 35;
 	int PLAYER_WIDTH = 20;
 	
+	//peach constants
+	int PEACH_START_X = 60;
+	int PEACH_START_Y = 480;
+
+	int PEACH_HEIGHT = 35;
+	int PEACH_WIDTH = 20;
+	
 	//barrel constants
 	int BARREL_START_X = 120;
 	int BARREL_START_Y = 200;

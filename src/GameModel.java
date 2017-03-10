@@ -14,6 +14,7 @@ public class GameModel extends Observable implements constants {
 	private ArrayList<GameObject> GOList;
 	private ArrayList<MovingObject> MOList;
 	private Player mario;
+	private Peach peach;
 	
 	protected int spawnTime = 2;
 	protected int spawnTimer = 0;
@@ -94,9 +95,6 @@ public class GameModel extends Observable implements constants {
 		GOList = new ArrayList<GameObject>();
 		
 		//create platforms		
-		//GOList.add(new Platform(50-constants.platform_WIDTH,580-constants.platform_HEIGHT,constants.platform_HEIGHT,constants.platform_WIDTH));
-		
-		//GOList.add(new Ladder(500,constants.SCREEN_Y - 172,11*constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
 		
 		//bottom layer first half
 		for(int i = 0; i < constants.SCREEN_X /2; i = i + constants.platform_WIDTH){
@@ -119,10 +117,6 @@ public class GameModel extends Observable implements constants {
 			y = y - 1;
 		}
 		
-		for(int i = 0; i < 11*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
-			GOList.add(new Ladder(500,612-i,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
-		}
-		
 		//third layer
 		y = constants.SCREEN_Y - 300;
 		for(int i = 100; i < constants.SCREEN_X - 50; i = i + constants.platform_WIDTH){
@@ -140,8 +134,13 @@ public class GameModel extends Observable implements constants {
 		
 		
 		//create ladders
+		for(int i = 0; i < 11*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
+			GOList.add(new Ladder(500,612-i,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
+		}
 		
-		
+		//Spawn Peach
+		peach = new Peach(constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_HEIGHT,constants.PEACH_WIDTH);
+		GOList.add(peach);
 	}
 
 	private void initMovingObjects() {
