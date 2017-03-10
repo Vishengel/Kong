@@ -33,8 +33,8 @@ public class GamePanel extends JPanel implements Observer {
 	 public void paintComponent(Graphics g){
 		super.paintComponent(g); 
 				
-		//draw the Konger himself
-		g.drawImage(kong, 60,120,100,100, null);
+		//Draw the Konger himself
+		g.drawImage(kong, 60,165,100,100, null);
 		
         for (GameObject object : model.getGOList()){
         	if(object instanceof Platform){

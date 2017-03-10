@@ -10,7 +10,7 @@ public class Player extends MovingObject{
 	private boolean hasPowerUp = false, goLeft, goRight, goUp, goDown, jump;
 	private boolean keysDown[] = new boolean[255];	 
 	private boolean jumping;
-	private float jumpHeight = 3.6f;
+	private float jumpHeight = 3.5f;
 	private boolean hasWon = false;
 	private boolean isKilled = false;
 	
@@ -32,8 +32,8 @@ public class Player extends MovingObject{
 	public void act(int time){
 		dx = 0;
 		dy = 0;
-		System.out.println("Standing on Ladder:" + isClimbing);
-		System.out.println("Standing on platform: " + standing);
+		//System.out.println("Standing on Ladder:" + isClimbing);
+		//System.out.println("Standing on platform: " + standing);
 		//call the super act function for gravity and standing on platform
 		super.act(time);
 		readInput();

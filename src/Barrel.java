@@ -12,7 +12,7 @@ public class Barrel extends MovingObject{
 		symbol = 'O';
 		killOnCollision = false;
 		direction = true;
-		xVel = 4;
+		xVel = 2;
 		color = color.orange;
 		pointAwarded = false;
 		name = "player";
