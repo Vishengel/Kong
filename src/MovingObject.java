@@ -11,6 +11,7 @@ public abstract class MovingObject extends GameObject{
 	protected boolean hasCollision = false;
 	protected boolean killOnCollision;
 	protected boolean isClimbing = false;
+	protected boolean collidingWithPeach = false;
 	
 	protected GameObject collidingWithLadder;
 	
@@ -30,7 +31,10 @@ public abstract class MovingObject extends GameObject{
 	}
 	
 	public void act(int time){
-		if (!standing() && !isClimbing) {
+		if (standing()) {
+			dy = 0;
+		}
+		if (!isClimbing) {
 			dy += gravity * time;
 		}
 	}
@@ -99,12 +103,16 @@ public abstract class MovingObject extends GameObject{
 				if (GO instanceof Ladder) {
 					collidingWithLadder = GO;
 				}
+				if (GO instanceof Peach) {
+					collidingWithPeach = true;
+				}
 				//System.out.println("Collision");
 				return true;
 			}
 		}	
 		// The player is not in collision with a ladder
 		collidingWithLadder = null;
+		collidingWithPeach = false;
 		
 		return false;
 	}

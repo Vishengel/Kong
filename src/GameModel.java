@@ -72,6 +72,12 @@ public class GameModel extends Observable implements constants {
 			for(int i = 0; i < MOList.size(); i++){
 					//make all moving objects act/move
 					MOList.get(i).act(gravityTimes.get(i));
+					if(mario.hasWon()) {
+						MOList.clear();
+						gravityTimes.clear();
+						initMovingObjects();
+						score+=1000;
+					}
 					//if player is hit, reset objects and subtract a life
 					if(mario.checkMOCollision(MOList)){
 						//System.out.println("MARIO IS DEAD!!!!!");

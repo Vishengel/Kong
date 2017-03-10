@@ -11,6 +11,7 @@ public class Player extends MovingObject{
 	private boolean keysDown[] = new boolean[255];	 
 	private boolean jumping;
 	private float jumpHeight = 3.6f;
+	private boolean hasWon = false;
 	private boolean isKilled = false;
 
     
@@ -30,7 +31,7 @@ public class Player extends MovingObject{
 	public void act(int time){
 		dx = 0;
 		dy = 0;
-			
+		
 		//call the super act function for gravity and standing on platform
 		super.act(time);
 		readInput();
@@ -88,6 +89,11 @@ public class Player extends MovingObject{
 			System.out.println(yPos);
 		}
 		
+		//If Mario is in collision with Peach, the game is over
+		if (collidingWithPeach) {
+			hasWon = true;
+		}
+		
 	}
 	
 	
@@ -127,6 +133,11 @@ public class Player extends MovingObject{
 	public void setJump(boolean b){
 		jumping = b;
 	}
+	
+	public boolean hasWon(){
+		return hasWon;
+	}
+	
 	public boolean isKilled(){
 		return isKilled;
 	}
