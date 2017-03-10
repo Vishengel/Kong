@@ -1,6 +1,9 @@
 
 public interface constants {
 	
+	//game logic constants
+	int MAX_EPOCHS = 10000;
+	
 	//screen constants
 	int SCREEN_X = 640;
 	int SCREEN_Y = 680;

@@ -10,6 +10,7 @@ import javax.swing.Timer;
 
 
 public class GameController {
+	
 	private GameModel model;
 	private GameView  view;
 	//for use input

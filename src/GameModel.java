@@ -15,9 +15,11 @@ public class GameModel extends Observable implements constants {
 	private ArrayList<MovingObject> MOList;
 	private Player mario;
 	private int timer = 0;
-	protected int spawnTime = 2;
-	protected int spawnTimer = 0;
-	
+	private int spawnTime = 2;
+	private int spawnTimer = 0;
+	private int gravityTime = 10;
+	private int barrelSpawnTime = 100;
+	private int epochs;
 	
 	
 	public GameModel(){
@@ -47,56 +49,58 @@ public class GameModel extends Observable implements constants {
 	
 	//main game loop
 	public void runGame() throws InterruptedException{
-		while(true){
-		timer++;
-		//handle gravity every 150 milliseconds
-		if(timer % 10 == 0){
-			incrementTime();	
-		}
-		//spawn a barrel every 450 milliseconds
-		if(timer % 30 == 0){
-			spawnBarrel();
-		} 
-		//reset timer eventually, to avoid overflow
-		if(timer > 1500){
-			timer = 0;
-		}
-		//System.out.println(timer);
-		//System.out.println(gravityTimes);
-		for(int i = 0; i < MOList.size(); i++){
-				//make all moving objects act/move
-				MOList.get(i).act(gravityTimes.get(i));
-				//if player is hit, reset objects and subtract a life
-				if(mario.checkMOCollision(MOList)){
-					//System.out.println("MARIO IS DEAD!!!!!");
-					MOList.clear();
-					gravityTimes.clear();
-					initMovingObjects();
-					lives--;
-				} 
-				//If object falls out of the game screen, delete it
-				else if(MOList.get(i).getYPos() >= constants.SCREEN_Y){
-					MOList.remove(i);
-					gravityTimes.remove(i);
-				}
-				
-				//If mario jumps over a barrel, increment score by 100
-				else if(MOList.get(i).getYPos() >= mario.getYPos()  && MOList.get(i).getYPos() <= mario.getYPos() + 100 && 
-					mario.getXPos() >= MOList.get(i).getXPos()	&&
-					mario.getXPos() <= MOList.get(i).getXPos()+MOList.get(i).getWidth() &&
-					!(MOList.get(i).pointAwarded)){
+		while(epochs < constants.MAX_EPOCHS){
+			epochs++;
+			//System.out.println(epochs);
+			timer++;
+			//handle gravity every 150 milliseconds
+			if(timer % gravityTime == 0){
+				incrementTime();	
+			}
+			//spawn a barrel every 450 milliseconds
+			if(timer % barrelSpawnTime == 0){
+				spawnBarrel();
+			} 
+			//reset timer eventually, to avoid overflow
+			if(timer > 1500){
+				timer = 0;
+			}
+			//System.out.println(timer);
+			//System.out.println(gravityTimes);
+			for(int i = 0; i < MOList.size(); i++){
+					//make all moving objects act/move
+					MOList.get(i).act(gravityTimes.get(i));
+					//if player is hit, reset objects and subtract a life
+					if(mario.checkMOCollision(MOList)){
+						//System.out.println("MARIO IS DEAD!!!!!");
+						MOList.clear();
+						gravityTimes.clear();
+						initMovingObjects();
+						lives--;
+					} 
+					//If object falls out of the game screen, delete it
+					else if(MOList.get(i).getYPos() >= constants.SCREEN_Y){
+						MOList.remove(i);
+						gravityTimes.remove(i);
+					}
 					
-					MOList.get(i).setPointAwarded();
-					score += 100;
-				}
+					//If mario jumps over a barrel, increment score by 100
+					else if(MOList.get(i).getYPos() >= mario.getYPos()  && MOList.get(i).getYPos() <= mario.getYPos() + 100 && 
+						mario.getXPos() >= MOList.get(i).getXPos()	&&
+						mario.getXPos() <= MOList.get(i).getXPos()+MOList.get(i).getWidth() &&
+						!(MOList.get(i).pointAwarded)){
+						
+						MOList.get(i).setPointAwarded();
+						score += 100;
+					}
+			}
+			Thread.sleep(15);
 		}
-		Thread.sleep(15);
-	}
-		//setChanged();
-		//notifyObservers();
-	
-		//stopping condition
-		//gameOver = true; 
+			//setChanged();
+			//notifyObservers();
+		
+			//stopping condition
+			//gameOver = true; 
 		
 	}	
 	
