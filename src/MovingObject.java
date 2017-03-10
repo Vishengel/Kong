@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public abstract class MovingObject extends GameObject{
 	//These values represent the velocity in the x and y plane
 	protected float xVel;
@@ -70,7 +72,6 @@ public abstract class MovingObject extends GameObject{
 				//make object stand exactly on top of the platform 
 				yPos = t2 - height;
 				//System.out.println("Standing on platform!");
-				
 				return true;
 			}
 			
