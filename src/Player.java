@@ -40,12 +40,9 @@ public class Player extends MovingObject{
 		// already jumping, start jumping
 		if(jump && !jumping && standing()){
 			jumping = true;	
-			//System.out.println("Before jump:" + yPos);
-			dy += -jumpHeight;
-			//System.out.println("After jump:" + (yPos + dy) );
 		}
 		
-		if (standing()) {
+		if (standing() || collidingWithLadder == null) {
 			isClimbing = false;
 		}
 		
@@ -68,13 +65,7 @@ public class Player extends MovingObject{
 			System.out.println(isClimbing);
 			dy += (goDown ? yVel : 0) - (goUp ? yVel : 0);
 		}
-		/*
-		//The player can only jump while not climbing a ladder and while standing on an object
-		if (!isClimbing && isStanding) {
-			// Temporary: only moves up
-			dy += (jump ? yVel : 0);
-		} 
-		*/
+
 		//apply vertical force if jumping
 		if(jumping){ 
 			dy += -jumpHeight;
@@ -105,7 +96,6 @@ public class Player extends MovingObject{
 		// There are two control schemes: WASD + shift and arrows + space bar
 		goLeft = keysDown[65] || keysDown[37];
 		goRight = keysDown[68] || keysDown[39];
-		//goUp and goDown will be implemented once ladders have been implemented as well
 		goUp = keysDown[87] || keysDown[38];
 		goDown = keysDown[83] || keysDown[40];
 		jump = keysDown[16] || keysDown[32];

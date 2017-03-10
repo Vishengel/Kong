@@ -31,7 +31,7 @@ public abstract class MovingObject extends GameObject{
 	
 	public void act(int time){
 		if (!standing() && !isClimbing) {
-			dy = gravity * time;
+			dy += gravity * time;
 		}
 	}
 	

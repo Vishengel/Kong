@@ -62,35 +62,12 @@ public class GameController {
 			down[e.getKeyCode()] = true;
 			pressed[e.getKeyCode()] = true;
 			model.passKeysDownToPlayer(down);
-			
-			/*
-			if(e.getKeyChar() == 'a') {
-				 System.out.println("A pressed");
-				 model.setPlayerAction(1);
-				 
-	         }
-			if(e.getKeyChar() == 'd') {
-				 System.out.println("D pressed");
-				 model.setPlayerAction(2);
-	         }
-			*/
 		}
 
 		@Override
 		public void keyReleased(KeyEvent e) {
 			down[e.getKeyCode()]=false;
 			model.passKeysDownToPlayer(down);
-			/*
-			if(e.getKeyChar() == 'a') {
-				 System.out.println("A pressed");
-				 model.setPlayerAction(4);
-				 
-	         }
-			if(e.getKeyChar() == 'd') {
-				 System.out.println("D pressed");
-				 model.setPlayerAction(4);
-	         }
-	         */
 		}
 
 		@Override
