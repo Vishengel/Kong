@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 public abstract class MovingObject extends GameObject{
 	//These values represent the velocity in the x and y plane
 	protected float xVel;
@@ -10,6 +8,9 @@ public abstract class MovingObject extends GameObject{
 	//This value is true if the moving object is colliding with another object
 	protected boolean hasCollision = false;
 	protected boolean killOnCollision;
+	protected boolean isClimbing = false;
+	
+	protected GameObject collidingWithLadder;
 	
 	protected float gravity = 2;
 	protected boolean pointAwarded = true;
@@ -27,11 +28,9 @@ public abstract class MovingObject extends GameObject{
 	}
 	
 	public void act(int time){
-		if(standing()){
-			dy = 0;
+		if (!standing() && !isClimbing) {
+			dy += gravity * time;
 		}
-		dy = gravity * time;	
-		
 	}
 	
 	//each subclass of this class implements its own version of the act, movement and collision
@@ -61,18 +60,23 @@ public abstract class MovingObject extends GameObject{
 	}
 	//check if object is standing on a platform
 	public boolean standing(){
-		for(GameObject GO :GOList){
+		for(GameObject GO : GOList){
+			if (!(GO instanceof Platform)) {
+				continue;
+			}
 			float l1 = xPos, r1 = xPos+width, t1 = yPos, b1 = yPos+height;
 			float l2 = GO.xPos, r2 = GO.xPos+GO.width, t2 = GO.yPos, b2 = GO.yPos+GO.height;
-			if((b1 <= b2 && b1 >= t2) && r1 > l2 && l1 < r2){ 
+			if((b1 <= b2 && b1 >= t2) && r1 > l2 && l1 < r2 && GO.isSolid()){ 
 				//make object stand exactly on top of the platform 
 				yPos = t2 - height;
 				//System.out.println("Standing on platform!");
+				
 				return true;
 			}
 			
 		}
 		//System.out.println("Not standing..");
+		
 		return false;
 		
 	}
@@ -90,12 +94,16 @@ public abstract class MovingObject extends GameObject{
 			//System.out.println(b1);
 			//System.out.println(b2);
 			if (!(l1>=r2 || l2>=r1 || t1>=b2 || t2>=b1) && t2 < b1 && b1 > b2) {
-
+				if (GO instanceof Ladder) {
+					collidingWithLadder = GO;
+				}
 				//System.out.println("Collision");
 				return true;
 			}
 		}	
-		// The player is not in collision with any other object
+		// The player is not in collision with a ladder
+		collidingWithLadder = null;
+		
 		return false;
 	}
 	
