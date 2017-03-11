@@ -16,11 +16,11 @@ public class Player extends MovingObject{
 	private boolean isKilled = false;
 	
     
-	public Player(int x, int y, int h, int w, ArrayList<GameObject> GOList) {
-		super(x, y, h, w, GOList);
+	public Player(int x, int y, int h, int w) {
+		super(x, y, h, w);
 
-		xVel = 2.5f;
-		yVel = 5f;
+		xVel = 1f;
+		yVel = 1.5f;
 
 		killOnCollision = false;
 		color = Color.blue;
@@ -64,14 +64,14 @@ public void move(){
 		switch(action){
 		//don't allow vertical movement when climbing
 		case 0:
-			if(!isClimbing){
+			//if(!isClimbing){
 				dx += -xVel;
-			}
+			//}
 			break;
 		case 1: 
-			if(!isClimbing){
+			//if(!isClimbing){
 				dx += xVel;
-			}
+			//}
 			break;
 		case 2:
 			if(canClimb && !jumping){

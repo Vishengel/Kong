@@ -7,18 +7,18 @@ public class Barrel extends MovingObject{
 	//keep track of the distance fallen in order to change direction 
 	private int distanceFallen = 0;
 	
-	public Barrel(int x, int y, int h, int w, ArrayList<GameObject> GOList, boolean d) {
-		super(x, y, h, w, GOList);
+	public Barrel(int x, int y, int h, int w, boolean d) {
+		super(x, y, h, w);
 		symbol = 'O';
 		killOnCollision = false;
 		direction = true;
-		xVel = 2.2f;
+		xVel = 1.6f;
 		yVel = 3;
 		color = color.orange;
 		pointAwarded = false;
 		name = "barrel";
 	}
-	
+
 	public void act(int time) {
 		dx = 0;
 		dy = 0;
@@ -55,7 +55,7 @@ public class Barrel extends MovingObject{
 		
 		if(canClimb){
 			if(actionSelector.nextInt(4) == 0){
-
+				dx = 0;
 				dy += yVel;
 			}
 		} 

@@ -25,7 +25,7 @@ public class GameController {
 		view = new GameView(model);
 		reader = new Scanner(System.in);
 		
-		view.drawView(model.getGOList(), model.getMOList());
+		//view.drawView(model.getPlatformList(), model.getLadderList() ,model.getMOList());
 		view.addKeyListener(inputController);
 		
 		//make a thread that controls game model logic

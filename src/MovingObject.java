@@ -25,9 +25,8 @@ public abstract class MovingObject extends GameObject{
 	
 	protected ArrayList<GameObject> GOList;
 	
-	public MovingObject(int x, int y, int h, int w, ArrayList<GameObject> GOList) {
+	public MovingObject(int x, int y, int h, int w) {
 		super(x, y, h, w);	
-		this.GOList = GOList;
 		actionSelector = new Random();
 		
 	}

@@ -35,22 +35,16 @@ public class GamePanel extends JPanel implements Observer {
 				
 		//Draw the Konger himself
 		g.drawImage(kong, 60,165,100,100, null);
+		g.drawImage(peach,constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_WIDTH, constants.PEACH_HEIGHT, null);
 		
-        for (GameObject object : model.getGOList()){
-        	String name = object.getName();
-        	if(name == "platform"){
-        		g.drawImage(platform,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
-    		}
-        	
-        	if(name == "ladder") {
-        		g.drawImage(ladder,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
-        	}
-        	
-        	if(name == "peach") {
-        		g.drawImage(peach,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
-        	}
-     
+        for (Platform p : model.getPlatformList()){
+        	g.drawImage(platform,(int)p.getXPos(), (int)p.getYPos(), (int)p.getWidth(), (int)p.getHeight(), null);
         }
+        for(Ladder l: model.getLadderList()){
+        	g.drawImage(ladder,(int)l.getXPos(), (int)l.getYPos(), (int)l.getWidth(), (int)l.getHeight(), null);
+        }
+        	
+       
         g.setColor(Color.WHITE);
         g.drawString("Score: " + model.getScore(), 500, 50); 
         
