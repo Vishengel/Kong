@@ -51,19 +51,14 @@ public class Barrel extends MovingObject{
 			}
 		}
 		
-		if(actionSelector.nextInt(4) == 0){
-			goingDown = true;
-		}
-		else{
-			goingDown = false;
-		}
-		     
 		
-		if(canClimb && goingDown){	
-				dx = 0;
+		
+		if(canClimb){
+			if(actionSelector.nextInt(4) == 0){
+
 				dy += yVel;
-		}
-		
+			}
+		} 
 		
 		
 		xPos += dx;

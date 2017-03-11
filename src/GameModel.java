@@ -179,7 +179,7 @@ public class GameModel extends Observable implements constants {
 					//make object stand exactly on top of the platform 
 					MO.standing = true;
 					//make object stand exactly on top of the platform, unless climbing on ladder
-					if(!MO.canClimb && !MO.goingDown){
+					if(!MO.canClimb){
 						MO.setYPos(GO.getYPos() - MO.getHeight());
 					}
 					//System.out.println("Standing on platform!");
