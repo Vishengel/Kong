@@ -12,19 +12,22 @@ public class Barrel extends MovingObject{
 		symbol = 'O';
 		killOnCollision = false;
 		direction = true;
-		xVel = 2;
+		xVel = 2.2f;
+		yVel = 3;
 		color = color.orange;
 		pointAwarded = false;
 		name = "barrel";
 	}
 	
 	public void act(int time) {
+		dx = 0;
+		dy = 0;
 		super.act(time);
-		
-		dy = gravity * time;
+			
+		//If barrel is on a ladder, 25 % to fall down ladder
 		
 		//if falling for longer than 2 time units, change direction
-		if(distanceFallen > 50 && standing){
+		if(distanceFallen > 30 && standing){
 			direction = !direction;
 			//System.out.println(direction);
 			}
@@ -35,17 +38,30 @@ public class Barrel extends MovingObject{
 			distanceFallen = 0;
 			
 			if(direction){
-				dx = xVel;
+				dx += xVel;
 			}
 			else{
-				dx = -xVel;
+				dx += -xVel;
 			}
 		}
 		else{
 			//Only let a barrel pause in its horizontal movement if it falls a long distance
-			if(distanceFallen > 0){
+			if(distanceFallen > 3){
 				dx = 0f;
 			}
+		}
+		
+		if(actionSelector.nextInt(4) == 0){
+			goingDown = true;
+		}
+		else{
+			goingDown = false;
+		}
+		     
+		
+		if(canClimb && goingDown){	
+				dx = 0;
+				dy += yVel;
 		}
 		
 		

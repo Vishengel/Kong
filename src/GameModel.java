@@ -11,8 +11,10 @@ public class GameModel extends Observable implements constants {
 	private int lives = 3;
 	private int timer = 0;
 	
+	private boolean gameWon = false;
+	
 	private int gravityTime = 10;
-	private int barrelSpawnTime = 100;
+	private int barrelSpawnTime = 200;
 	private int epochs;
 	private int sleepTime = 15;
 	
@@ -35,6 +37,7 @@ public class GameModel extends Observable implements constants {
 	public void incrementTime(){
 		for(int i = 0; i < MOList.size(); i++){
 			MovingObject MO = MOList.get(i);
+			//reset gravity when standing or climbing
 			if(MO.standing || MO.isClimbing){
 				gravityTimes.set(i, 0);
 				if(MO instanceof Player){
@@ -61,7 +64,7 @@ public class GameModel extends Observable implements constants {
 			}
 			//spawn a barrel every 450 milliseconds
 			if(timer % barrelSpawnTime == 0){
-				//spawnBarrel();
+				spawnBarrel();
 			} 
 			//reset timer eventually, to avoid overflow
 			if(timer > 1500){
@@ -82,14 +85,25 @@ public class GameModel extends Observable implements constants {
 						initMovingObjects();
 						score+=1000;
 					}
-					//if player is hit, reset objects and subtract a life
-					if(MOList.get(0).isKilled){
+					//if player is hit or game is won, reset objects. 
+					if(MOList.get(0).isKilled || gameWon){
 						//System.out.println("MARIO IS DEAD!!!!!");
 						MOList.clear();
 						gravityTimes.clear();
 						initMovingObjects();
-						lives--;
+						
+						//if mario is hit, subtract a life
+						if(MOList.get(0).isKilled){	
+							lives--;
+						}
+						//if mario saved the princess, add 1000 points instead
+						else{
+							gameWon = false;
+							score += 1000;
+						}
+						
 					} 
+					
 					
 					//If object falls out of the game screen, delete it
 					else if(MOList.get(i).getYPos() >= constants.SCREEN_Y){
@@ -153,8 +167,6 @@ public class GameModel extends Observable implements constants {
 	public MovingObject checkCollisions(MovingObject MO){
 		//For every moving object, check if it is standing on a platform
 		MO.standing = false;
-		//MO.canClimb = false;
-		//MO.isClimbing = false;
 		MO = checkLadderCollisions(MO);
 		
 		
@@ -167,7 +179,7 @@ public class GameModel extends Observable implements constants {
 					//make object stand exactly on top of the platform 
 					MO.standing = true;
 					//make object stand exactly on top of the platform, unless climbing on ladder
-					if(!MO.canClimb){
+					if(!MO.canClimb && !MO.goingDown){
 						MO.setYPos(GO.getYPos() - MO.getHeight());
 					}
 					//System.out.println("Standing on platform!");
@@ -180,6 +192,10 @@ public class GameModel extends Observable implements constants {
 			if(MO.standing || !MO.canClimb){
 				MO.isClimbing = false;
 			}
+			//If Mario is in collision with Peach, the game is over
+			if (GO.getName() == "peach" && isColliding(MO,GO)) {
+				gameWon = true;
+			}
 			
 		}	
 		
@@ -190,6 +206,8 @@ public class GameModel extends Observable implements constants {
 				MO.isKilled = true;						
 			}
 		}
+	
+		
 		return MO;
 	} 
 		

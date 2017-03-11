@@ -14,7 +14,7 @@ public class Player extends MovingObject{
 	private float jumpHeight = 2.6f;
 	private boolean hasWon = false;
 	private boolean isKilled = false;
-	private Random actionSelector;
+	
     
 	public Player(int x, int y, int h, int w, ArrayList<GameObject> GOList) {
 		super(x, y, h, w, GOList);
@@ -28,7 +28,7 @@ public class Player extends MovingObject{
 		symbol = 'x';
 		
 		name = "player";
-		actionSelector = new Random();
+		
 	}
 	
 	
@@ -50,16 +50,17 @@ public class Player extends MovingObject{
 		if(goDown){
 			action = 3;
 		}
-		
-		//action = 1;
-		//action = actionSelector.nextInt(4); 
-		//jump = actionSelector.nextInt(10) >= 3 ? false : true;
-	}
-	
-	public void move(){
 		if(jump){
 			jumping = true;
 		}
+		//action = 1;
+		//action = actionSelector.nextInt(4); 
+		//jump = actionSelector.nextInt(10) >= 3 ? false : true;
+		
+	}
+	
+public void move(){
+		
 		switch(action){
 		//don't allow vertical movement when climbing
 		case 0:
@@ -67,7 +68,7 @@ public class Player extends MovingObject{
 				dx += -xVel;
 			}
 			break;
-		case 1:
+		case 1: 
 			if(!isClimbing){
 				dx += xVel;
 			}
@@ -125,10 +126,7 @@ public class Player extends MovingObject{
 		if(xPos >= constants.SCREEN_X - 30){
 			xPos = constants.SCREEN_X - 30;
 		}
-		//If Mario is in collision with Peach, the game is over
-		if (collidingWithPeach) {
-			hasWon = true;
-		}
+		
 		
 	}
 	

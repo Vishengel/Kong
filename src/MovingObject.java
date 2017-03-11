@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Random;
 
 public abstract class MovingObject extends GameObject{
 	//These values represent the velocity in the x and y plane
@@ -14,10 +15,11 @@ public abstract class MovingObject extends GameObject{
 	protected boolean canClimb = false;
 	protected boolean collidingWithPeach = false;
 	protected boolean standing = false;
-	
+	protected boolean goingDown = false;
 	protected float gravity = 2;
 	protected boolean pointAwarded = true;
 	protected boolean isKilled = false;
+	protected Random actionSelector;
 	
 	//represents the action that the object can take
 	protected int action;
@@ -27,12 +29,13 @@ public abstract class MovingObject extends GameObject{
 	public MovingObject(int x, int y, int h, int w, ArrayList<GameObject> GOList) {
 		super(x, y, h, w);	
 		this.GOList = GOList;
+		actionSelector = new Random();
 		
 	}
 	
 	public void act(int time){
 		dy += gravity * time;	
-		//if object is standing next to ladder and goes up or down, set climbing mode on
+	
 		
 	}
 	
@@ -43,6 +46,11 @@ public abstract class MovingObject extends GameObject{
 	public abstract boolean up();
 	public abstract boolean down();	
 	
+	
+	public void selectAction(){
+		
+	}
+
 	public float getXVel(){
 		return xVel;
 	}

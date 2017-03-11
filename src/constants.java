@@ -23,7 +23,7 @@ public interface constants {
 	
 	//peach constants
 	int PEACH_START_X = SCREEN_X / 2 - PLATFORM_WIDTH;
-	int PEACH_START_Y = 155;
+	int PEACH_START_Y = 160;
 
 	int PEACH_HEIGHT = 35;
 	int PEACH_WIDTH = 20;
@@ -32,8 +32,8 @@ public interface constants {
 	int BARREL_START_X = 120;
 	int BARREL_START_Y = 250;
 	
-	int BARREL_HEIGHT = 20;
-	int BARREL_WIDTH = 25;
+	int BARREL_HEIGHT = 14;
+	int BARREL_WIDTH = 20;
 	
 	//flame constants
 	
