@@ -9,7 +9,7 @@ public interface constants {
 	int SCREEN_Y = 680;
 	
 	//player constants
-	int PLAYER_START_X = 10;
+	int PLAYER_START_X = 500;
 	int PLAYER_START_Y = 600;
 
 

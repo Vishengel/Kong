@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.AbstractAction;
 import javax.swing.Timer;
@@ -9,16 +10,16 @@ public class Player extends MovingObject{
 
 	private boolean hasPowerUp = false, goLeft, goRight, goUp, goDown, jump;
 	private boolean keysDown[] = new boolean[255];	 
-	private boolean jumping;
-	private float jumpHeight = 3.5f;
+	private boolean jumping = false;
+	private float jumpHeight = 2.6f;
 	private boolean hasWon = false;
 	private boolean isKilled = false;
-	
+	private Random actionSelector;
     
 	public Player(int x, int y, int h, int w, ArrayList<GameObject> GOList) {
 		super(x, y, h, w, GOList);
 
-		xVel = 5f;
+		xVel = 2.5f;
 		yVel = 5f;
 
 		killOnCollision = false;
@@ -27,43 +28,103 @@ public class Player extends MovingObject{
 		symbol = 'x';
 		
 		name = "player";
+		actionSelector = new Random();
 	}
 	
+	
+	//actions: 
+	//0 : left
+	//1 : right
+	//2 : up
+	//3 : down
+	public void selectAction(){
+		if(goLeft){
+			action = 0;
+		}
+		if(goRight){
+			action = 1;
+		}
+		if(goUp){
+			action = 2;
+		}
+		if(goDown){
+			action = 3;
+		}
+		
+		//action = 1;
+		//action = actionSelector.nextInt(4); 
+		//jump = actionSelector.nextInt(10) >= 3 ? false : true;
+	}
+	
+	public void move(){
+		if(jump){
+			jumping = true;
+		}
+		switch(action){
+		//don't allow vertical movement when climbing
+		case 0:
+			if(!isClimbing){
+				dx += -xVel;
+			}
+			break;
+		case 1:
+			if(!isClimbing){
+				dx += xVel;
+			}
+			break;
+		case 2:
+			if(canClimb && !jumping){
+				isClimbing = true;
+				dy -= yVel/2;
+			}
+			break;
+		case 3:
+			if(canClimb && !jumping){
+				isClimbing = true;
+				dy += yVel/2;
+			}
+			break;
+		}
+	} 
+	
 	public void act(int time){
+		//System.out.println("Standing: " + standing);
 		dx = 0;
 		dy = 0;
+		action = -1;
 		//System.out.println("Standing on Ladder:" + isClimbing);
 		//System.out.println("Standing on platform: " + standing);
 		//call the super act function for gravity and standing on platform
-		super.act(time);
+		
+		
 		readInput();
+		selectAction();
+		move();
+		super.act(time);
 		
 		
-		//if the jump key is down and the player is currently standing on a platform and not
-		// already jumping, start jumping
-		if(jump && !jumping && standing){
-			jumping = true;	
+		//System.out.println(isClimbing);
+		
+		//prevent jumping while climbing a ladder
+		if(isClimbing){
+			jumping = false;
 		}
-		
-		
-		
-		dx += (goRight ? xVel : 0) - (goLeft ? xVel : 0);
-		
-		
-		if (isClimbing) {
-			dy += (goDown ? yVel/2 : 0) - (goUp ? yVel/2 : 0);
-		}
-
-		//apply vertical force if jumping
-		if(jumping){ 
+		if(jumping){
 			dy += -jumpHeight;
-			//out.println(dy);
 		}
+			
+		
 		
 		xPos += dx;
 		yPos += dy;
-			
 		
+		//prevent player from walking out of the screen
+		if(xPos <= 0){
+			xPos = 0;
+		}
+		if(xPos >= constants.SCREEN_X - 30){
+			xPos = constants.SCREEN_X - 30;
+		}
 		//If Mario is in collision with Peach, the game is over
 		if (collidingWithPeach) {
 			hasWon = true;

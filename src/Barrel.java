@@ -15,7 +15,7 @@ public class Barrel extends MovingObject{
 		xVel = 2;
 		color = color.orange;
 		pointAwarded = false;
-		name = "player";
+		name = "barrel";
 	}
 	
 	public void act(int time) {

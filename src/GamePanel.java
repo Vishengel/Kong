@@ -37,15 +37,16 @@ public class GamePanel extends JPanel implements Observer {
 		g.drawImage(kong, 60,165,100,100, null);
 		
         for (GameObject object : model.getGOList()){
-        	if(object instanceof Platform){
+        	String name = object.getName();
+        	if(name == "platform"){
         		g.drawImage(platform,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
     		}
         	
-        	if(object instanceof Ladder) {
+        	if(name == "ladder") {
         		g.drawImage(ladder,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
         	}
         	
-        	if(object instanceof Peach) {
+        	if(name == "peach") {
         		g.drawImage(peach,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
         	}
      
@@ -54,11 +55,11 @@ public class GamePanel extends JPanel implements Observer {
         g.drawString("Score: " + model.getScore(), 500, 50); 
         
         for (MovingObject object : model.getMOList()){
-        	//g.setColor(object.getColor());
-        	if(object instanceof Barrel){
+        	String name = object.getName();
+        	if(name == "barrel"){
         		g.drawImage(barrel,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
         	}
-            if(object instanceof Player){
+            if(name == "player"){
             	g.drawImage(mario, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);	
             }
         }
