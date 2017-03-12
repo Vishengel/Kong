@@ -7,7 +7,7 @@ public class Barrel extends MovingObject{
 	//keep track of the distance fallen in order to change direction 
 	private int distanceFallen = 0;
 	
-	public Barrel(int x, int y, int h, int w, boolean d) {
+	public Barrel(int x, int y, int h, int w, boolean d, boolean falling) {
 		super(x, y, h, w);
 		symbol = 'O';
 		killOnCollision = false;
@@ -17,54 +17,61 @@ public class Barrel extends MovingObject{
 		color = color.orange;
 		pointAwarded = false;
 		name = "barrel";
+		this.falling = falling;
 	}
 	
 	public void act(int time) {
 		dx = 0;
 		dy = 0;
 		
-		//if falling for longer than 2 time units, change direction
-		if(distanceFallen > 30 && standing){
-			direction = !direction;
-			//System.out.println(direction);
-			}
-		//System.out.println(distanceFallen);
-		
-		if(standing){
-			//reset distance fallen
-			distanceFallen = 0;
+		if(!falling) {
+			//if falling for longer than 2 time units, change direction
+			if(distanceFallen > 30 && standing){
+				direction = !direction;
+				//System.out.println(direction);
+				}
+			//System.out.println(distanceFallen);
 			
-			if(direction){
-				dx += xVel;
+			if(standing){
+				//reset distance fallen
+				distanceFallen = 0;
+				
+				if(direction){
+					dx += xVel;
+				}
+				else{
+					dx += -xVel;
+				}
 			}
 			else{
-				dx += -xVel;
+				//Only let a barrel pause in its horizontal movement if it falls a long distance
+				if(distanceFallen > 3){
+					dx = 0f;
+				}
 			}
-		}
-		else{
-			//Only let a barrel pause in its horizontal movement if it falls a long distance
-			if(distanceFallen > 3){
-				dx = 0f;
+			
+			
+			//If barrel is on a ladder, 25 % to fall down ladder
+			if(canClimb){
+				if(actionSelector.nextInt(4) >= 2){
+					isClimbing = true;
+				}
+			} 
+			
+			if(isClimbing){
+				//dx = 0;
+				dy += yVel;
 			}
+			super.act(time);
+			distanceFallen += dy;
+		} else {
+			//Placeholder constant falling velocity
+			//The falling barrel ignores gravity
+			dy += 3;
 		}
 		
-		
-		//If barrel is on a ladder, 25 % to fall down ladder
-		if(canClimb){
-			if(actionSelector.nextInt(4) >= 2){
-				isClimbing = true;
-			}
-		} 
-		
-		if(isClimbing){
-			//dx = 0;
-			dy += yVel;
-		}
-		
-		super.act(time);
 		xPos += dx;
 		yPos += dy;
-		distanceFallen += dy;
 	}
 	
 	public boolean checkCollisions(ArrayList<GameObject> GOList) {

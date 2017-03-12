@@ -15,6 +15,7 @@ public abstract class MovingObject extends GameObject{
 	protected boolean canClimb = false;
 	protected boolean collidingWithPeach = false;
 	protected boolean standing = false;
+	protected boolean falling = false;
 	protected float gravity = 0.12f;
 	protected boolean pointAwarded = true;
 	protected boolean isKilled = false;
@@ -77,5 +78,9 @@ public abstract class MovingObject extends GameObject{
 	}
 	public boolean pointAwarded(){
 		return pointAwarded;
+	}
+	
+	public boolean isFalling() {
+		return falling;
 	}
 } 

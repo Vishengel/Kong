@@ -19,8 +19,8 @@ public class Player extends MovingObject{
 	public Player(int x, int y, int h, int w) {
 		super(x, y, h, w);
 
-		xVel = 5f;
-		yVel = 5f;
+		xVel = 2f;
+		yVel = 2f;
 
 		killOnCollision = false;
 		color = Color.blue;

@@ -33,15 +33,16 @@ public class GameModel extends Observable implements constants {
 	private boolean powerupActivated = false;
 	private boolean gameWon = false;
 	private boolean gameOver = false; 
+	private boolean firstBarrel = true;
+	private boolean firstFlameOilCollision = true;
 		
 	public GameModel(){
 		initGame();
 	}
 	
-	public void spawnBarrel(){
+	public void spawnBarrel(boolean falling){
 		gravityTimes.add(0);
-		MOList.add(new Barrel(constants.BARREL_START_X,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, true));
-		
+		MOList.add(new Barrel(constants.BARREL_START_X,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, true, falling));
 	}
 	public void incrementTime(){
 		for(int i = 0; i < MOList.size(); i++){
@@ -71,7 +72,13 @@ public class GameModel extends Observable implements constants {
 			//spawn barrel
 			if(spawnTimer == barrelSpawnTime){
 				spawnTimer = 0;
-				spawnBarrel();
+				//The first barrel always goes directly down to the oil barrel
+				if (firstBarrel) {
+					spawnBarrel(true);
+					firstBarrel = false;
+				} else {
+					spawnBarrel(false);
+				}
 			}	
 			spawnTimer++;
 			
@@ -97,12 +104,7 @@ public class GameModel extends Observable implements constants {
 					MOList.get(i).act(gravityTimes.get(i));
 					//check collisions and update moving object states
 					
-					if(mario.hasWon()) {
-						MOList.clear();
-						PUList.clear();
-						gravityTimes.clear();
-						initFirstLevel();
-						initMovingObjects();
+					if(gameWon) {
 						score+=1000;
 					}
 					//if player is hit or game is won, reset objects. 
@@ -113,6 +115,8 @@ public class GameModel extends Observable implements constants {
 						gravityTimes.clear();
 						initFirstLevel();
 						initMovingObjects();
+						firstBarrel = true;
+						powerupActivated = false;
 						
 						//if mario is hit, subtract a life
 						if(MOList.get(0).isKilled){	
@@ -121,12 +125,11 @@ public class GameModel extends Observable implements constants {
 						//if mario saved the princess, add 1000 points instead
 						else{
 							gameWon = false;
-							score += 1000;
+							//score += 1000;
 						}
 						
 					} 
-					
-					
+										
 					//If object falls out of the game screen, delete it
 					else if(MOList.get(i).getYPos() >= constants.SCREEN_Y){
 						MOList.remove(i);
@@ -135,7 +138,7 @@ public class GameModel extends Observable implements constants {
 					
 					//If a barrel has been smashed, the value of smashedBarrelIndex >= 0
 					//We remove the barrel using this index
-					if (smashedBarrelIndex >= 0) {
+					else if (smashedBarrelIndex >= 0) {
 						MOList.remove(smashedBarrelIndex);
 						gravityTimes.remove(smashedBarrelIndex);
 						smashedBarrelIndex = -1;
@@ -150,6 +153,11 @@ public class GameModel extends Observable implements constants {
 						MOList.get(i).setPointAwarded();
 						score += 100;
 					}
+			}
+			
+			if(flame != null) {
+				//The flame's direction depends on the player's direction, so we handle that here
+				flame.setDirection(mario.getXPos(), mario.getYPos());
 			}
 
 			//slow game model down, so that game can be played by human
@@ -180,11 +188,16 @@ public class GameModel extends Observable implements constants {
 		return false;
 	}
 	
-	public boolean isCollidingWithPlatformOrLadder(GameObject o1, GameObject o2){
+	public boolean isCollidingWithPlatformOrLadder(MovingObject o1, GameObject o2){
 		float l1 = o1.getXPos(), r1 = l1+o1.getWidth(), t1 = o1.getYPos(), b1 = t1+o1.getHeight();
 		float l2 = o2.getXPos(), r2 = o2.getXPos()+o2.getWidth(), t2 = o2.getYPos(), b2 = o2.getYPos()+o2.getHeight();
 		//For Jelle: remember that y = 0 is at THE TOP of the screen
-		if(b1 <= b2 && b1 >= t2 && r1 > l2 && l1 < r2){
+		if((b1 <= b2 && b1 >= t2 && r1 > l2 && l1 < r2)){
+			//If a moving object is falling, ladders and platforms are ignored
+			if(o1.isFalling()) {
+				//System.out.println("Falling!");
+				return false;
+			}
 			return true;
 		}
 		return false;
@@ -210,6 +223,7 @@ public class GameModel extends Observable implements constants {
 		MO.standing = false;
 		MO = checkLadderCollisions(MO);
 		
+		//Handle collision of moving object with a platform
 		for(GameObject platform : platformList){
 			boolean isColliding = isCollidingWithPlatformOrLadder(MO,platform);
 			
@@ -251,8 +265,21 @@ public class GameModel extends Observable implements constants {
 		}
 	
 		//If Mario is in collision with Peach, the game is over
-		if (isColliding(MO,peach)) {
+		if(MO.getName() == "player" && isColliding(MO,peach)) {
 			gameWon = true;
+		}
+		
+		//If a falling barrel hits the oil barrel, spawn a flame
+		if(MO.isFalling() && isColliding(MO,oil) && firstFlameOilCollision) {
+			//This boolean makes sure a flame is only spawned once for each collision between the barrel and the oil
+			firstFlameOilCollision = false;
+			//Initialize flame
+			flame = new Flame(constants.FLAME_START_X,constants.FLAME_START_Y,constants.FLAME_HEIGHT,constants.FLAME_WIDTH);	
+			//Add flame to Moving Object list
+			MOList.add(flame);
+			gravityTimes.add(0);
+		} else if (MO.isFalling() && !isColliding(MO,oil)) {
+			firstFlameOilCollision = true;
 		}
 		
 		//Check whether Mario is colliding with a powerup
@@ -541,13 +568,9 @@ public class GameModel extends Observable implements constants {
 		MOList = new ArrayList<MovingObject>();
 		//initialize player
 		mario = new Player(constants.PLAYER_START_X,constants.PLAYER_START_Y,constants.PLAYER_HEIGHT,constants.PLAYER_WIDTH);	
-		//add possible initial barrels or flames
-		//Barrel b = new Barrel(constants.BARREL_START_X,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WEIGHT, GOList, true);
-		//Barrel b2 = new Barrel(constants.BARREL_START_X + 50,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WEIGHT, GOList, true);
+
 		//add objects to list of moving objects
-		MOList.add(mario);		
-		//MOList.add(b);
-		//MOList.add(b2);
+		MOList.add(mario);	
 		
 		//initalize the gravity timers of the moving objects
 		for(int i = 0; i < MOList.size(); i++){

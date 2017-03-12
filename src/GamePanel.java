@@ -40,7 +40,6 @@ public class GamePanel extends JPanel implements Observer {
 		g.drawImage(kong, 60,165,100,100, null);
 		g.drawImage(peach,constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_WIDTH, constants.PEACH_HEIGHT, null);
 		g.drawImage(oil,constants.OIL_START_X,constants.OIL_START_Y,constants.OIL_WIDTH, constants.OIL_HEIGHT, null);
-		g.drawImage(flame,constants.FLAME_START_X,constants.FLAME_START_Y,constants.FLAME_WIDTH, constants.FLAME_HEIGHT, null);
 		
         for (Platform p : model.getPlatformList()){
         	g.drawImage(platform,(int)p.getXPos(), (int)p.getYPos(), (int)p.getWidth(), (int)p.getHeight(), null);
@@ -64,6 +63,9 @@ public class GamePanel extends JPanel implements Observer {
         	}
             if(name == "player"){
             	g.drawImage(mario, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);	
+            }
+            if(name == "flame") {
+            	g.drawImage(flame, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
             }
         }
        /* for(int i = 0; i < model.getLives(); i++){    	
