@@ -38,6 +38,8 @@ public class Player extends MovingObject{
 	//2 : up
 	//3 : down
 	public void selectAction(){
+		//jump = actionSelector.nextInt(10) >= 7 ? true : false;
+		//action = actionSelector.nextInt(4); 
 		if(goLeft){
 			action = 0;
 		}
@@ -53,9 +55,8 @@ public class Player extends MovingObject{
 		if(jump){
 			jumping = true;
 		}
-		//action = 1;
-		//action = actionSelector.nextInt(4); 
-		//jump = actionSelector.nextInt(10) >= 3 ? false : true;
+		
+		
 		
 	}
 	
@@ -93,9 +94,6 @@ public void move(){
 		dx = 0;
 		dy = 0;
 		action = -1;
-		//System.out.println("Standing on Ladder:" + isClimbing);
-		//System.out.println("Standing on platform: " + standing);
-		//call the super act function for gravity and standing on platform
 		
 		
 		readInput();
@@ -114,7 +112,7 @@ public void move(){
 		}
 			
 		super.act(time);
-		
+		System.out.println(time);
 		xPos += dx;
 		yPos += dy;
 		

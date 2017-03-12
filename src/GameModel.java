@@ -25,8 +25,11 @@ public class GameModel extends Observable implements constants {
 	private ArrayList<MovingObject> MOList;
 	private Player mario;
 	private Peach peach;
+	
+	private boolean GUI_ON;
 		
-	public GameModel(){
+	public GameModel(boolean GUI_ON){
+		this.GUI_ON = GUI_ON;
 		initGame();
 	}
 	
@@ -39,7 +42,7 @@ public class GameModel extends Observable implements constants {
 		for(int i = 0; i < MOList.size(); i++){
 			MovingObject MO = MOList.get(i);
 			//reset gravity when standing or climbing
-			if(MO.standing || MO.isClimbing){
+			if((MO.standing )|| MO.isClimbing){
 				gravityTimes.set(i, 0);
 				if(MO instanceof Player){
 					((Player) MOList.get(i)).setJump(false);
@@ -116,8 +119,9 @@ public class GameModel extends Observable implements constants {
 						score += 100;
 					}
 			}
-			
-			Thread.sleep(sleepTime);
+			if(GUI_ON){
+				Thread.sleep(sleepTime);
+			}
 		}
 			//setChanged();
 			//notifyObservers();

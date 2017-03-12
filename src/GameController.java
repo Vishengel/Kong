@@ -10,23 +10,23 @@ import javax.swing.Timer;
 
 
 public class GameController {
-	
+	private boolean GUI_ON;
 	private GameModel model;
 	private GameView  view;
-	//for use input
-	private Scanner reader;
 	private InputController inputController = new InputController();
-	//private int timer = 0;
 	private Thread thread;
+	
+	public GameController(boolean GUI_ON){
+		this.GUI_ON = GUI_ON;
+	}
+	
+	
 	public void start() throws IOException{
 		//create game model and view
-		model = new GameModel();
+		model = new GameModel(GUI_ON);
 		
-		view = new GameView(model);
-		reader = new Scanner(System.in);
 		
-		//view.drawView(model.getPlatformList(), model.getLadderList() ,model.getMOList());
-		view.addKeyListener(inputController);
+		
 		
 		//make a thread that controls game model logic
 		thread = new Thread(){
@@ -43,33 +43,19 @@ public class GameController {
 		thread.start();
 		
 		
-		
-		AbstractAction FPSTimer = new AbstractAction(){
-			public void actionPerformed(ActionEvent e){
-				view.gamePanel.repaint();					
-			}			
-		};
-		new Timer(1, FPSTimer).start();
-		//view.add(view.getGamePanel());
-		//main game loop
-		//while(!model.isGameOver()){
-			//get user input
-			//int action = getInput(reader);
-			//change action of player
-			//model.setPlayerAction(action);
-			//update the rest of the model
-			//model.runGame();
-			//redraw view
-			//view.drawView(model.getGOList(), model.getMOList());			
-		//}
+		//If GUI is on, add framerate and update timer
+		if(GUI_ON){
+			view = new GameView(model);
+			view.addKeyListener(inputController);
+			AbstractAction FPSTimer = new AbstractAction(){
+				public void actionPerformed(ActionEvent e){
+					view.gamePanel.repaint();					
+				}			
+			};
+			new Timer(1, FPSTimer).start();
+		}
 	}
-	/*
-	private int getInput(Scanner reader) {
-		System.out.println("1 - left    2 - right	3 - jump	4 - idle");
-		System.out.print("> ");
-		return reader.nextInt();
-	}
-	*/
+	
 	
 	class InputController implements KeyListener {
 		private boolean[] down = new boolean[255];
