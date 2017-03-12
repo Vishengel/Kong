@@ -19,8 +19,8 @@ public class Player extends MovingObject{
 	public Player(int x, int y, int h, int w) {
 		super(x, y, h, w);
 
-		xVel = 1.5f;
-		yVel = 1.5f;
+		xVel = 1f;
+		yVel = 1f;
 
 		killOnCollision = false;
 		color = Color.blue;
@@ -101,7 +101,7 @@ public void move(){
 		move();
 		
 		
-		//System.out.println(isClimbing);
+		
 		
 		//prevent jumping while climbing a ladder
 		if(isClimbing){
@@ -112,7 +112,7 @@ public void move(){
 		}
 			
 		super.act(time);
-		System.out.println(time);
+		
 		xPos += dx;
 		yPos += dy;
 		

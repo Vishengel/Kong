@@ -32,8 +32,8 @@ public interface constants {
 	int BARREL_START_X = 120;
 	int BARREL_START_Y = 250;
 	
-	int BARREL_HEIGHT = 14;
-	int BARREL_WIDTH = 26;
+	int BARREL_HEIGHT = 20;
+	int BARREL_WIDTH = 22;
 	
 	//flame constants
 	

@@ -15,7 +15,7 @@ public abstract class MovingObject extends GameObject{
 	protected boolean canClimb = false;
 	protected boolean collidingWithPeach = false;
 	protected boolean standing = false;
-	protected float gravity = 2;
+	protected float gravity = 0.12f;
 	protected boolean pointAwarded = true;
 	protected boolean isKilled = false;
 	protected Random actionSelector;

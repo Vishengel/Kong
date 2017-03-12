@@ -9,12 +9,13 @@ import javax.swing.Timer;
 public class GameModel extends Observable implements constants {
 	private int score = 0;
 	private int lives = 3;
-	//private int timer = 0;
+	private int spawnTimer = 0;
+	private int gravityTimer = 0;
 	
 	private boolean gameWon = false;
 	
 	private int gravityTime = 10;
-	private int barrelSpawnTime = 300;
+	private int barrelSpawnTime = 250;
 	private int epochs;
 	private int sleepTime = 15;
 	
@@ -59,16 +60,20 @@ public class GameModel extends Observable implements constants {
 
 	public void runGame() throws InterruptedException{
 		while(epochs < constants.MAX_EPOCHS){
-			epochs++;
 			
-			//handle gravity every 150 milliseconds
-			if(epochs % gravityTime == 0){
-				incrementTime();	
-			}
-			//spawn a barrel every 450 milliseconds
-			if(epochs % barrelSpawnTime == 0){
+			//handle gravity
+			//if(gravityTimer == gravityTime){
+				//gravityTimer = 0;
+				incrementTime();
+			//}
+			//gravityTimer++;
+				
+			//spawn barrel
+			if(spawnTimer == barrelSpawnTime){
+				spawnTimer = 0;
 				spawnBarrel();
-			} 
+			}	
+			spawnTimer++;
 			
 			for(int i = 0; i < MOList.size(); i++){
 					//make all moving objects act/move
@@ -122,12 +127,8 @@ public class GameModel extends Observable implements constants {
 			if(GUI_ON){
 				Thread.sleep(sleepTime);
 			}
+			epochs++;
 		}
-			//setChanged();
-			//notifyObservers();
-		
-			//stopping condition
-			//gameOver = true; 
 		
 	}	
 	
