@@ -26,7 +26,7 @@ public class Player extends MovingObject{
 		color = Color.blue;
 		action = -1;
 		symbol = 'x';
-		
+		action = 1;
 		name = "player";
 		
 	}
@@ -38,8 +38,15 @@ public class Player extends MovingObject{
 	//2 : up
 	//3 : down
 	public void selectAction(){
-		//jump = actionSelector.nextInt(10) >= 7 ? true : false;
-		//action = actionSelector.nextInt(4); 
+		
+		//random mario behavior
+		if(constants.AI_MARIO){
+			jump = actionSelector.nextInt(100) <= 10 ? true : false;
+			if(actionSelector.nextInt(100) < 10){
+				action = 1 - action;
+		    }
+		}
+		
 		if(goLeft){
 			action = 0;
 		}
@@ -55,6 +62,9 @@ public class Player extends MovingObject{
 		if(jump){
 			jumping = true;
 		}
+		
+		
+		
 		
 		
 		
@@ -93,7 +103,10 @@ public void move(){
 		//System.out.println("Standing: " + standing);
 		dx = 0;
 		dy = 0;
-		action = -1;
+		//only reset action if mario is not controlled by AI
+		if(!constants.AI_MARIO){
+			action = -1;
+		}
 		
 		
 		readInput();
@@ -112,6 +125,8 @@ public void move(){
 		}
 			
 		super.act(time);
+		
+		System.out.println(dy);
 		
 		xPos += dx;
 		yPos += dy;

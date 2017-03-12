@@ -1,6 +1,11 @@
 
 public interface constants {
 
+	//GUI on or off
+	boolean GUI_ON = true;
+	
+	//player or AI mario
+	boolean AI_MARIO = true;
 	//game logic constants
 	int MAX_EPOCHS = 1000000;
 	

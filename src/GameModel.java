@@ -9,12 +9,8 @@ import javax.swing.Timer;
 public class GameModel extends Observable implements constants {
 	private int score = 0;
 	private int lives = 3;
-	private int spawnTimer = 0;
-	private int gravityTimer = 0;
-	
+	private int spawnTimer = 0;	
 	private boolean gameWon = false;
-	
-	private int gravityTime = 10;
 	private int barrelSpawnTime = 250;
 	private int epochs;
 	private int sleepTime = 15;
@@ -26,11 +22,9 @@ public class GameModel extends Observable implements constants {
 	private ArrayList<MovingObject> MOList;
 	private Player mario;
 	private Peach peach;
-	
-	private boolean GUI_ON;
+
 		
-	public GameModel(boolean GUI_ON){
-		this.GUI_ON = GUI_ON;
+	public GameModel(){
 		initGame();
 	}
 	
@@ -62,11 +56,7 @@ public class GameModel extends Observable implements constants {
 		while(epochs < constants.MAX_EPOCHS){
 			
 			//handle gravity
-			//if(gravityTimer == gravityTime){
-				//gravityTimer = 0;
-				incrementTime();
-			//}
-			//gravityTimer++;
+			incrementTime();
 				
 			//spawn barrel
 			if(spawnTimer == barrelSpawnTime){
@@ -124,6 +114,7 @@ public class GameModel extends Observable implements constants {
 						score += 100;
 					}
 			}
+			//slow game model down, so that game can be played by human
 			if(GUI_ON){
 				Thread.sleep(sleepTime);
 			}

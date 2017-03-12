@@ -10,20 +10,17 @@ import javax.swing.Timer;
 
 
 public class GameController {
-	private boolean GUI_ON;
 	private GameModel model;
 	private GameView  view;
 	private InputController inputController = new InputController();
 	private Thread thread;
 	
-	public GameController(boolean GUI_ON){
-		this.GUI_ON = GUI_ON;
-	}
+	
 	
 	
 	public void start() throws IOException{
 		//create game model and view
-		model = new GameModel(GUI_ON);
+		model = new GameModel();
 		
 		
 		
@@ -44,7 +41,7 @@ public class GameController {
 		
 		
 		//If GUI is on, add framerate and update timer
-		if(GUI_ON){
+		if(constants.GUI_ON){
 			view = new GameView(model);
 			view.addKeyListener(inputController);
 			AbstractAction FPSTimer = new AbstractAction(){
