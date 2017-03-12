@@ -18,7 +18,7 @@ public class Barrel extends MovingObject{
 		pointAwarded = false;
 		name = "barrel";
 	}
-
+	
 	public void act(int time) {
 		dx = 0;
 		dy = 0;

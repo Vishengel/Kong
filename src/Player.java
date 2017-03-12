@@ -64,14 +64,14 @@ public void move(){
 		switch(action){
 		//don't allow vertical movement when climbing
 		case 0:
-			//if(!isClimbing){
+			if(!isClimbing){
 				dx += -xVel;
-			//}
+			}
 			break;
 		case 1: 
-			//if(!isClimbing){
+			if(!isClimbing){
 				dx += xVel;
-			//}
+			}
 			break;
 		case 2:
 			if(canClimb && !jumping){
