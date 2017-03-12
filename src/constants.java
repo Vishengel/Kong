@@ -14,7 +14,7 @@ public interface constants {
 	int SCREEN_Y = 680;
 	
 	//player constants
-	int PLAYER_START_X = 50;
+	int PLAYER_START_X = 125;
 	int PLAYER_START_Y = 600;
 
 	int PLAYER_HEIGHT = 32;
@@ -23,6 +23,11 @@ public interface constants {
 	//platform constants
 	int PLATFORM_HEIGHT = 17;
 	int PLATFORM_WIDTH = 40;
+	
+
+	//ladder constants
+	int LADDER_WIDTH = 20;
+	int LADDER_HEIGHT = 10;
 	
 	//peach constants
 	int PEACH_START_X = SCREEN_X / 2 - PLATFORM_WIDTH;
@@ -38,9 +43,22 @@ public interface constants {
 	int BARREL_HEIGHT = 20;
 	int BARREL_WIDTH = 22;
 	
+	//oil constants
+	int OIL_START_X = 60;
+	int OIL_START_Y = 592;
+	
+	int OIL_HEIGHT = 40;
+	int OIL_WIDTH = 30;
+	
 	//flame constants
+	int FLAME_START_X = 60;
+	int FLAME_START_Y = 600;
+	
+	int FLAME_HEIGHT = 28;
+	int FLAME_WIDTH = 25;
+	
+	//powerup constants
+	int POWERUP_HEIGHT = 27;
+	int POWERUP_WIDTH = 23;
 
-	//ladder constants
-	int LADDER_WIDTH = 20;
-	int LADDER_HEIGHT = 10;
 }

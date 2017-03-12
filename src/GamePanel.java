@@ -19,6 +19,9 @@ public class GamePanel extends JPanel implements Observer {
 	Image barrel = new ImageIcon(getClass().getResource("images/barrel.png")).getImage();
 	Image platform = new ImageIcon(getClass().getResource("images/platform.png")).getImage();
 	Image ladder = new ImageIcon(getClass().getResource("images/ladder.png")).getImage();
+	Image oil = new ImageIcon(getClass().getResource("images/oil.png")).getImage();
+	Image flame = new ImageIcon(getClass().getResource("images/flame.png")).getImage();
+	Image powerup = new ImageIcon(getClass().getResource("images/powerup.png")).getImage();
 	
 	public GamePanel(GameModel model) throws IOException {
 		setOpaque(true);
@@ -33,15 +36,21 @@ public class GamePanel extends JPanel implements Observer {
 	 public void paintComponent(Graphics g){
 		super.paintComponent(g); 
 				
-		//Draw the Konger himself
+		//Draw game objects
 		g.drawImage(kong, 60,165,100,100, null);
 		g.drawImage(peach,constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_WIDTH, constants.PEACH_HEIGHT, null);
+		g.drawImage(oil,constants.OIL_START_X,constants.OIL_START_Y,constants.OIL_WIDTH, constants.OIL_HEIGHT, null);
+		g.drawImage(flame,constants.FLAME_START_X,constants.FLAME_START_Y,constants.FLAME_WIDTH, constants.FLAME_HEIGHT, null);
 		
         for (Platform p : model.getPlatformList()){
         	g.drawImage(platform,(int)p.getXPos(), (int)p.getYPos(), (int)p.getWidth(), (int)p.getHeight(), null);
         }
         for(Ladder l: model.getLadderList()){
         	g.drawImage(ladder,(int)l.getXPos(), (int)l.getYPos(), (int)l.getWidth(), (int)l.getHeight(), null);
+        }
+        
+        for(Powerup pu : model.getPUList()) {
+        	g.drawImage(powerup,(int)pu.getXPos(), (int)pu.getYPos(), (int)pu.getWidth(), (int)pu.getHeight(), null);
         }
         	
        

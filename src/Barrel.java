@@ -23,9 +23,6 @@ public class Barrel extends MovingObject{
 		dx = 0;
 		dy = 0;
 		
-			
-
-		
 		//if falling for longer than 2 time units, change direction
 		if(distanceFallen > 30 && standing){
 			direction = !direction;

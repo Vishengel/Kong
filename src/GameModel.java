@@ -10,19 +10,29 @@ public class GameModel extends Observable implements constants {
 	private int score = 0;
 	private int lives = 3;
 	private int spawnTimer = 0;	
-	private boolean gameWon = false;
 	private int barrelSpawnTime = 250;
+	private int smashedBarrelIndex = -1;
+	private int powerupTimer = 0;	
+	private int powerupDuration = 500;
+	private int powerupIndex = -1;
 	private int epochs;
 	private int sleepTime = 15;
 	
 	private ArrayList<Integer> gravityTimes;
-	private boolean gameOver = false; 
 	private ArrayList<Platform> platformList;
 	private ArrayList<Ladder> ladderList;
 	private ArrayList<MovingObject> MOList;
+	private ArrayList<Powerup> PUList;
+	
 	private Player mario;
 	private Peach peach;
-
+	private Oil oil;
+	private Flame flame;
+	private Powerup powerup;
+	
+	private boolean powerupActivated = false;
+	private boolean gameWon = false;
+	private boolean gameOver = false; 
 		
 	public GameModel(){
 		initGame();
@@ -65,6 +75,21 @@ public class GameModel extends Observable implements constants {
 			}	
 			spawnTimer++;
 			
+			//I
+			if(powerupActivated) {
+				if (powerupIndex >=0) {
+					PUList.remove(powerupIndex);
+					powerupIndex = -1;
+				}
+				
+				if(powerupTimer == powerupDuration){
+					powerupTimer = 0;
+					powerupActivated = false;
+					System.out.println("Powerup deactivated");
+				}	
+				powerupTimer++;
+			}
+			
 			for(int i = 0; i < MOList.size(); i++){
 					//make all moving objects act/move
 				MovingObject MO = checkCollisions(MOList.get(i));
@@ -74,7 +99,9 @@ public class GameModel extends Observable implements constants {
 					
 					if(mario.hasWon()) {
 						MOList.clear();
+						PUList.clear();
 						gravityTimes.clear();
+						initFirstLevel();
 						initMovingObjects();
 						score+=1000;
 					}
@@ -82,7 +109,9 @@ public class GameModel extends Observable implements constants {
 					if(MOList.get(0).isKilled || gameWon){
 						//System.out.println("MARIO IS DEAD!!!!!");
 						MOList.clear();
+						PUList.clear();
 						gravityTimes.clear();
+						initFirstLevel();
 						initMovingObjects();
 						
 						//if mario is hit, subtract a life
@@ -103,6 +132,14 @@ public class GameModel extends Observable implements constants {
 						MOList.remove(i);
 						gravityTimes.remove(i);
 					}
+					
+					//If a barrel has been smashed, the value of smashedBarrelIndex >= 0
+					//We remove the barrel using this index
+					if (smashedBarrelIndex >= 0) {
+						MOList.remove(smashedBarrelIndex);
+						gravityTimes.remove(smashedBarrelIndex);
+						smashedBarrelIndex = -1;
+					}
 
 					//If mario jumps over a barrel, increment score by 100
 					else if(MOList.get(i).getYPos() >= mario.getYPos()  && MOList.get(i).getYPos() <= mario.getYPos() + 100 && 
@@ -114,6 +151,7 @@ public class GameModel extends Observable implements constants {
 						score += 100;
 					}
 			}
+
 			//slow game model down, so that game can be played by human
 			if(GUI_ON){
 				Thread.sleep(sleepTime);
@@ -134,7 +172,18 @@ public class GameModel extends Observable implements constants {
 	
 	public boolean isColliding(GameObject o1, GameObject o2){
 		float l1 = o1.getXPos(), r1 = l1+o1.getWidth(), t1 = o1.getYPos(), b1 = t1+o1.getHeight();
-		float l2 = o2.xPos, r2 = o2.xPos+o2.width, t2 = o2.yPos, b2 = o2.yPos+o2.height;
+		float l2 = o2.getXPos(), r2 = o2.getXPos()+o2.getWidth(), t2 = o2.getYPos(), b2 = o2.getYPos()+o2.getHeight();
+		//For Jelle: remember that y = 0 is at THE TOP of the screen
+		if(t1 <= b2 && b1 >= t2 && r1 > l2 && l1 < r2){
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean isCollidingWithPlatformOrLadder(GameObject o1, GameObject o2){
+		float l1 = o1.getXPos(), r1 = l1+o1.getWidth(), t1 = o1.getYPos(), b1 = t1+o1.getHeight();
+		float l2 = o2.getXPos(), r2 = o2.getXPos()+o2.getWidth(), t2 = o2.getYPos(), b2 = o2.getYPos()+o2.getHeight();
+		//For Jelle: remember that y = 0 is at THE TOP of the screen
 		if(b1 <= b2 && b1 >= t2 && r1 > l2 && l1 < r2){
 			return true;
 		}
@@ -144,7 +193,7 @@ public class GameModel extends Observable implements constants {
 	
 	public MovingObject checkLadderCollisions(MovingObject MO){
 		for(GameObject ladder : ladderList){
-			if(isColliding(MO, ladder)){		
+			if(isCollidingWithPlatformOrLadder(MO, ladder)){		
 				MO.canClimb = true;
 				//System.out.println("COLLIDING WITH LADDER");
 				return MO;
@@ -162,7 +211,7 @@ public class GameModel extends Observable implements constants {
 		MO = checkLadderCollisions(MO);
 		
 		for(GameObject platform : platformList){
-			boolean isColliding = isColliding(MO,platform);
+			boolean isColliding = isCollidingWithPlatformOrLadder(MO,platform);
 			
 			//check standing
 			if(!MO.standing){
@@ -190,14 +239,30 @@ public class GameModel extends Observable implements constants {
 		
 		//check if moving objects touch each other, but make sure an object isn't checked with itself
 		for(MovingObject MO2 : MOList){
-			if(MO != MO2 && isColliding(MO,MO2)){
+			//If Mario collides with a barrel, the game is over...
+			if(MO.getName() == "player" && MO != MO2 && isColliding(MO,MO2) && powerupActivated == false){
 				MO.isKilled = true;						
+			} else if(MO.getName() == "player" && MO != MO2 && powerupActivated && isColliding(MO,MO2)) {
+				//...unless Mario has a powerup. Then, the barrel is deleted and the score is incremented by 200
+				//The barrel is stored in a temporary variable
+				smashedBarrelIndex = MOList.indexOf(MO2);
+				score += 200;
 			}
 		}
 	
 		//If Mario is in collision with Peach, the game is over
 		if (isColliding(MO,peach)) {
 			gameWon = true;
+		}
+		
+		//Check whether Mario is colliding with a powerup
+		//Barrels never collide with a powerup, so we don't check the type of moving object
+		for(Powerup PU : PUList) {
+			if(isColliding(MO,PU)) {
+				powerupActivated = true;
+				powerupIndex = PUList.indexOf(PU);
+				System.out.println("Powerup activated");
+			}
 		}
 		
 		return MO;
@@ -208,11 +273,10 @@ public class GameModel extends Observable implements constants {
 		//initialize list
 		platformList = new ArrayList<Platform>();
 		ladderList =  new ArrayList<Ladder>();
+		PUList = new ArrayList<Powerup>();
+		
 		//initTestLevel();
 		initFirstLevel();
-		
-		
-		peach = new Peach(constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_HEIGHT,constants.PEACH_WIDTH);
 	}
 	
 	private void initTestLevel() {
@@ -465,6 +529,10 @@ public class GameModel extends Observable implements constants {
 			GOList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
 		}
 		*/
+		peach = new Peach(constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_HEIGHT,constants.PEACH_WIDTH);
+		oil = new Oil(constants.OIL_START_X,constants.OIL_START_Y,constants.OIL_HEIGHT,constants.OIL_WIDTH);
+		PUList.add(new Powerup(425,500,constants.POWERUP_HEIGHT,constants.POWERUP_WIDTH));
+		PUList.add(new Powerup(50,285,constants.POWERUP_HEIGHT,constants.POWERUP_WIDTH));
 	}
 
 	private void initMovingObjects() {
@@ -506,6 +574,10 @@ public class GameModel extends Observable implements constants {
 	
 	public ArrayList<MovingObject> getMOList(){
 		return MOList;
+	}
+	
+	public ArrayList<Powerup> getPUList(){
+		return PUList;
 	}
 	
 	public boolean isGameOver(){

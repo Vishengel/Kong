@@ -15,15 +15,9 @@ public class GameController {
 	private InputController inputController = new InputController();
 	private Thread thread;
 	
-	
-	
-	
 	public void start() throws IOException{
 		//create game model and view
-		model = new GameModel();
-		
-		
-		
+		model = new GameModel();	
 		
 		//make a thread that controls game model logic
 		thread = new Thread(){
@@ -38,8 +32,7 @@ public class GameController {
 		  };
 		  
 		thread.start();
-		
-		
+				
 		//If GUI is on, add framerate and update timer
 		if(constants.GUI_ON){
 			view = new GameView(model);
@@ -56,13 +49,11 @@ public class GameController {
 	
 	class InputController implements KeyListener {
 		private boolean[] down = new boolean[255];
-		private boolean[] pressed = new boolean[255];
 		
 		@Override
 		public void keyPressed(KeyEvent e) {
 			//System.out.println("Key pressed");
 			down[e.getKeyCode()] = true;
-			pressed[e.getKeyCode()] = true;
 			model.passKeysDownToPlayer(down);
 		}
 

@@ -19,8 +19,8 @@ public class Player extends MovingObject{
 	public Player(int x, int y, int h, int w) {
 		super(x, y, h, w);
 
-		xVel = 1f;
-		yVel = 1f;
+		xVel = 5f;
+		yVel = 5f;
 
 		killOnCollision = false;
 		color = Color.blue;
@@ -127,7 +127,7 @@ public void move(){
 			
 		super.act(time);
 		
-		System.out.println(dy);
+		//System.out.println(dy);
 		
 		xPos += dx;
 		yPos += dy;
