@@ -33,9 +33,10 @@ public abstract class MovingObject extends GameObject{
 	
 	public void act(int time){
 		dy += gravity * time;
-		if(this instanceof Player){
+		/*if(this instanceof Player){
 			System.out.println(gravity * time);
-		}
+		}*/
+		
 	
 		
 	}

@@ -19,7 +19,7 @@ public class Player extends MovingObject{
 	public Player(int x, int y, int h, int w) {
 		super(x, y, h, w);
 
-		xVel = 1f;
+		xVel = 1.5f;
 		yVel = 1.5f;
 
 		killOnCollision = false;
@@ -101,7 +101,6 @@ public void move(){
 		readInput();
 		selectAction();
 		move();
-		super.act(time);
 		
 		
 		//System.out.println(isClimbing);
@@ -114,7 +113,7 @@ public void move(){
 			dy += -jumpHeight;
 		}
 			
-		
+		super.act(time);
 		
 		xPos += dx;
 		yPos += dy;

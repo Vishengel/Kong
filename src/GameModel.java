@@ -14,7 +14,7 @@ public class GameModel extends Observable implements constants {
 	private boolean gameWon = false;
 	
 	private int gravityTime = 10;
-	private int barrelSpawnTime = 200;
+	private int barrelSpawnTime = 300;
 	private int epochs;
 	private int sleepTime = 15;
 	

@@ -9,7 +9,7 @@ public interface constants {
 	int SCREEN_Y = 680;
 	
 	//player constants
-	int PLAYER_START_X = 500;
+	int PLAYER_START_X = 50;
 	int PLAYER_START_Y = 600;
 
 
@@ -32,8 +32,8 @@ public interface constants {
 	int BARREL_START_X = 120;
 	int BARREL_START_Y = 250;
 	
-	int BARREL_HEIGHT = 14;
-	int BARREL_WIDTH = 20;
+	int BARREL_HEIGHT = 20;
+	int BARREL_WIDTH = 26;
 	
 	//flame constants
 	

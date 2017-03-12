@@ -49,7 +49,7 @@ public class GameController {
 				view.gamePanel.repaint();					
 			}			
 		};
-		new Timer(15, FPSTimer).start();
+		new Timer(1, FPSTimer).start();
 		//view.add(view.getGamePanel());
 		//main game loop
 		//while(!model.isGameOver()){
