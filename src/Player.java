@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.AbstractAction;
 import javax.swing.Timer;
@@ -9,65 +10,135 @@ public class Player extends MovingObject{
 
 	private boolean hasPowerUp = false, goLeft, goRight, goUp, goDown, jump;
 	private boolean keysDown[] = new boolean[255];	 
-	private boolean jumping;
-	private float jumpHeight = 3.6f;
+	private boolean jumping = false;
+	private float jumpHeight = 2.6f;
 	private boolean hasWon = false;
 	private boolean isKilled = false;
 	
     
-	public Player(int x, int y, int h, int w, ArrayList<GameObject> GOList) {
-		super(x, y, h, w, GOList);
+	public Player(int x, int y, int h, int w) {
+		super(x, y, h, w);
 
-		xVel = 5f;
-		yVel = 5f;
+		xVel = 1f;
+		yVel = 1f;
 
 		killOnCollision = false;
 		color = Color.blue;
 		action = -1;
 		symbol = 'x';
-		
+		action = 1;
 		name = "player";
+		
 	}
 	
+	
+	//actions: 
+	//0 : left
+	//1 : right
+	//2 : up
+	//3 : down
+	public void selectAction(){
+		
+		//random mario behavior
+		if(constants.AI_MARIO){
+			jump = actionSelector.nextInt(100) <= 10 ? true : false;
+			if(actionSelector.nextInt(100) < 10){
+				action = 1 - action;
+		    }
+		}
+		
+		if(goLeft){
+			action = 0;
+		}
+		if(goRight){
+			action = 1;
+		}
+		if(goUp){
+			action = 2;
+		}
+		if(goDown){
+			action = 3;
+		}
+		if(jump){
+			jumping = true;
+		}
+		
+		
+		
+		
+		
+		
+	}
+	
+public void move(){
+		
+		switch(action){
+		//don't allow vertical movement when climbing
+		case 0:
+			if(!isClimbing){
+				dx += -xVel;
+			}
+			break;
+		case 1: 
+			if(!isClimbing){
+				dx += xVel;
+			}
+			break;
+		case 2:
+			if(canClimb && !jumping){
+				isClimbing = true;
+				dy -= yVel/2;
+			}
+			break;
+		case 3:
+			if(canClimb && !jumping){
+				isClimbing = true;
+				dy += yVel/2;
+			}
+			break;
+		}
+	} 
+	
 	public void act(int time){
+		//System.out.println("Standing: " + standing);
 		dx = 0;
 		dy = 0;
-		System.out.println("Standing on Ladder:" + isClimbing);
-		System.out.println("Standing on platform: " + standing);
-		//call the super act function for gravity and standing on platform
-		super.act(time);
+		//only reset action if mario is not controlled by AI
+		if(!constants.AI_MARIO){
+			action = -1;
+		}
+		
+		
 		readInput();
+		selectAction();
+		move();
 		
 		
-		//if the jump key is down and the player is currently standing on a platform and not
-		// already jumping, start jumping
-		if(jump && !jumping && standing){
-			jumping = true;	
+		
+		
+		//prevent jumping while climbing a ladder
+		if(isClimbing){
+			jumping = false;
 		}
-		
-		
-		
-		dx += (goRight ? xVel : 0) - (goLeft ? xVel : 0);
-		
-		
-		if (isClimbing) {
-			dy += (goDown ? yVel/2 : 0) - (goUp ? yVel/2 : 0);
-		}
-
-		//apply vertical force if jumping
-		if(jumping){ 
+		if(jumping){
 			dy += -jumpHeight;
-			//out.println(dy);
 		}
+			
+		super.act(time);
+		
+		System.out.println(dy);
 		
 		xPos += dx;
 		yPos += dy;
-			
 		
-		//If Mario is in collision with Peach, the game is over
-		if (collidingWithPeach) {
-			hasWon = true;
+		//prevent player from walking out of the screen
+		if(xPos <= 0){
+			xPos = 0;
 		}
+		if(xPos >= constants.SCREEN_X - 30){
+			xPos = constants.SCREEN_X - 30;
+		}
+		
 		
 	}
 	

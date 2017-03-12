@@ -7,24 +7,27 @@ public class Barrel extends MovingObject{
 	//keep track of the distance fallen in order to change direction 
 	private int distanceFallen = 0;
 	
-	public Barrel(int x, int y, int h, int w, ArrayList<GameObject> GOList, boolean d) {
-		super(x, y, h, w, GOList);
+	public Barrel(int x, int y, int h, int w, boolean d) {
+		super(x, y, h, w);
 		symbol = 'O';
 		killOnCollision = false;
 		direction = true;
-		xVel = 4;
+		xVel = 2.2f;
+		yVel = 3;
 		color = color.orange;
 		pointAwarded = false;
-		name = "player";
+		name = "barrel";
 	}
 	
 	public void act(int time) {
-		super.act(time);
+		dx = 0;
+		dy = 0;
 		
-		dy = gravity * time;
+			
+
 		
 		//if falling for longer than 2 time units, change direction
-		if(distanceFallen > 50 && standing){
+		if(distanceFallen > 30 && standing){
 			direction = !direction;
 			//System.out.println(direction);
 			}
@@ -35,21 +38,33 @@ public class Barrel extends MovingObject{
 			distanceFallen = 0;
 			
 			if(direction){
-				dx = xVel;
+				dx += xVel;
 			}
 			else{
-				dx = -xVel;
+				dx += -xVel;
 			}
 		}
 		else{
 			//Only let a barrel pause in its horizontal movement if it falls a long distance
-			if(distanceFallen > 0){
+			if(distanceFallen > 3){
 				dx = 0f;
 			}
 		}
 		
 		
+		//If barrel is on a ladder, 25 % to fall down ladder
+		if(canClimb){
+			if(actionSelector.nextInt(4) >= 2){
+				isClimbing = true;
+			}
+		} 
 		
+		if(isClimbing){
+			//dx = 0;
+			dy += yVel;
+		}
+		
+		super.act(time);
 		xPos += dx;
 		yPos += dy;
 		distanceFallen += dy;

@@ -33,32 +33,27 @@ public class GamePanel extends JPanel implements Observer {
 	 public void paintComponent(Graphics g){
 		super.paintComponent(g); 
 				
-		//draw the Konger himself
-		g.drawImage(kong, 60,120,100,100, null);
+		//Draw the Konger himself
+		g.drawImage(kong, 60,165,100,100, null);
+		g.drawImage(peach,constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_WIDTH, constants.PEACH_HEIGHT, null);
 		
-        for (GameObject object : model.getGOList()){
-        	if(object instanceof Platform){
-        		g.drawImage(platform,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
-    		}
-        	
-        	if(object instanceof Ladder) {
-        		g.drawImage(ladder,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
-        	}
-        	
-        	if(object instanceof Peach) {
-        		g.drawImage(peach,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
-        	}
-     
+        for (Platform p : model.getPlatformList()){
+        	g.drawImage(platform,(int)p.getXPos(), (int)p.getYPos(), (int)p.getWidth(), (int)p.getHeight(), null);
         }
+        for(Ladder l: model.getLadderList()){
+        	g.drawImage(ladder,(int)l.getXPos(), (int)l.getYPos(), (int)l.getWidth(), (int)l.getHeight(), null);
+        }
+        	
+       
         g.setColor(Color.WHITE);
         g.drawString("Score: " + model.getScore(), 500, 50); 
         
         for (MovingObject object : model.getMOList()){
-        	//g.setColor(object.getColor());
-        	if(object instanceof Barrel){
+        	String name = object.getName();
+        	if(name == "barrel"){
         		g.drawImage(barrel,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
         	}
-            if(object instanceof Player){
+            if(name == "player"){
             	g.drawImage(mario, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);	
             }
         }
