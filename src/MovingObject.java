@@ -10,7 +10,7 @@ public abstract class MovingObject extends GameObject{
 	//This value is true if the moving object is colliding with another object
 	protected boolean hasCollision = false;
 	protected boolean killOnCollision;
-	protected boolean isClimbing = false;
+	protected boolean canClimb = false, isClimbing = false;
 	protected boolean collidingWithPeach = false;
 	protected boolean standing = false;
 	protected GameObject collidingWithLadder;
@@ -65,7 +65,9 @@ public abstract class MovingObject extends GameObject{
 		action = a;
 	}
 	
-	
+	public boolean isStanding(){
+		return standing;
+	}
 	
 	
 	//check if object is standing on a platform

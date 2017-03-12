@@ -44,11 +44,15 @@ public class Player extends MovingObject{
 		if(jump && !jumping && standing){
 			jumping = true;	
 		}
-		
-		
+		if(standing) {
+			isClimbing = false;
+		}
 		
 		dx += (goRight ? xVel : 0) - (goLeft ? xVel : 0);
 		
+		if (!isClimbing && canClimb && (goUp || goDown)) {
+			isClimbing = true;
+		}
 		
 		if (isClimbing) {
 			dy += (goDown ? yVel/2 : 0) - (goUp ? yVel/2 : 0);
@@ -61,8 +65,7 @@ public class Player extends MovingObject{
 		}
 		
 		xPos += dx;
-		yPos += dy;
-			
+		yPos += dy;	
 		
 		//If Mario is in collision with Peach, the game is over
 		if (collidingWithPeach) {

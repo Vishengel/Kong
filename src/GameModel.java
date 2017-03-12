@@ -61,7 +61,7 @@ public class GameModel extends Observable implements constants {
 			}
 			//spawn a barrel every 450 milliseconds
 			if(timer % barrelSpawnTime == 0){
-				//spawnBarrel();
+				spawnBarrel();
 			} 
 			//reset timer eventually, to avoid overflow
 			if(timer > 1500){
@@ -139,30 +139,20 @@ public class GameModel extends Observable implements constants {
 	public MovingObject checkCollisions(MovingObject MO){
 		//For every moving object, check if it is standing on a platform
 		MO.standing = false;
-		MO.isClimbing = false;
+		//MO.isClimbing = false;
 		
 		for(GameObject GO : GOList){
 			boolean isColliding = isColliding(MO,GO);
 			
-			//check climbing
-			if(!MO.isClimbing){
-				if(GO.getName() == "ladder" && isColliding){
-					MO.isClimbing = true;
-					break;
-				}
-				if(GO.getName() == "ladder" && !isColliding){
-					MO.isClimbing = false;
-				}
-			}
 			//check standing
 			if(!MO.standing){
 				if(GO.getName() == "platform" && isColliding){ 
 					//make object stand exactly on top of the platform 
 					MO.standing = true;
 					//make object stand exactly on top of the platform, unless climbing on ladder
-					if(!MO.isClimbing){
+					//if(!MO.isClimbing){
 						MO.setYPos(GO.getYPos() - MO.getHeight());
-					}
+					//}
 					//System.out.println("Standing on platform!");
 									
 				}
@@ -170,6 +160,17 @@ public class GameModel extends Observable implements constants {
 				if(GO.getName() == "platform" && !isColliding){		
 					MO.standing = false;
 					//System.out.println("Not standing..");
+				}
+			}
+			
+			//check climbing
+			if(!MO.isClimbing){
+				if(GO.getName() == "ladder" && isColliding && MO.isStanding()){
+					MO.canClimb = true;
+					break;
+				}
+				if(GO.getName() == "ladder" && !isColliding){
+					MO.canClimb = false;
 				}
 			}
 			
