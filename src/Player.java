@@ -119,6 +119,8 @@ public void move(){
 		//prevent jumping while climbing a ladder
 		if(isClimbing){
 			jumping = false;
+			dx = 0;
+			xPos = ladderXPos + constants.LADDER_WIDTH / 2 - constants.PLAYER_WIDTH / 2;
 		}
 
 		if(jumping){

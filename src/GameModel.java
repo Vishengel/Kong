@@ -28,7 +28,6 @@ public class GameModel extends Observable implements constants {
 	private Peach peach;
 	private Oil oil;
 	private Flame flame;
-	private Powerup powerup;
 	
 	private boolean powerupActivated = false;
 	private boolean gameWon = false;
@@ -178,11 +177,14 @@ public class GameModel extends Observable implements constants {
 		
 	}
 	
-	public boolean isColliding(GameObject o1, GameObject o2){
+	public boolean isColliding(MovingObject o1, GameObject o2){
 		float l1 = o1.getXPos(), r1 = l1+o1.getWidth(), t1 = o1.getYPos(), b1 = t1+o1.getHeight();
 		float l2 = o2.getXPos(), r2 = o2.getXPos()+o2.getWidth(), t2 = o2.getYPos(), b2 = o2.getYPos()+o2.getHeight();
 		//For Jelle: remember that y = 0 is at THE TOP of the screen
-		if(t1 <= b2 && b1 >= t2 && r1 > l2 && l1 < r2){
+		if(!(l1>=r2 || l2>=r1 || t1>=b2 || t2>=b1)){
+			if(t1 > b2) {
+				o1.setCollidingWithTop(true);
+			}
 			return true;
 		}
 		return false;
@@ -191,7 +193,7 @@ public class GameModel extends Observable implements constants {
 	public boolean isCollidingWithPlatformOrLadder(MovingObject o1, GameObject o2){
 		float l1 = o1.getXPos(), r1 = l1+o1.getWidth(), t1 = o1.getYPos(), b1 = t1+o1.getHeight();
 		float l2 = o2.getXPos(), r2 = o2.getXPos()+o2.getWidth(), t2 = o2.getYPos(), b2 = o2.getYPos()+o2.getHeight();
-		//For Jelle: remember that y = 0 is at THE TOP of the screen
+		//Jelle: remember that y = 0 is at THE TOP of the screen
 		if((b1 <= b2 && b1 >= t2 && r1 > l2 && l1 < r2)){
 			//If a moving object is falling, ladders and platforms are ignored
 			if(o1.isFalling()) {
@@ -205,14 +207,17 @@ public class GameModel extends Observable implements constants {
 	
 	
 	public MovingObject checkLadderCollisions(MovingObject MO){
+		MO.setCollidingWithTop(false);
 		for(GameObject ladder : ladderList){
-			if(isCollidingWithPlatformOrLadder(MO, ladder)){		
-				MO.canClimb = true;
+			if(isColliding(MO, ladder)){		
+				MO.setCanClimb(true);
+				MO.setLadderXPos(ladder.getXPos());
 				//System.out.println("COLLIDING WITH LADDER");
 				return MO;
 			}
 		}
-		MO.canClimb = false;
+		MO.setCanClimb(false);
+		MO.setFirstCanClimb(true);
 		return MO;
 	}
 	
