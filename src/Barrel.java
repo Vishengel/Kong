@@ -26,7 +26,7 @@ public class Barrel extends MovingObject{
 		
 		if(!falling) {
 			//if falling for longer than 2 time units, change direction
-			if(distanceFallen > 30 && standing){
+			if(distanceFallen > 25 && standing){
 				direction = !direction;
 				//System.out.println(direction);
 				}
