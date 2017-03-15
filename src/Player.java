@@ -8,7 +8,7 @@ import javax.swing.Timer;
 
 public class Player extends MovingObject{
 
-	private boolean hasPowerUp = false, goLeft, goRight, goUp, goDown, jump;
+	private boolean goLeft, goRight, goUp, goDown, jump;
 	private boolean keysDown[] = new boolean[255];	 
 	private boolean jumping = false;
 	private float jumpHeight = 2.6f;
@@ -23,10 +23,6 @@ public class Player extends MovingObject{
 		yVel = 2f;
 
 		killOnCollision = false;
-		color = Color.blue;
-		action = -1;
-		symbol = 'x';
-		action = 1;
 		name = "player";
 		
 	}
@@ -41,10 +37,9 @@ public class Player extends MovingObject{
 		
 		//random mario behavior
 		if(constants.AI_MARIO){
-			jump = actionSelector.nextInt(100) <= 10 ? true : false;
-			if(actionSelector.nextInt(100) < 10){
-				action = 1 - action;
-		    }
+			if(!jumping){
+				action = actionSelector.nextInt(7);
+			}
 		}
 		
 		if(goLeft){
@@ -74,27 +69,45 @@ public void move(){
 		
 		switch(action){
 		//don't allow vertical movement when climbing
+		//move left
 		case 0:
 			if(!isClimbing){
 				dx += -xVel;
 			}
 			break;
+		//move right
 		case 1: 
 			if(!isClimbing){
 				dx += xVel;
 			}
 			break;
+		//move up
 		case 2:
 			if(canClimb && !jumping){
 				isClimbing = true;
 				dy -= yVel/2;
 			}
 			break;
+		//move down
 		case 3:
 			if(canClimb && !jumping){
 				isClimbing = true;
 				dy += yVel/2;
 			}
+			break;
+		//jump up
+		case 4:
+			jumping = true;
+			break;
+		//jump left
+		case 5:
+			jumping = true;
+			dx += -xVel;
+			break;
+		//jump right
+		case 6:
+			jumping = true;
+			dx += xVel;
 			break;
 		}
 	} 
@@ -113,7 +126,7 @@ public void move(){
 		selectAction();
 		move();
 		
-		
+		System.out.println(action);
 		
 		
 		//prevent jumping while climbing a ladder
