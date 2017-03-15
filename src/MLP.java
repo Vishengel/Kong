@@ -5,7 +5,7 @@ public class MLP {
 	//amount of inputs
 	private int amountInput = 3;
 	//amount of nodes in the hidden layer
-	private int amountHidden = 3;
+	private int amountHidden = 20;
 	//amount of nodes in the output layer
 	private int amountOutput = 1;
 	//amount of patterns
@@ -13,7 +13,7 @@ public class MLP {
 	//define the learning rate
 	private double learningRate = 0.3;
 	
-	private int[] target = new int[] {0, 1, 1, 1};
+	private int[] target = new int[] {0, 1, 1, 0};
 	private int[][] inputs = new int[][] {
 			{0,0,-1}, 
 			{0,1,-1}, 
@@ -69,66 +69,55 @@ public class MLP {
 		 return (1/( 1 + Math.pow(Math.E,(-1*activation))));
 	}
 	
-	public void calculateHiddenOutput(){
-		//calculate activation of one hidden node: input vector * hidden weight matrix
-		for(int pattern = 0; pattern < amountPatterns; pattern++){
-			System.out.println("Pattern: " + pattern); 
-			//current pattern
-			int[] input = inputs[pattern];
-			//loop through the hidden weights and calculate the hidden activation
-			for(int i = 0; i < amountHidden; i++){
-				double activation = 0;
-				for(int j = 0; j < amountInput; j++){
-					activation += input[j] * weightsHidden[j][i];
-				}
-				hiddenNodes.get(i).setActivation(activation);
-				//calculate output of hidden layer by using the sigmoid function
-				hiddenNodes.get(i).setOutput(sigmoid(activation));
+	public void calculateHiddenOutput(int pattern){
+		int[] input = inputs[pattern];
+		//loop through the hidden weights and calculate the hidden activation
+		for(int i = 0; i < amountHidden; i++){
+			double activation = 0;
+			for(int j = 0; j < amountInput; j++){
+				activation += input[j] * weightsHidden[j][i];
 			}
-			//print output of hidden layer
-			for(int i = 0; i < amountHidden; i++){
-				//System.out.println(hiddenNodes.get(i).getOutput());
-			}
+			hiddenNodes.get(i).setActivation(activation);
+			//calculate output of hidden layer by using the sigmoid function
+			hiddenNodes.get(i).setOutput(sigmoid(activation));
 		}
+		/*print output of hidden layer
+		for(int i = 0; i < amountHidden; i++){
+			//System.out.println(hiddenNodes.get(i).getOutput());
+		}
+		*/
+	}
 		
+	
+	
+	public void calculateOutput(int pattern){
+		for(int i = 0; i < amountOutput; i++){
+			double activation = 0;
+			for(int j = 0; j < amountHidden; j++){
+				activation += hiddenNodes.get(j).getOutput() * weightsOutput[j][i];
+			}
+			outputNodes.get(i).setActivation(activation);					
+			outputNodes.get(i).setOutput(sigmoid(activation));		
+			double gradient = sigmoidPrime(activation) * (target[pattern] - outputNodes.get(i).getOutput());
+			outputNodes.get(i).setGradient(gradient);			
+		}
+					
+		for(int i = 0; i < amountOutput; i++){
+			//System.out.println("Gradient of output node " + i + ": " + outputNodes.get(i).getGradient());
+			System.out.println("Output: " + (outputNodes.get(i).getActivation() >= 0 ? 1 : 0) + " ");
+		}
 	}
-	
-	public void calculateOutput(){
-				for(int pattern = 0; pattern < amountPatterns; pattern++){
-					System.out.println("Pattern: " + pattern);
-					//reset activation in all hidden nodes
-	
-					int[] input = inputs[pattern];
-					for(int i = 0; i < amountOutput; i++){
-						double activation = 0;
-						for(int j = 0; j < amountHidden; j++){
-							activation += input[j] * weightsOutput[j][i];
-						}
-						outputNodes.get(i).setActivation(activation);
-						
-						outputNodes.get(i).setOutput(sigmoid(activation));
-					
-						double gradient = sigmoidPrime(activation) * (target[pattern] - outputNodes.get(i).getOutput());
-						outputNodes.get(i).setGradient(gradient);
-						
-					}
-					
-					for(int i = 0; i < amountOutput; i++){
-						//System.out.println("Gradient of output node " + i + ": " + outputNodes.get(i).getGradient());
-						System.out.println("Output: " + outputNodes.get(i).getOutput());
-					}
-				}
 				
+	
+	
+	public void forwardPass(int pattern){
+		//System.out.println("----Hidden layer----");
+		calculateHiddenOutput(pattern);
+		//System.out.println("----output layer----");
+		calculateOutput(pattern);
 	}
 	
-	public void forwardPass(){
-		System.out.println("----Hidden layer----");
-		calculateHiddenOutput();
-		System.out.println("----output layer----");
-		calculateOutput();
-	}
-	
-	public void backPropagation(){
+	public void backPropagation(int pattern){
 		//calculate the local gradient of the hidden layer
 		for(int i= 0; i < amountHidden; i++){
 			double gradient = sigmoidPrime(hiddenNodes.get(i).getActivation());
@@ -139,38 +128,49 @@ public class MLP {
 			}
 			gradient = gradient * gradientOutput;
 			hiddenNodes.get(i).setGradient(gradient);
-			System.out.println("Gradient of hidden node " + i + ": " + hiddenNodes.get(i).getGradient());
+			//System.out.println("Gradient of hidden node " + i + ": " + hiddenNodes.get(i).getGradient());
 		}
 		//calculate weight changes of hidden layer
-		for(int pattern = 0; pattern < amountPatterns; pattern++){
-			int[] input = inputs[pattern];
-			for(int i = 0; i < amountInput; i++){
-				for(int j = 0; j < amountHidden; j++){
-					weightsHidden[i][j] += learningRate * input[j] * hiddenNodes.get(j).getGradient();
-				}
-			}
-			//calculate weight changes of output layer
-			for(int i = 0; i < amountHidden; i++){
-				for(int j = 0; j < amountOutput; j++){
-					weightsOutput[i][j] += learningRate * hiddenNodes.get(j).getOutput() * outputNodes.get(j).getGradient();
-				}
+		int[] input = inputs[pattern];
+		for(int i = 0; i < amountInput; i++){
+			for(int j = 0; j < amountHidden; j++){
+				weightsHidden[i][j] += learningRate * input[i] * hiddenNodes.get(j).getGradient();
 			}
 		}
-		
+		//calculate weight changes of output layer
+		for(int i = 0; i < amountHidden; i++){
+			for(int j = 0; j < amountOutput; j++){
+				weightsOutput[i][j] += learningRate * hiddenNodes.get(i).getOutput() * outputNodes.get(j).getGradient();
+			}
+		}
 	}
+		
 	
-	public void testNetwork(){
-		forwardPass();
+	
+	public void testNetwork(){	
+		for(int pattern = 0; pattern < amountPatterns; pattern++){
+			System.out.println("pattern: " + pattern + ":");
+			forwardPass(pattern);
+		}
 	}
 	
 	public void trainNetwork(){
-		int epochs = 1000;
+		int epochs = 10000;
 		int epoch = 0;
+		//train a predetermined amount of epochs
 		while(epoch < epochs){
-			forwardPass();
-			backPropagation();
-			epoch++;
+			//show each input to the net and perform forward and backwards propagation
+			for(int pattern = 0; pattern < amountPatterns; pattern++){
+				//System.out.println("Pattern " + pattern + ":");
+				forwardPass(pattern);
+				backPropagation(pattern);			
+			}
+		epoch++;
 		}
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		System.out.println("------RESULTS-----");
 		testNetwork();
 	}
 	
