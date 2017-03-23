@@ -8,5 +8,11 @@ public class Main {
 		NeuralNetworkJelle n = new NeuralNetworkJelle();
 		n.trainNetwork();
 		n.printResults();
+
+		/*
+		MLP mlp = new MLP();
+		mlp.trainNetwork();
+		*/
+
 	}
 }
