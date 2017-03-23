@@ -34,30 +34,34 @@ public class Player extends MovingObject{
 	//2 : up
 	//3 : down
 	public void selectAction(){
-		
-		//random mario behavior
-		if(constants.AI_MARIO){
-			if(!jumping){
+				
+		if(!jumping){
+			if(goLeft){
+				action = 0;
+			}
+			if(goRight){
+				action = 1;
+			}
+			if(goUp){
+				action = 2;
+			}
+			if(goDown){
+				action = 3;
+			}
+			if(jump){
+				action = 4;
+			}
+			if(jump && goLeft){
+				action = 5;
+			}
+			if(jump && goRight){
+				action = 6;
+			}
+			//random mario behavior
+			if(constants.AI_MARIO){
 				action = actionSelector.nextInt(7);
 			}
 		}
-		
-		if(goLeft){
-			action = 0;
-		}
-		if(goRight){
-			action = 1;
-		}
-		if(goUp){
-			action = 2;
-		}
-		if(goDown){
-			action = 3;
-		}
-		if(jump){
-			jumping = true;
-		}
-		
 		
 		
 		
@@ -116,8 +120,8 @@ public void move(){
 		//System.out.println("Standing: " + standing);
 		dx = 0;
 		dy = 0;
-		//only reset action if mario is not controlled by AI
-		if(!constants.AI_MARIO){
+		//reset action
+		if(!jumping){
 			action = -1;
 		}
 		
