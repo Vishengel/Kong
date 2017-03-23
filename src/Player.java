@@ -130,7 +130,7 @@ public void move(){
 		selectAction();
 		move();
 		
-		System.out.println(action);
+		//System.out.println(action);
 		
 		
 		//prevent jumping while climbing a ladder

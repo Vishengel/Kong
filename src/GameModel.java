@@ -80,8 +80,7 @@ public class GameModel extends Observable implements constants {
 				}
 			}	
 			spawnTimer++;
-			
-			//I
+
 			if(powerupActivated) {
 				if (powerupIndex >=0) {
 					PUList.remove(powerupIndex);
@@ -102,29 +101,17 @@ public class GameModel extends Observable implements constants {
 				MOList.set(i, MO); 
 					MOList.get(i).act(gravityTimes.get(i));
 					//check collisions and update moving object states
-					
-					//if player is hit or game is won, reset objects. 
-					if(MOList.get(0).isKilled || gameWon){
-						//System.out.println("MARIO IS DEAD!!!!!");
-						MOList.clear();
-						PUList.clear();
-						gravityTimes.clear();
-						initFirstLevel();
-						initMovingObjects();
-						firstBarrel = true;
-						powerupActivated = false;
 						
-						//if mario is hit, subtract a life
-						if(MOList.get(0).isKilled){	
-							lives--;
-						}
+					//if mario is hit, subtract a life
+					if(MOList.get(0).isKilled){	
+						lives--;
+						resetGame();
+					} else if(gameWon){
 						//if mario saved the princess, add 1000 points instead
-						else{
-							gameWon = false;
-							score += 1000;
-						}
-						
-					} 
+						gameWon = false;
+						score += 1000;
+						resetGame();
+					}
 										
 					//If object falls out of the game screen, delete it
 					else if(MOList.get(i).getYPos() >= constants.SCREEN_Y){
@@ -172,6 +159,16 @@ public class GameModel extends Observable implements constants {
 		//initialize player and possibly other moving objects
 		initMovingObjects();
 		
+	}
+	
+	public void resetGame() {
+		MOList.clear();
+		PUList.clear();
+		gravityTimes.clear();
+		initFirstLevel();
+		initMovingObjects();
+		firstBarrel = true;
+		powerupActivated = false;
 	}
 	
 	public boolean isColliding(MovingObject o1, GameObject o2){
@@ -234,6 +231,7 @@ public class GameModel extends Observable implements constants {
 				if(isColliding){ 
 					//make object stand exactly on top of the platform 
 					MO.standing = true;
+	
 					//make object stand exactly on top of the platform, unless climbing on ladder
 					if(!MO.isClimbing){
 						MO.setYPos(platform.getYPos() - MO.getHeight());
@@ -257,7 +255,7 @@ public class GameModel extends Observable implements constants {
 		for(MovingObject MO2 : MOList){
 			//If Mario collides with a barrel, the game is over...
 			if(MO.getName() == "player" && MO != MO2 && isColliding(MO,MO2) && powerupActivated == false){
-				MO.isKilled = true;						
+				//MO.isKilled = true;						
 			} else if(MO.getName() == "player" && MO != MO2 && powerupActivated && isColliding(MO,MO2)) {
 				//...unless Mario has a powerup. Then, the barrel is deleted and the score is incremented by 200
 				//The barrel is stored in a temporary variable
@@ -430,7 +428,7 @@ public class GameModel extends Observable implements constants {
 		y = constants.SCREEN_Y - 50;
 		for(int i = 0; i < 2*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
 			y -= constants.LADDER_HEIGHT;
-			ladderList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
+			//ladderList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
 		}
 		
 		y -= 2 * constants.PLATFORM_HEIGHT;
@@ -466,7 +464,7 @@ public class GameModel extends Observable implements constants {
 		y -= platformYDiff;
 		for(int i = 0; i < 2*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
 			y -= constants.LADDER_HEIGHT;
-			ladderList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
+			//ladderList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
 		}
 		
 		y -= 4 * constants.LADDER_HEIGHT;
@@ -495,7 +493,7 @@ public class GameModel extends Observable implements constants {
 
 		for(int i = 0; i < 2*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
 			y -= constants.LADDER_HEIGHT;
-			ladderList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
+			//ladderList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
 		}
 		
 		y -= 4 * constants.LADDER_HEIGHT;
@@ -524,7 +522,7 @@ public class GameModel extends Observable implements constants {
 		y -= 2 * platformYDiff;
 		for(int i = 0; i < 3*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
 			y -= constants.LADDER_HEIGHT;
-			ladderList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
+			//ladderList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
 		}
 		
 		y -= constants.PLATFORM_HEIGHT;

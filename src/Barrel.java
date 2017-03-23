@@ -60,8 +60,9 @@ public class Barrel extends MovingObject{
 				if(actionSelector.nextInt(4) >= 0){
 					System.out.println(++i);
 					isClimbing = true;
+					standing = false;
 				}
-				dy += 5*yVel;
+				//dy += yVel;
 			} 
 			
 			if(isClimbing){
