@@ -103,9 +103,6 @@ public class GameModel extends Observable implements constants {
 					MOList.get(i).act(gravityTimes.get(i));
 					//check collisions and update moving object states
 					
-					if(gameWon) {
-						score+=1000;
-					}
 					//if player is hit or game is won, reset objects. 
 					if(MOList.get(0).isKilled || gameWon){
 						//System.out.println("MARIO IS DEAD!!!!!");
@@ -124,7 +121,7 @@ public class GameModel extends Observable implements constants {
 						//if mario saved the princess, add 1000 points instead
 						else{
 							gameWon = false;
-							//score += 1000;
+							score += 1000;
 						}
 						
 					} 
@@ -292,7 +289,10 @@ public class GameModel extends Observable implements constants {
 		for(Powerup PU : PUList) {
 			if(isColliding(MO,PU)) {
 				powerupActivated = true;
+				//Store the index of the activated powerup so it can be deleted from the list
 				powerupIndex = PUList.indexOf(PU);
+				//This makes sure the timer is reset when a powerup is picked up while a powerup is already active
+				powerupTimer = 0;
 				System.out.println("Powerup activated");
 			}
 		}
