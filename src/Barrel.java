@@ -53,7 +53,7 @@ public class Barrel extends MovingObject{
 			
 			//If barrel is on a ladder, 25 % to fall down ladder
 			if(canClimb){
-				if(actionSelector.nextInt(4) >= 2){
+				if(actionSelector.nextInt(100) <= 70 ){
 					isClimbing = true;
 				}
 			} 
