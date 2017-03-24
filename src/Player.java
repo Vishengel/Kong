@@ -19,8 +19,8 @@ public class Player extends MovingObject{
 	public Player(int x, int y, int h, int w) {
 		super(x, y, h, w);
 
-		xVel = 2f;
-		yVel = 2f;
+		xVel = 1.5f;
+		yVel = 1.5f;
 
 		killOnCollision = false;
 		name = "player";
@@ -204,6 +204,16 @@ public void move(){
 	
 	public boolean isKilled(){
 		return isKilled;
+	}
+
+
+	public boolean isClimbing() {	
+		return isClimbing;
+	}
+
+
+	public boolean isJumping() {
+		return jumping;
 	}
 	
 }

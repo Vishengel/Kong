@@ -1,4 +1,5 @@
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observer;
 import java.util.Observable;
@@ -24,6 +25,10 @@ public class GameModel extends Observable implements constants {
 	private ArrayList<MovingObject> MOList;
 	private ArrayList<Powerup> PUList;
 	
+	//this array contains the 3 boolean and 6 float inputs for the MLP
+	private float[] inputs = new float[9];
+	
+	
 	private Player mario;
 	private Peach peach;
 	private Oil oil;
@@ -35,6 +40,8 @@ public class GameModel extends Observable implements constants {
 	private boolean gameOver = false; 
 	private boolean firstBarrel = true;
 	private boolean firstFlameOilCollision = true;
+	
+	FileHandler fh = new FileHandler();
 		
 	public GameModel(){
 		initGame();
@@ -44,6 +51,8 @@ public class GameModel extends Observable implements constants {
 		gravityTimes.add(0);
 		MOList.add(new Barrel(constants.BARREL_START_X,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, true, falling));
 	}
+	
+	
 	public void incrementTime(){
 		for(int i = 0; i < MOList.size(); i++){
 			MovingObject MO = MOList.get(i);
@@ -60,12 +69,86 @@ public class GameModel extends Observable implements constants {
 		}	
 	}
 	
+	public float getEuclideanDistance(GameObject go1, GameObject go2) {
+		float x1 = go1.getXPos() + go1.getWidth() / 2;
+		float x2 = go2.getXPos() + go2.getWidth() / 2;
+		float y1 = go1.getYPos() + go1.getHeight() / 2;
+		float y2 = go2.getYPos() + go2.getHeight() / 2;
+		return (float) Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) );
+	}
+	
+	public float findNearestObject(String objectName){
+		float minimumDistance = 9999999;
+		if(objectName == "ladder"){
+			for(int i = 0; i < ladderList.size(); i++){
+				Ladder l = ladderList.get(i);
+				float distance = getEuclideanDistance(mario,ladderList.get(i));
+				//if platform is closest to mario, save the distance
+				//only do this if the platform is between the top and middle of mario
+				if(distance < minimumDistance && (l.getYPos() + l.getHeight()) > mario.getYPos()
+				&& (l.getYPos() + l.getHeight()) < (mario.getYPos() + mario.getHeight() / 2)){
+					minimumDistance = distance;
+				}
+			}
+			
+		}
+		else if(objectName == "powerup"){
+			for(int i = 0; i < PUList.size(); i++){
+				float distance = getEuclideanDistance(mario,PUList.get(i));
+				if(distance < minimumDistance){
+					minimumDistance = distance;
+				}
+			}		
+		}
+		
+		else if(objectName == "barrel"){
+			for(int i = 0; i < MOList.size(); i++){
+				if(MOList.get(i).getName() == "barrel"){
+					Barrel b = (Barrel) MOList.get(i);
+					float distance = getEuclideanDistance(mario,ladderList.get(i));
+					if(distance < minimumDistance){
+								minimumDistance = distance;
+					}
+				}
+			}
+		}
+		
+		return minimumDistance;
+	}
+	
+	public void calculateInputs(){
+		//update boolean input array
+		inputs[0] = powerupActivated ? 1 : 0;
+		inputs[1] = mario.isClimbing() ? 1 : 0;
+		inputs[2] = mario.isJumping() ? 1 : 0;
+		//update distance input array
+		//calculate distance to flame enemy
+		if(flame != null){
+			inputs[3] = getEuclideanDistance(mario, flame);
+			//System.out.println("1. nearest flame " + inputs[0]);
+		}
+		//calculate distance to nearest power-up
+		inputs[4] = findNearestObject("powerup");
+		//System.out.println("2. nearest powerup " + inputs[1]);
+		//calculate distance to nearest ladder
+		inputs[5] = findNearestObject("ladder");
+		//System.out.println("3. Nearest Ladder: " + inputs[2]);
+		//calculate distance to peach
+		inputs[6] = getEuclideanDistance(mario, peach);
+		//System.out.println("4. peach: " + inputs[3]);
+		//calculate distance to the nearest barrel on the same platform
+		inputs[7] =	findNearestObject("barrel");
+		//System.out.println("nearest barrel: " + inputs[4]);
+		//calculate distance to nearest barrel on upper platform
+		inputs[8] = findNearestObject("upperBarrel");
+		//System.out.println("nearest upper-barrel: " + inputs[5]);
+	}
+	
 	
 	//main game loop
-
-	public void runGame() throws InterruptedException{
+	public void runGame() throws InterruptedException, IOException{
 		while(epochs < constants.MAX_EPOCHS){
-			
+			calculateInputs();
 			//handle gravity
 			incrementTime();
 				
@@ -165,6 +248,9 @@ public class GameModel extends Observable implements constants {
 				Thread.sleep(sleepTime);
 			}
 			epochs++;
+			//write game state + action taken to training set
+			fh.writeToFile(inputs,mario.getAction());
+			
 		}
 		
 	}	
