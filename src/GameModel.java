@@ -1,4 +1,5 @@
 import java.awt.event.ActionEvent;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observer;
@@ -42,6 +43,7 @@ public class GameModel extends Observable implements constants {
 	private boolean firstFlameOilCollision = true;
 	
 	FileHandler fh = new FileHandler();
+	MLP mlp;
 		
 	public GameModel(){
 		initGame();
@@ -147,6 +149,13 @@ public class GameModel extends Observable implements constants {
 	
 	//main game loop
 	public void runGame() throws InterruptedException, IOException{
+		//if training, create the mlp and train it using the data gathered during demonstration
+		if(constants.trainingPhase){
+			System.out.println("Training MLP...");
+			mlp = createAndTrainMLP();
+			System.out.println("Training done! Begin testing!");
+			
+		}
 		while(epochs < constants.MAX_EPOCHS){
 			calculateInputs();
 			//handle gravity
@@ -182,6 +191,18 @@ public class GameModel extends Observable implements constants {
 			
 			for(int i = 0; i < MOList.size(); i++){
 					//make all moving objects act/move
+				//generate player action with the MLP using the current state, when testing
+				//cast inputs to doubles... should be easier to do somehow...
+				if(constants.testingPhase){
+					double[] inputDoubleCopy = new double[10];
+					for(int j = 0; j < 9; j++){
+						inputDoubleCopy[j] = (double) inputs[j];
+						//System.out.println(j + ": " + inputDoubleCopy[j]);
+					}
+					int action = mlp.testNetwork(inputDoubleCopy);
+					//System.out.println(action);
+					mario.setAction(action);
+				}
 				MovingObject MO = checkCollisions(MOList.get(i));
 				MOList.set(i, MO); 
 					MOList.get(i).act(gravityTimes.get(i));
@@ -249,13 +270,22 @@ public class GameModel extends Observable implements constants {
 			}
 			epochs++;
 			//write game state + action taken to training set
-			//fh.writeToFile(inputs,mario.getAction());
-			fh.readFile();
+			if(constants.demoPhase){
+				fh.writeToFile(inputs,mario.getAction());
+			}
+			
 			
 		}
 		
 	}	
-	
+	//create and train mlp using the demo data
+	private MLP createAndTrainMLP() throws FileNotFoundException, IOException {
+		
+		mlp = new MLP(fh.readFile());
+		mlp.trainNetwork();
+		return mlp;
+	}
+
 	//This function is called at the start of the game and runs the entire model
 	public void initGame() {
 		//initialize game objects 
