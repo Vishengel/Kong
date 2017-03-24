@@ -5,9 +5,9 @@ public class Main {
 	public static void main(String[] args) throws IOException{
 		GameController gc = new GameController();
 		gc.start();
-		NeuralNetworkJelle n = new NeuralNetworkJelle();
-		n.trainNetwork();
-		n.printResults();
+		//NeuralNetworkJelle n = new NeuralNetworkJelle();
+		//n.trainNetwork();
+		//n.printResults();
 
 		/*
 		MLP mlp = new MLP();

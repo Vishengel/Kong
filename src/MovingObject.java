@@ -95,6 +95,26 @@ public abstract class MovingObject extends GameObject{
 		this.ladderXPos = ladderXPos;
 	}
 	
+	public boolean getStanding() {
+		return standing;
+	}
+	
+	public void setStanding(boolean standing) {
+		this.standing = standing;
+	}
+	
+	public boolean getCanClimb() {
+		return canClimb;
+	}
+	
+	public boolean getIsClimbing() {
+		return isClimbing;
+	}
+	
+	public void setIsClimbing(boolean isClimbing) {
+		this.isClimbing = isClimbing;
+	}
+	
 	public void setFirstCanClimb(boolean firstCanClimb) {
 		this.firstCanClimb = firstCanClimb;
 	}

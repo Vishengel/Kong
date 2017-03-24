@@ -69,6 +69,7 @@ public class GameModel extends Observable implements constants {
 			incrementTime();
 				
 			//spawn barrel
+			/*
 			if(spawnTimer == barrelSpawnTime){
 				spawnTimer = 0;
 				//The first barrel always goes directly down to the oil barrel
@@ -79,6 +80,11 @@ public class GameModel extends Observable implements constants {
 					spawnBarrel(false);
 				}
 			}	
+			*/
+			if (firstBarrel) {
+				spawnBarrel(false);
+				firstBarrel = false;
+			}
 			spawnTimer++;
 
 			if(powerupActivated) {
@@ -171,14 +177,11 @@ public class GameModel extends Observable implements constants {
 		powerupActivated = false;
 	}
 	
-	public boolean isColliding(MovingObject o1, GameObject o2){
+	public boolean isColliding(GameObject o1, GameObject o2){
 		float l1 = o1.getXPos(), r1 = l1+o1.getWidth(), t1 = o1.getYPos(), b1 = t1+o1.getHeight();
 		float l2 = o2.getXPos(), r2 = o2.getXPos()+o2.getWidth(), t2 = o2.getYPos(), b2 = o2.getYPos()+o2.getHeight();
 		//For Jelle: remember that y = 0 is at THE TOP of the screen
 		if(!(l1>=r2 || l2>=r1 || t1>=b2 || t2>=b1)){
-			if(t1 > b2) {
-				o1.setCollidingWithTop(true);
-			}
 			return true;
 		}
 		return false;
@@ -201,17 +204,26 @@ public class GameModel extends Observable implements constants {
 	
 	
 	public MovingObject checkLadderCollisions(MovingObject MO){
-		MO.setCollidingWithTop(false);
+		boolean collidingWithLadder = false;
+		
 		for(GameObject ladder : ladderList){
-			if(isColliding(MO, ladder)){		
+			if(isColliding(MO, ladder)){	
+				collidingWithLadder = true;
 				MO.setCanClimb(true);
 				MO.setLadderXPos(ladder.getXPos());
-				//System.out.println("COLLIDING WITH LADDER");
-				return MO;
+				if (MO.getYPos() > ladder.getYPos()) {
+					MO.setCollidingWithTop(true);
+					//System.out.println("COLLIDING WITH LADDER");
+				}
+				
 			}
 		}
-		MO.setCanClimb(false);
-		MO.setFirstCanClimb(true);
+		if (!collidingWithLadder) {
+			MO.setCanClimb(false);
+			MO.setFirstCanClimb(true);
+			MO.setCollidingWithTop(false);
+		}
+		
 		return MO;
 	}
 	
@@ -223,29 +235,30 @@ public class GameModel extends Observable implements constants {
 		MO = checkLadderCollisions(MO);
 		
 		//Handle collision of moving object with a platform
-		for(GameObject platform : platformList){
+		for(Platform platform : platformList){
 			boolean isColliding = isCollidingWithPlatformOrLadder(MO,platform);
-			
-			//check standing
-			if(!MO.standing){
-				if(isColliding){ 
-					//make object stand exactly on top of the platform 
-					MO.standing = true;
-	
-					//make object stand exactly on top of the platform, unless climbing on ladder
-					if(!MO.isClimbing){
-						MO.setYPos(platform.getYPos() - MO.getHeight());
-					}
 
-					//System.out.println("Standing on platform!");
-									
+			//check standing
+			if(!MO.getStanding()){
+				if(isColliding){ 
+					if(!(MO.getIsClimbing() && platform.getHasLadder())) {
+						//make object stand exactly on top of the platform 
+						MO.setStanding(true);
+		
+						//make object stand exactly on top of the platform, unless climbing on ladder
+						if(!MO.getIsClimbing()){
+							MO.setYPos(platform.getYPos() - MO.getHeight());
+						}
+	
+						//System.out.println("Standing on platform!");
+					}			
 				}
 				
 			}	
 			
 			//If not colliding with ladder or standing on platform, stop climbing
-			if(MO.standing || !MO.canClimb){
-				MO.isClimbing = false;
+			if(MO.getStanding() || !MO.getCanClimb()){
+				MO.setIsClimbing(false);
 			}
 			
 		}	
@@ -297,7 +310,6 @@ public class GameModel extends Observable implements constants {
 		
 		return MO;
 	} 
-		
 	
 	private void initObjects() {
 		//initialize list
@@ -309,49 +321,14 @@ public class GameModel extends Observable implements constants {
 		initFirstLevel();
 	}
 	
-	private void initTestLevel() {
-		//create platforms		
-		
-		//bottom layer first half
-		for(int i = 0; i < constants.SCREEN_X /2; i = i + constants.PLATFORM_WIDTH){
-			platformList.add(new Platform(50 + i,constants.SCREEN_Y - 50,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH));
-		}
-		
-		
-		//bottom layer second half 
-		int y = constants.SCREEN_Y - 50;
-		for(int i = constants.SCREEN_X /2; i < constants.SCREEN_X - 50; i = i + constants.PLATFORM_WIDTH){
-			platformList.add(new Platform(i,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH));
-			y = y - 1;
-		}
-		
-		//second layer
-		int x = constants.SCREEN_X - 100;
-		y = constants.SCREEN_Y - 150;
-		for(int i = x - 20; i > 35; i = i - constants.PLATFORM_WIDTH){
-			platformList.add(new Platform(i,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH));
-			y = y - 1;
-		}
-		
-		//third layer
-		y = constants.SCREEN_Y - 300;
-		for(int i = 100; i < constants.SCREEN_X - 50; i = i + constants.PLATFORM_WIDTH){
-			platformList.add(new Platform(i,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH));
-			y = y - 1;
-		}
-		
-		//upper layer
-		x = constants.SCREEN_X - 100;
-		y = constants.SCREEN_Y - 450;
-		for(int i = x - 20; i > 50; i = i - constants.PLATFORM_WIDTH){
-			platformList.add(new Platform(i,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH));
-			y = y - 1;
-		}
-		
-		
-		//create ladders
-		for(int i = 0; i < 11*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
-			ladderList.add(new Ladder(500,612-i,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
+	//Function that determines for a given platform whether it's colliding with a ladder before it's added to the list
+	private void checkPlatformLadderCollisions() {
+		for(Platform platform : platformList) {
+			for(Ladder ladder : ladderList){
+				if(isColliding(platform, ladder)){	
+					platform.setHasLadder(true);
+				}
+			}
 		}
 	}
 	
@@ -359,10 +336,12 @@ public class GameModel extends Observable implements constants {
 		int x = 0;
 		int y = constants.SCREEN_Y - 50;
 		int platformYDiff = 2;
+		Platform p;
 
 		//bottom layer left half
 		for(int i = 0; i < constants.SCREEN_X /2; i += constants.PLATFORM_WIDTH){
-			platformList.add(new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH));
+			p = new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
+			platformList.add(p);
 			x = i;
 		}
 		
@@ -370,7 +349,8 @@ public class GameModel extends Observable implements constants {
 		for(int i = x; i <= constants.SCREEN_X - constants.PLATFORM_WIDTH; i += constants.PLATFORM_WIDTH){
 			x = i;
 			y -= platformYDiff;
-			platformList.add(new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH));
+			p = new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
+			platformList.add(p);
 		}
 		
 		//Middle four layers
@@ -385,7 +365,8 @@ public class GameModel extends Observable implements constants {
 				for(int i = x; i >= 0; i -= constants.PLATFORM_WIDTH){
 					x = i;
 					y -= platformYDiff;
-					platformList.add(new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH));
+					p = new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
+					platformList.add(p);
 				}
 			} else {
 				x += constants.PLATFORM_WIDTH;
@@ -394,7 +375,8 @@ public class GameModel extends Observable implements constants {
 				for(int i = x; i <= constants.SCREEN_X - constants.PLATFORM_WIDTH; i += constants.PLATFORM_WIDTH){
 					x = i;
 					y -= platformYDiff;
-					platformList.add(new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH));
+					p = new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
+					platformList.add(p);
 				}
 			}
 		}
@@ -407,38 +389,41 @@ public class GameModel extends Observable implements constants {
 		for(int i = x; i > constants.SCREEN_X/2 + constants.PLATFORM_WIDTH; i -= constants.PLATFORM_WIDTH){
 			x = i;
 			y -= platformYDiff;
-			platformList.add(new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH));
+			p = new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
+			platformList.add(p);
 		}
 		
 		for(int i = x; i >= 0; i -= constants.PLATFORM_WIDTH){
 			x = i;
-			platformList.add(new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH));
+			p = new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
+			platformList.add(p);
 		}
 		
 		//Peach layer
 		x = constants.SCREEN_X/2 - constants.PLATFORM_WIDTH;
 		y -= 4*constants.PLATFORM_HEIGHT;
 		for(int i = 0; i < 3; i++){
-			platformList.add(new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH));
+			p = new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
+			platformList.add(p);
 			x += constants.PLATFORM_WIDTH;
 		}
 		
 		//Draw bottom layer ladders 
-		x = 5 * constants.PLATFORM_WIDTH;
-		y = constants.SCREEN_Y - 50;
+		x = 4 * constants.PLATFORM_WIDTH + 10;
+		y = constants.SCREEN_Y - 60;
 		for(int i = 0; i < 2*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
 			y -= constants.LADDER_HEIGHT;
 			//ladderList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
 		}
 		
-		y -= 2 * constants.PLATFORM_HEIGHT;
+		y -= constants.PLATFORM_HEIGHT + 5 * platformYDiff;
 		for(int i = 0; i < 3*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
 			y -= constants.LADDER_HEIGHT;
 			ladderList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
 		}
 		
 		x = constants.SCREEN_X - 2 * constants.PLATFORM_WIDTH;
-		y = constants.SCREEN_Y - 50 - 5 * platformYDiff;
+		y = constants.SCREEN_Y - 31 * platformYDiff;
 		for(int i = 0; i < 6*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
 			y -= constants.LADDER_HEIGHT;
 			ladderList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
@@ -511,7 +496,7 @@ public class GameModel extends Observable implements constants {
 		}
 		
 		x -= 3 * constants.PLATFORM_WIDTH;
-		y += 4 * constants.PLATFORM_HEIGHT - 2 * platformYDiff;
+		y += 4 * constants.PLATFORM_HEIGHT - 3 * platformYDiff;
 		for(int i = 0; i < 6*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
 			y -= constants.LADDER_HEIGHT;
 			ladderList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
@@ -519,7 +504,7 @@ public class GameModel extends Observable implements constants {
 		
 		//Draw fifth layer ladders
 		x += 4 * constants.PLATFORM_WIDTH;
-		y -= 2 * platformYDiff;
+		y -= 3 * platformYDiff;
 		for(int i = 0; i < 3*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
 			y -= constants.LADDER_HEIGHT;
 			//ladderList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
@@ -563,6 +548,8 @@ public class GameModel extends Observable implements constants {
 		oil = new Oil(constants.OIL_START_X,constants.OIL_START_Y,constants.OIL_HEIGHT,constants.OIL_WIDTH);
 		PUList.add(new Powerup(425,500,constants.POWERUP_HEIGHT,constants.POWERUP_WIDTH));
 		PUList.add(new Powerup(50,285,constants.POWERUP_HEIGHT,constants.POWERUP_WIDTH));
+		//Check for each platform whether it collides with a ladder
+		checkPlatformLadderCollisions();
 	}
 
 	private void initMovingObjects() {

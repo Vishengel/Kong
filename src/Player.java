@@ -87,14 +87,22 @@ public void move(){
 			break;
 		//move up
 		case 2:
-			if(canClimb && !jumping){
+			// We can move up if:
+			// -Mario is colliding with a ladder (canClimb)
+			// -Mario is not jumping
+			// -Mario is either standing below the ladder or already climbing
+			if(canClimb && !jumping && (collidingWithTop || isClimbing)){
 				isClimbing = true;
 				dy -= yVel/2;
 			}
 			break;
 		//move down
 		case 3:
-			if(canClimb && !jumping){
+			// We can move down if:
+			// -Mario is colliding with a ladder (canClimb)
+			// -Mario is not jumping
+			// -Mario is either standing above the ladder or already climbing
+			if(canClimb && !jumping && (!collidingWithTop || isClimbing)){
 				isClimbing = true;
 				dy += yVel/2;
 			}
