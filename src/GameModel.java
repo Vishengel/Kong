@@ -249,7 +249,8 @@ public class GameModel extends Observable implements constants {
 			}
 			epochs++;
 			//write game state + action taken to training set
-			fh.writeToFile(inputs,mario.getAction());
+			//fh.writeToFile(inputs,mario.getAction());
+			fh.readFile();
 			
 		}
 		
