@@ -59,6 +59,7 @@ public class Barrel extends MovingObject{
 				firstCanClimb = false;
 				if(actionSelector.nextInt(4) >= 0){
 					System.out.println(++i);
+
 					isClimbing = true;
 					standing = false;
 				}
