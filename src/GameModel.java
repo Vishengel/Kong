@@ -268,7 +268,7 @@ public class GameModel extends Observable implements constants {
 		for(MovingObject MO2 : MOList){
 			//If Mario collides with a barrel, the game is over...
 			if(MO.getName() == "player" && MO != MO2 && isColliding(MO,MO2) && powerupActivated == false){
-				//MO.isKilled = true;						
+				MO.isKilled = constants.DEATH;						
 			} else if(MO.getName() == "player" && MO != MO2 && powerupActivated && isColliding(MO,MO2)) {
 				//...unless Mario has a powerup. Then, the barrel is deleted and the score is incremented by 200
 				//The barrel is stored in a temporary variable
