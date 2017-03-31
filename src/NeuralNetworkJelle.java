@@ -8,14 +8,14 @@ public class NeuralNetworkJelle {
 	private int nOutputs = 1;
 	
 	//All four possible input combinations of two input boolean values, plus the threshold multiplier
-	private int[][] input = new int[][] {
-										{0,0,-1},
-										{1,0,-1},
-										{0,1,-1},
-										{1,1,-1}
-										};
+	private double[][] input = new double[][] {
+												{0.0, 0.0, -1.0},
+												{1.0, 0.0, -1.0},
+												{0.0, 1.0, -1.0},
+												{1.0, 1.0, -1.0}
+												};
 	//The target values corresponding with each input				
-	private int[] target = new int[] {0,1,1,1};
+	private double[] target = new double[] {0.0, 0.0, 0.0, 1.0};
 	
 	//A list of output neurons
 	private ArrayList<NeuronJelle> outputList = new ArrayList<NeuronJelle>();
@@ -41,14 +41,17 @@ public class NeuralNetworkJelle {
 			//System.out.println("Training completed in " + epoch + " epochs");
 			previousTotalError = totalError;
 			totalError = 0;
-			for(NeuronJelle n : outputList) {
-				//Loop through all input patterns
-				for(int i=0; i<input.length; i++) {
+			//Loop through all input patterns
+			for(int i=0; i<input.length; i++) {
+				for(NeuronJelle n : outputList) {	
 					//Set the neuron's input to the current pattern
 					n.setInput(input[i]);
 					//Calculate the activation
 					n.setActivation();
+					//Set the output
+					n.setOutput();
 					//Update the weights
+					n.setOutputGradient(target[i]);
 					n.updateWeights(target[i], learningRate);
 					//Add the neuron's error to the total error
 					totalError += n.getError();
