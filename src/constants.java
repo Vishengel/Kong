@@ -3,7 +3,7 @@ public interface constants {
 
 	//GUI on or off
 	boolean GUI_ON = true;
-	
+	boolean demoPhase = true;
 	//player or AI mario
 	boolean AI_MARIO = false;
 	//game logic constants
