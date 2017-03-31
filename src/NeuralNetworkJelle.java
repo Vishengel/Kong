@@ -15,7 +15,7 @@ public class NeuralNetworkJelle {
 												{1.0, 1.0, -1.0}
 												};
 	//The target values corresponding with each input				
-	private double[] target = new double[] {0.0, 0.0, 0.0, 1.0};
+	private double[] target = new double[] {0.0, 1.0, 1.0, 1.0};
 	
 	//A list of output neurons
 	private ArrayList<NeuronJelle> outputList = new ArrayList<NeuronJelle>();

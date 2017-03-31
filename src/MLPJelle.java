@@ -1,13 +1,9 @@
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 //Implementation of a multi-layer perceptron
 public class MLPJelle {
-	//Define the number of nodes in input, hidden and output layers
-	private int nInput = 3;
-	private int nHidden = 2;
-	private int nOutput = 1;
-	//Define the number of hidden layers
-	private int nHiddenLayers = 1;
 	//All four possible input combinations of two input boolean values, plus the threshold multiplier
 	private double[][] input = new double[][] {
 										{0.0, 0.0, -1.0},
@@ -16,14 +12,20 @@ public class MLPJelle {
 										{1.0, 1.0, -1.0}
 										};
 	//The target values corresponding with each input				
-	private double[] target = new double[] {0.0, 0.0, 0.0, 1.0};
+	private double[] target = new double[] {0.0, 1.0, 1.0, 0.0};
+	//Define the number of nodes in input, hidden and output layers
+	private int nInput = input[0].length;
+	private int nHidden = 4;
+	private int nOutput = 1;
+	//Define the number of hidden layers
+	private int nHiddenLayers = 1;
 	//Define a list that contains a list of nodes for each hidden layer
 	private ArrayList<ArrayList<NeuronJelle>> hiddenList = new ArrayList<ArrayList<NeuronJelle>>();
 	//Define a list of output neurons
 	private ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
 	private double learningRate = 0.3;
-	private double errorThreshold = 0.0001;
+	private double errorThreshold = 0.005;
 	private int maxEpochs = 50000;
 	
 	public MLPJelle() {
@@ -33,10 +35,11 @@ public class MLPJelle {
 	public void initNetwork() {
 		ArrayList<NeuronJelle> hiddenLayer = new ArrayList<NeuronJelle>();
 		int nWeights = nInput;
+		
 		//Initialize hidden layers
 		for (int i=0; i<nHiddenLayers; i++) {
 			//Clear the hiddenlayer after each iteration
-			hiddenLayer.clear();
+			hiddenLayer = new ArrayList<NeuronJelle>();
 			for (int j=0; j<nHidden; j++) {
 				//Add nWeights amount of nodes to the hidden layer
 				//For the first iteration, this amount is equal to the number of inputs
@@ -54,23 +57,48 @@ public class MLPJelle {
 	}
 	
 	public void trainNetwork() {
-		double totalError = 0, previousTotalError;
+		double totalError = 0, previousTotalError; 
 		int epoch = 0;
 		do {
 			//System.out.println("Training completed in " + epoch + " epochs");
 			previousTotalError = totalError;
 			totalError = 0;
 			
+			this.shuffleInput();
+			
 			for (int i=0; i<this.nInput; i++) {
 				this.forwardPass(this.input[i]);
 				totalError = this.backwardPass(i);
 			}
 			
+			totalError /= -1*this.input.length;
+			
+			//System.out.println(totalError);
+			
 			epoch++;
 		//Continue until either the maximum number of epochs is reached 
 		//or the decrease in the error is smaller than the threshold
-		} while (Math.abs(previousTotalError - totalError) > errorThreshold || epoch < maxEpochs);
+		} while (totalError > errorThreshold && epoch < maxEpochs);
 		System.out.println("Training completed in " + epoch + " epochs");
+	}
+	
+	public void shuffleInput() {
+		Random rnd = ThreadLocalRandom.current();
+		int index;
+		double[] a;
+		double b;
+		
+		for (int i = input.length - 1; i > 0; i--)
+		{
+		  index = rnd.nextInt(i + 1);
+		  // Simple swap
+		  a = input[index];
+		  b = target[index];
+		  input[index] = input[i];
+		  input[i] = a;
+		  target[index] = target[i];
+		  target[i] = b;
+		}
 	}
 	
 	public void forwardPass(double[] input) {
@@ -106,8 +134,6 @@ public class MLPJelle {
 		//Calculate gradients for nodes in the output layer
 		for (NeuronJelle n : outputLayer) {
 			n.setOutputGradient(target[patternIndex]);
-			//n.updateWeights(target[patternIndex], learningRate);
-			//totalError += n.getError();
 		}
 		
 		nextLayer = outputLayer;
@@ -118,7 +144,6 @@ public class MLPJelle {
 			for (int j=0; j<nHidden; j++) {
 				//Calculate gradients for nodes in each hidden layer
 				hiddenList.get(i).get(j).setHiddenGradient(j, nextLayer);
-				//hiddenList.get(i).get(j).updateWeights(target[patternIndex], learningRate);
 			}
 			nextLayer = hiddenList.get(i);
 		}
@@ -126,7 +151,8 @@ public class MLPJelle {
 		//Update the weights for nodes in the output layer
 		for (NeuronJelle n : outputLayer) {
 			n.updateWeights(target[patternIndex], learningRate);
-			totalError += n.getError();
+			//totalError += n.getError();
+			totalError += n.getCrossEntropy();
 		}
 		
 		for (int i=nHiddenLayers-1; i>=0; i--) {
@@ -141,17 +167,55 @@ public class MLPJelle {
 	}
 	
 	public void testNetwork() {
-		for (int i=0; i<this.input.length; i++) {
-			this.forwardPass(this.input[i]);
-			for (NeuronJelle n : outputLayer) {
-				System.out.println("Pattern " + i);	
-				
-				for(int j=0; j<input[i].length-1; j++) {
-					System.out.println("	Input: " + input[i][j]);	
+		int testEpoch;
+		double nCorrect = 0;
+		double output, target;
+		
+		for (testEpoch=0; testEpoch < 10000; testEpoch++) {
+			for (int i=0; i<this.input.length; i++) {
+				this.forwardPass(this.input[i]);
+				for (NeuronJelle n : outputLayer) {
+					/*
+					System.out.println("Pattern " + i);	
+					//Don't print the bias
+					for(int j=0; j<input[i].length-1; j++) {
+						System.out.println("	Input: " + input[i][j]);	
+					}
+					
+					System.out.println("	Output: " + (n.getActivation() >= 0 ? 1 : 0));	
+					*/
+					
+					output = (n.getActivation() >= 0.0 ? 1.0 : 0);
+					target = this.target[i];
+					//System.out.println(output + " " + target);
+					if (output == target) {
+						nCorrect++;
+					}
 				}
-				
-				System.out.println("	Output: " + (n.getActivation() >= 0 ? 1 : 0));	
 			}
+		}
+		//System.out.println(nCorrect + " " + ((double)testEpoch*(double)this.input.length));
+		System.out.println("Accuracy: " + (nCorrect * 100) / ((double)testEpoch*(double)this.input.length) + "%");
+	}
+	
+	public void printNetwork() {
+		for (int i=0; i<nHiddenLayers; i++) {
+			System.out.println("Hidden layer " + i + ": ");
+			//Calculate the output for each node in the hidden layer
+			for (int j=0; j<nHidden; j++) {
+				System.out.println("Hidden node " + j);
+				hiddenList.get(i).get(j).printWeights();
+			}
+
+		}
+		
+		for (NeuronJelle n : outputLayer) {
+			System.out.println("Output node " + outputLayer.indexOf(n));
+			n.printWeights();
+		}
+		
+		for (int i=0; i<target.length; i++) {
+			System.out.println(target[i]);
 		}
 	}
 		

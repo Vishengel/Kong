@@ -5,14 +5,18 @@ public class Main {
 	public static void main(String[] args) throws IOException{
 		//GameController gc = new GameController();
 		//gc.start();
+		
 		//NeuralNetworkJelle n = new NeuralNetworkJelle();
 		//n.trainNetwork();
 		//n.printResults();
 		
 		MLPJelle mlp = new MLPJelle();
-		mlp.trainNetwork();
-		mlp.testNetwork();
-		
+		for(int i=0; i<10; i++) {
+			mlp = new MLPJelle();
+			mlp.trainNetwork();
+			mlp.testNetwork();
+		}
+		//mlp.printNetwork();
 		/*
 		MLP mlp = new MLP();
 		mlp.trainNetwork();

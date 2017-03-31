@@ -8,6 +8,7 @@ public class NeuronJelle {
 	private double gradient;
 	private double output;
 	private double error;
+	private double crossEntropy;
 	
 	public NeuronJelle(int nInputs) {
 		this.nInputs = nInputs;
@@ -18,8 +19,12 @@ public class NeuronJelle {
 	
 	public void initWeights() {
 		for(int i=0; i<nInputs; i++) {
-			weights[i] = Math.random();
+			weights[i] = -1.0 + (Math.random() * 2.0);
 		}
+	}
+	
+	public double[] getInput() {
+		return this.input;
 	}
 	
 	public void setInput(double[] input) {
@@ -70,6 +75,7 @@ public class NeuronJelle {
 	
 	public void updateWeights(double target, double learningRate) {
 		this.error = 0.5*(target - this.output)*(target - this.output);
+		this.crossEntropy = target * Math.log(this.output) + (1 - target)*Math.log(1 - this.output);
 		
 		for(int i=0; i<this.weights.length; i++) {
 			this.weights[i] += learningRate*gradient*this.input[i];
@@ -82,6 +88,10 @@ public class NeuronJelle {
 	
 	public double getError() {
 		return this.error;
+	}
+	
+	public double getCrossEntropy() {
+		return this.crossEntropy;
 	}
 	
 	public double sigmoid(double activation){
