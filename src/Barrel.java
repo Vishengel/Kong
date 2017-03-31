@@ -14,7 +14,7 @@ public class Barrel extends MovingObject{
 		killOnCollision = false;
 		direction = true;
 		xVel = 2.2f;
-		yVel = 3;
+		yVel = 2.2f;
 		pointAwarded = false;
 		name = "barrel";
 		this.falling = falling;
@@ -49,17 +49,13 @@ public class Barrel extends MovingObject{
 					dx = 0f;
 				}
 			}
-			
-			if(collidingWithTop) {
-				System.out.println(collidingWithTop);
-			}
+
 			//If barrel is on a ladder, 50% chance to fall down ladder
 			if(canClimb && firstCanClimb && !collidingWithTop){
-				//System.out.println(collidingWithTop);
+				System.out.println(collidingWithTop);
 				firstCanClimb = false;
 				if(actionSelector.nextInt(4) >= 0){
-					System.out.println(++i);
-
+					//System.out.println(++i);
 					isClimbing = true;
 					standing = false;
 				}
@@ -68,8 +64,8 @@ public class Barrel extends MovingObject{
 			
 			if(isClimbing){
 				//System.out.println("Climbing");
-				//dx = 0;
-				//xPos = ladderXPos + constants.LADDER_WIDTH / 2 - constants.BARREL_WIDTH / 2;
+				dx = 0;
+				xPos = ladderXPos + constants.LADDER_WIDTH / 2 - constants.BARREL_WIDTH / 2;
 				dy += yVel;
 			}
 			super.act(time);
