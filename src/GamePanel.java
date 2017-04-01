@@ -42,7 +42,9 @@ public class GamePanel extends JPanel implements Observer {
 		g.drawImage(oil,constants.OIL_START_X,constants.OIL_START_Y,constants.OIL_WIDTH, constants.OIL_HEIGHT, null);
 		
         for (Platform p : model.getPlatformList()){
+        	//if(p.getHasLadder()) {
         	g.drawImage(platform,(int)p.getXPos(), (int)p.getYPos(), (int)p.getWidth(), (int)p.getHeight(), null);
+        	//}
         }
         for(Ladder l: model.getLadderList()){
         	g.drawImage(ladder,(int)l.getXPos(), (int)l.getYPos(), (int)l.getWidth(), (int)l.getHeight(), null);

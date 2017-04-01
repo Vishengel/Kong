@@ -6,6 +6,10 @@ public interface constants {
 	boolean demoPhase = true;
 	//player or AI mario
 	boolean AI_MARIO = false;
+	
+	//When false, Mario cannot die
+	boolean DEATH = false;
+	
 	//game logic constants
 	int MAX_EPOCHS = 1000000;
 	
