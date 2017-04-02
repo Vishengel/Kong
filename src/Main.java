@@ -5,7 +5,7 @@ public class Main {
 	public static void main(String[] args) throws IOException{
 		GameController gc = new GameController();
 		gc.start();
-		
+
 		//NeuralNetworkJelle n = new NeuralNetworkJelle();
 		//n.trainNetwork();
 		//MLP mlp = new MLP();
@@ -17,12 +17,17 @@ public class Main {
 		//fh.readFile(floats,booleans,5);
 		//n.printResults();
 		
-		MLPJelle mlp = new MLPJelle();
-		for(int i=0; i<10; i++) {
+		//MLPJelle mlp = new MLPJelle();
+		//mlp.trainNetwork();
+	    //mlp.testNetwork(null);
+		//mlp.printNetwork();
+		
+		/*for(int i=0; i<10; i++) {
 			mlp = new MLPJelle();
 			mlp.trainNetwork();
 			mlp.testNetwork();
 		}
+		*/
 		//mlp.printNetwork();
 		/*
 		MLP mlp = new MLP();

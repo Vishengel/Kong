@@ -11,7 +11,7 @@ public class GameModel extends Observable implements constants {
 	private int score = 0;
 	private int lives = 3;
 	private int spawnTimer = 0;	
-	private int barrelSpawnTime = 250;
+	private int barrelSpawnTime = 120;
 	private int smashedBarrelIndex = -1;
 	private int powerupTimer = 0;	
 	private int powerupDuration = 500;
@@ -25,9 +25,11 @@ public class GameModel extends Observable implements constants {
 	private ArrayList<MovingObject> MOList;
 	private ArrayList<Powerup> PUList;
 	
-	//this array contains the 3 boolean and 6 float inputs for the MLP
-	private float[] inputs = new float[9];
+	//this array contains the 3 boolean and 5 float inputs for the MLP
+	private double[] inputs = new double[8];
 	
+	
+	MLPJelle mlp;
 	
 	private Player mario;
 	private Peach peach;
@@ -115,6 +117,20 @@ public class GameModel extends Observable implements constants {
 		return minimumDistance;
 	}
 	
+	public float normalize(float distance){
+		if(distance < 15){
+			return 1;
+			
+		}
+		else if(distance >= 15 && distance < 200){
+			return 0;
+		}
+		else{
+			return -1;
+		}
+		//return (distance < 500? (500-distance)/500 : 500);
+	}
+	
 	public void calculateInputs(){
 		//update boolean input array
 		inputs[0] = powerupActivated ? 1 : 0;
@@ -123,37 +139,52 @@ public class GameModel extends Observable implements constants {
 		//update distance input array
 		//calculate distance to flame enemy
 		if(flame != null){
-			inputs[3] = getEuclideanDistance(mario, flame);
+			inputs[3] = normalize((getEuclideanDistance(mario, flame)));
 			//System.out.println("1. nearest flame " + inputs[0]);
 		}
 		//calculate distance to nearest power-up
-		inputs[4] = findNearestObject("powerup");
+		inputs[4] = normalize(findNearestObject("powerup"));
 		//System.out.println("2. nearest powerup " + inputs[1]);
 		//calculate distance to nearest ladder
-		inputs[5] = findNearestObject("ladder");
-		//System.out.println("3. Nearest Ladder: " + inputs[2]);
-		//calculate distance to peach
-		inputs[6] = getEuclideanDistance(mario, peach);
+		inputs[5] = normalize(findNearestObject("ladder"));
+		//System.out.println("3. Nearest Ladder: " + inputs[5]);
+		//System.out.println("3. Nearest Ladder: " + findNearestObject("ladder"));
+		//calculate distance to peach 
+		inputs[6] = normalize(getEuclideanDistance(mario, peach));
 		//System.out.println("4. peach: " + inputs[3]);
 		//calculate distance to the nearest barrel on the same platform
-		inputs[7] =	findNearestObject("barrel");
+		inputs[7] =	normalize(findNearestObject("barrel"));
 		//System.out.println("nearest barrel: " + inputs[4]);
 		//calculate distance to nearest barrel on upper platform
-		inputs[8] = findNearestObject("upperBarrel");
+		//inputs[8] = normalize(findNearestObject("upperBarrel"));
 		//System.out.println("nearest upper-barrel: " + inputs[5]);
 	}
 	
 	
 	//main game loop
 	public void runGame() throws InterruptedException, IOException{
+		//create mlp, train it on demo data
+		if(constants.testPhase){
+			mlp = new MLPJelle();
+			mlp.trainNetwork();
+		}
 		while(epochs < constants.MAX_EPOCHS){
 			calculateInputs();
+			//present input to network
+			if(constants.testPhase){
+				mario.setAction(mlp.testNetwork(inputs));
+			}
+			//print inputs
+			//for(int i = 0; i < 8; i++){
+				//System.out.print(inputs[i] + " ");
+			//}
+			//System.out.println("Nearest barrel: " + inputs[7]);
 			//handle gravity
 			incrementTime();
 				
 			//spawn barrel
-			/*
-			if(spawnTimer == barrelSpawnTime){
+			
+			/*if(spawnTimer == barrelSpawnTime){
 				spawnTimer = 0;
 				//The first barrel always goes directly down to the oil barrel
 				if (firstBarrel) {
@@ -162,12 +193,8 @@ public class GameModel extends Observable implements constants {
 				} else {
 					spawnBarrel(false);
 				}
-			}	
-			*/
-			if (firstBarrel) {
-				spawnBarrel(false);
-				firstBarrel = false;
-			}
+			}	*/
+		
 			spawnTimer++;
 
 			if(powerupActivated) {
@@ -183,6 +210,7 @@ public class GameModel extends Observable implements constants {
 				}	
 				powerupTimer++;
 			}
+			
 			
 			for(int i = 0; i < MOList.size(); i++){
 					//make all moving objects act/move
@@ -238,7 +266,9 @@ public class GameModel extends Observable implements constants {
 			}
 			epochs++;
 			//write game state + action taken to training set
-			//fh.writeToFile(inputs,mario.getAction());
+			if(constants.demoPhase){
+				fh.writeToFile(inputs,mario.getAction());
+			}
 			
 			
 		}

@@ -52,9 +52,9 @@ public class Barrel extends MovingObject{
 			
 			//If barrel is on a ladder, 50% chance to fall down ladder
 			if(canClimb && firstCanClimb && !collidingWithTop){
-				System.out.println(collidingWithTop);
+				//System.out.println(collidingWithTop);
 				firstCanClimb = false;
-				if(actionSelector.nextInt(4) >= 0){
+				if(actionSelector.nextInt(4) >= 2){
 					//System.out.println(++i);
 
 					isClimbing = true;

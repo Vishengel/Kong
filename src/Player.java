@@ -33,22 +33,18 @@ public class Player extends MovingObject{
 	//1 : right
 	//2 : up
 	//3 : down
-	public void selectAction(){
-				
+	public void selectAction(){		
 		if(!jumping){
 			if(goLeft){
-				action = 0;
-			}
-			if(goRight){
 				action = 1;
 			}
-			if(goUp){
+			if(goRight){
 				action = 2;
 			}
-			if(goDown){
+			if(goUp){
 				action = 3;
 			}
-			if(jump){
+			if(goDown){
 				action = 4;
 			}
 			if(jump && goLeft){
@@ -57,10 +53,10 @@ public class Player extends MovingObject{
 			if(jump && goRight){
 				action = 6;
 			}
-			//random mario behavior
+			/*random mario behavior
 			if(constants.AI_MARIO){
 				action = actionSelector.nextInt(7);
-			}
+			}*/
 		}
 		
 		
@@ -74,19 +70,19 @@ public void move(){
 		switch(action){
 		//don't allow vertical movement when climbing
 		//move left
-		case 0:
-			if(!isClimbing){
+		case 1:
+			//if(/!isClimbing){
 				dx += -xVel;
-			}
+			//}
 			break;
 		//move right
-		case 1: 
-			if(!isClimbing){
+		case 2: 
+			//if(!isClimbing){
 				dx += xVel;
-			}
+			//}
 			break;
 		//move up
-		case 2:
+		case 3:
 			// We can move up if:
 			// -Mario is colliding with a ladder (canClimb)
 			// -Mario is not jumping
@@ -97,7 +93,7 @@ public void move(){
 			}
 			break;
 		//move down
-		case 3:
+		case 4:
 			// We can move down if:
 			// -Mario is colliding with a ladder (canClimb)
 			// -Mario is not jumping
@@ -106,10 +102,6 @@ public void move(){
 				isClimbing = true;
 				dy += yVel/2;
 			}
-			break;
-		//jump up
-		case 4:
-			jumping = true;
 			break;
 		//jump left
 		case 5:
@@ -128,11 +120,10 @@ public void move(){
 		//System.out.println("Standing: " + standing);
 		dx = 0;
 		dy = 0;
-		//reset action
-		if(!jumping){
-			action = -1;
+		//reset action during demo phase
+		if(!jumping && constants.demoPhase){
+			action = 0;
 		}
-		
 		
 		readInput();
 		selectAction();
