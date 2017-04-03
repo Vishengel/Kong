@@ -17,7 +17,7 @@ public class MLPJelle {
 	//Define the number of nodes in input, hidden and output layers
 	private int nInput;
 	private int nHidden = 50; 
-	private int nOutput = 3;
+	private int nOutput = 7; 
 	//Define the number of hidden layers
 	private int nHiddenLayers = 1;
 	//Define a list that contains a list of nodes for each hidden layer
@@ -26,7 +26,7 @@ public class MLPJelle {
 	private ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
 	private double learningRate = 0.6;
-	private double errorThreshold = 0.00000005;
+	private double errorThreshold = 0.00000001;
 	private double maxEpochs = 20000;
 	private double momentum = 0;
 	public MLPJelle() {
@@ -36,24 +36,30 @@ public class MLPJelle {
 	public void initNetwork() {
 		//read the demonstration data to be learned from 
 		double[][] initialInput = FH.readFile();
-		input = new double[initialInput.length][9];
+		input = new double[initialInput.length][7];
 		//filter out the target values from the input array
 		for(int i = 0; i < initialInput.length; i++){
 			//System.out.println("Pattern: " + i);
-			for(int j = 0; j < 8; j++){	
+			for(int j = 0; j < 6; j++){	
 				input[i][j] = initialInput[i][j];
 				//System.out.print(input[i][j] + " ");
 			}
 			//System.out.println();
 			//add the -1 value at the end of the input
-			input[i][8] = -1;
+			input[i][6] = -1;
 		}
 		//fill the target array with the target values 
 		target = new double[input.length][nOutput];
 		for(int i = 0; i < input.length; i++){
-				target[i][0] = initialInput[i][8];
-				target[i][1] = initialInput[i][9];
-				target[i][2] = initialInput[i][10];	
+				target[i][0] = initialInput[i][7];
+				target[i][1] = initialInput[i][8];
+				target[i][2] = initialInput[i][9];	
+				target[i][3] = initialInput[i][10];
+				target[i][4] = initialInput[i][11];
+				target[i][5] = initialInput[i][12];	
+				target[i][6] = initialInput[i][13];
+				
+				
 				//System.out.print(target[i][0] + " ");
 				//System.out.print(target[i][1] + " ");
 				//System.out.print(target[i][2]);
@@ -101,7 +107,7 @@ public class MLPJelle {
 	}
 	
 	public void trainNetwork() {
-		System.out.println("Testing:");
+		System.out.println("Training:");
 		double totalError = 0, previousTotalError; 
 		double epoch = 0;
 		do {
@@ -226,18 +232,31 @@ public class MLPJelle {
 		return number;
 	}
 	
+	public int maxOutput(){
+		double max = -1;
+		int maxIndex = 1;
+		for(int i = 0; i < nOutput; i++){
+			double output = outputLayer.get(i).getOutput();
+			if(output >= max){
+				max = output;
+				maxIndex = i;
+			}
+		}
+		return maxIndex;
+	}
+	
 	public int testNetwork(double[] input) {
-		int testEpoch;
+		int testEpoch; 
 		double nCorrect = 0;
 		double output = 0;
 		double tar;
 		//present game state to the network, calculate output
 		forwardPass(input);
-		System.out.println(binaryToInt());	
-		return binaryToInt();		
+		//System.out.println(binaryToInt());	
+		return maxOutput() + 1;	
 		
-		
-		/*for (testEpoch=0; testEpoch < 1; testEpoch++) {
+		/*
+		for (testEpoch=0; testEpoch < 1; testEpoch++) {
 			for (int i=0; i<this.input.length; i++) {
 		
 				this.forwardPass(this.input[i]);
@@ -245,40 +264,40 @@ public class MLPJelle {
 				System.out.println("Pattern " + i);
 				
 				//print input for each pattern
-				/*for(int j=0; j< this.input[i].length; j++) {
+				for(int j=0; j< this.input[i].length; j++) {
 					System.out.println("	Input: " + this.input[i][j]);	
-				}*/
+				}
 				//print all output of the output nodes for each pattern
-				/*for(int n = 0; n < nOutput; n++){					
-					System.out.println("	Output " + n + ": " + (outputLayer.get(n).getActivation() >= 0 ? 1 : 0));	
+				for(int n = 0; n < nOutput; n++){					
+					System.out.println("	Output " + n + ": " + (outputLayer.get(n).getOutput()));	
 						
-					
+				System.out.println("Max output: " + maxOutput());
 					//target = this.target[i][n];
 					//System.out.println(output + " " + target);
 					//if (output == target) {
 						//nCorrect++;
 					//}
-				} */
-				//output = binaryToInt();
+				} 
+				output = binaryToInt();
 			
 				//print the integer version of the binary encoded output	
 				//print target
-				/*for(int t = 0; t < 3; t++){
+				for(int t = 0; t < target[0].length; t++){
 				System.out.print("Target: " + target[i][t] + " ");
 				System.out.println();
-				}*/
+				}
 				//tar = target[i][0] * 4 + target[i][1] * 2 + target[i][2];
 				//System.out.println("T: " + tar);
 				//nCorrect += output == tar ? 1 : 0;
-				//System.out.println("Percentage correct: " + Math.round((nCorrect / this.input.length)*100));
-			//}
-		//}
-		//System.out.println(nCorrect + " " + ((double)testEpoch*(double)this.input.length));
-		//System.out.println("Accuracy: " + (nCorrect * 100) / ((double)testEpoch*(double)this.input.length) + "%");
+				System.out.println("Percentage correct: " + Math.round((nCorrect / this.input.length)*100));
+			}
+		}
+		System.out.println(nCorrect + " " + ((double)testEpoch*(double)this.input.length));
+		System.out.println("Accuracy: " + (nCorrect * 100) / ((double)testEpoch*(double)this.input.length) + "%");
 		 
 		 
 		 
-		//return 0;
+		return 0;*/
 	}
 	
 	public void printNetwork() {
