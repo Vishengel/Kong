@@ -16,19 +16,19 @@ public class MLPJelle {
 	private double[][] target /*= new double[][] {{0.0,0.0,0.0}, {0.0,0.0,1.0}, {0.0,1.0,0.0}, {0.0,1.0,1.0}}*/;
 	//Define the number of nodes in input, hidden and output layers
 	private int nInput;
-	private int nHidden = 50; 
+	private int nHidden = 70; 
 	private int nOutput = 7; 
 	//Define the number of hidden layers
-	private int nHiddenLayers = 1;
+	private int nHiddenLayers = 1; 
 	//Define a list that contains a list of nodes for each hidden layer
 	private ArrayList<ArrayList<NeuronJelle>> hiddenList = new ArrayList<ArrayList<NeuronJelle>>();
 	//Define a list of output neurons
 	private ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
 	private double learningRate = 0.6;
-	private double errorThreshold = 0.00000001;
-	private double maxEpochs = 20000;
-	private double momentum = 0;
+	private double errorThreshold = 0.0000000004;
+	private double maxEpochs = 10000;  
+	private double momentum = 0.6; 
 	public MLPJelle() {
 		this.initNetwork();	
 	}
@@ -44,44 +44,18 @@ public class MLPJelle {
 				input[i][j] = initialInput[i][j];
 				//System.out.print(input[i][j] + " ");
 			}
-			//System.out.println();
 			//add the -1 value at the end of the input
 			input[i][6] = -1;
 		}
 		//fill the target array with the target values 
 		target = new double[input.length][nOutput];
 		for(int i = 0; i < input.length; i++){
-				target[i][0] = initialInput[i][7];
-				target[i][1] = initialInput[i][8];
-				target[i][2] = initialInput[i][9];	
-				target[i][3] = initialInput[i][10];
-				target[i][4] = initialInput[i][11];
-				target[i][5] = initialInput[i][12];	
-				target[i][6] = initialInput[i][13];
+			for(int j = 0; j < initialInput[0].length - input[0].length; j++){
+				target[i][j] = initialInput[i][j + initialInput[0].length - input[0].length - 1];
 				
-				
-				//System.out.print(target[i][0] + " ");
-				//System.out.print(target[i][1] + " ");
-				//System.out.print(target[i][2]);
-				//System.out.println();
-		}
-		
-		
-		/*for(int i = 0; i < initialInput.length; i++){
-			System.out.println("Pattern: " + i);
-			for(int j = 0; j < 8; j++){	
-				System.out.print(input[i][j] + " ");
 			}
-			System.out.print(target[i][0] + " ");
-			System.out.print(target[i][1] + " ");
-			System.out.print(target[i][2] + " ");
-			System.out.println();
-			
-			
-		}
-		*/
+		}	
 		nInput = input[0].length;
-		//System.out.println(nInput);
 		
 		ArrayList<NeuronJelle> hiddenLayer = new ArrayList<NeuronJelle>();
 		int nWeights = nInput;
@@ -205,7 +179,7 @@ public class MLPJelle {
 		//Update the weights for nodes in the output layer
 		for(int i = 0; i < nOutput; i++){
 			outputLayer.get(i).updateWeights(target[patternIndex][i], learningRate, momentum);
-			//totalError += n.getError();
+			//totalError += outputLayer.get(i).getError();
 			totalError += outputLayer.get(i).getCrossEntropy();
 		}
 		
@@ -233,11 +207,11 @@ public class MLPJelle {
 	}
 	
 	public int maxOutput(){
-		double max = -1;
-		int maxIndex = 1;
+		double max = 0;
+		int maxIndex = 0;
 		for(int i = 0; i < nOutput; i++){
 			double output = outputLayer.get(i).getOutput();
-			if(output >= max){
+			if(output > max){
 				max = output;
 				maxIndex = i;
 			}
@@ -253,7 +227,13 @@ public class MLPJelle {
 		//present game state to the network, calculate output
 		forwardPass(input);
 		//System.out.println(binaryToInt());	
-		return maxOutput() + 1;	
+		/* activation of output nodes
+		for(int i = 0; i < nOutput; i++){
+			System.out.print("Output node " + i + ": " + outputLayer.get(i).getActivation());
+			System.out.println(" " + outputLayer.get(i).getOutput());
+			
+		}*/
+		return maxOutput();	
 		
 		/*
 		for (testEpoch=0; testEpoch < 1; testEpoch++) {
