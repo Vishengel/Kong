@@ -13,27 +13,28 @@ public class FileHandler {
 	
 	//write action in binary form to file
 	public void writeActionToFile(FileWriter fw, int action) throws IOException{
+		//System.out.println(action);
 		switch(action){
 		case 0:
-			fw.write(0 + "," + 0 + "," + 0 + "\n");
+			fw.write(1 + "," + 0 + "," + 0 + "," + 0 + "," + 0 + "," + 0 + "," + 0 +"\n");
 			break;
 		case 1:
-			fw.write(0 + "," + 0 + "," + 1 + "\n");
+			fw.write(0 + "," + 1 + "," + 0 + "," + 0 + "," + 0 + "," + 0 + "," + 0 +"\n");
 			break;
 		case 2:
-			fw.write(0 + "," + 1 + "," + 0 + "\n");
+			fw.write(0 + "," + 0 + "," + 1 + "," + 0 + "," + 0 + "," + 0 + "," + 0 +"\n");
 			break;
 		case 3:
-			fw.write(0 + "," + 1 + "," + 1 + "\n");
+			fw.write(0 + "," + 0 + "," + 0 + "," + 1 + "," + 0 + "," + 0 + "," + 0 +"\n");
 			break;
 		case 4:
-			fw.write(1 + "," + 0 + "," + 0 + "\n");
+			fw.write(0 + "," + 0 + "," + 0 + "," + 0 + "," + 1 + "," + 0 + "," + 0 +"\n");
 			break;
 		case 5:
-			fw.write(1 + "," + 0 + "," + 1 + "\n");
+			fw.write(0 + "," + 0 + "," + 0 + "," + 0 + "," + 0 + "," + 1 + "," + 0 +"\n");
 			break;
 		case 6:
-			fw.write(1 + "," + 1 + "," + 0 + "\n");
+			fw.write(0 + "," + 0 + "," + 0 + "," + 0 + "," + 0 + "," + 0 + "," + 1 +"\n");
 			break;
 			
 		}
@@ -72,7 +73,7 @@ public class FileHandler {
 	        System.out.println("File Read Error");
 	    }
 		
-		double[][] inputs = new double[amountOfLines][11];
+		double[][] inputs = new double[amountOfLines][14];
 		try {
 	        BufferedReader in = new BufferedReader(new FileReader("src/MyFile.csv"));
 	        String str;

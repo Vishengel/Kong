@@ -4,9 +4,9 @@ public interface constants {
 	//GUI on or off
 	boolean GUI_ON = true;
 	boolean demoPhase = false;
-	boolean testPhase = true;
+	boolean testPhase = true; 
 	//player or AI mario
-	//boolean AI_MARIO = false;
+	boolean AI_MARIO = true;
 	
 	//When false, Mario cannot die
 	boolean DEATH = false;

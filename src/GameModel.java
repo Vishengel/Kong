@@ -26,7 +26,7 @@ public class GameModel extends Observable implements constants {
 	private ArrayList<Powerup> PUList;
 	
 	//this array contains the 3 boolean and 5 float inputs for the MLP
-	private double[] inputs = new double[8];
+	private double[] inputs = new double[6];
 	
 	
 	MLPJelle mlp;
@@ -41,6 +41,9 @@ public class GameModel extends Observable implements constants {
 	private boolean gameOver = false; 
 	private boolean firstBarrel = true;
 	private boolean firstFlameOilCollision = true;
+	
+	//one of the inputs, specifying whether a ladder is to the right of mario or not
+	private int ladderRight;
 	
 	FileHandler fh = new FileHandler();
 		
@@ -89,7 +92,14 @@ public class GameModel extends Observable implements constants {
 				if(distance < minimumDistance && (l.getYPos() + l.getHeight()) > mario.getYPos()
 				&& (l.getYPos() + l.getHeight()) < (mario.getYPos() + mario.getHeight() / 2)){
 					minimumDistance = distance;
+					if(mario.getXPos() <= l.getXPos()){
+						ladderRight = 1;				
+					}
+					else{
+						ladderRight = 0;
+					}
 				}
+				
 			}
 			
 		}
@@ -133,31 +143,33 @@ public class GameModel extends Observable implements constants {
 	
 	public void calculateInputs(){
 		//update boolean input array
-		inputs[0] = powerupActivated ? 1 : 0;
-		inputs[1] = mario.isClimbing() ? 1 : 0;
-		inputs[2] = mario.isJumping() ? 1 : 0;
+		//inputs[0] = powerupActivated ? 1 : 0;
+		inputs[0] = mario.isClimbing() ? 1 : 0;
+		inputs[1] = mario.isJumping() ? 1 : 0;
 		//update distance input array
 		//calculate distance to flame enemy
-		if(flame != null){
-			inputs[3] = normalize((getEuclideanDistance(mario, flame)));
+		//if(flame != null){
+			//inputs[3] = normalize((getEuclideanDistance(mario, flame)));
 			//System.out.println("1. nearest flame " + inputs[0]);
-		}
+		//}
 		//calculate distance to nearest power-up
-		inputs[4] = normalize(findNearestObject("powerup"));
+		inputs[2] = normalize(findNearestObject("powerup"));
 		//System.out.println("2. nearest powerup " + inputs[1]);
 		//calculate distance to nearest ladder
-		inputs[5] = normalize(findNearestObject("ladder"));
+		inputs[3] = normalize(findNearestObject("ladder"));
+		inputs[4] = ladderRight;
 		//System.out.println("3. Nearest Ladder: " + inputs[5]);
 		//System.out.println("3. Nearest Ladder: " + findNearestObject("ladder"));
 		//calculate distance to peach 
-		inputs[6] = normalize(getEuclideanDistance(mario, peach));
+		inputs[5] = normalize(getEuclideanDistance(mario, peach));
 		//System.out.println("4. peach: " + inputs[3]);
 		//calculate distance to the nearest barrel on the same platform
-		inputs[7] =	normalize(findNearestObject("barrel"));
+		//inputs[7] =	normalize(findNearestObject("barrel"));
 		//System.out.println("nearest barrel: " + inputs[4]);
 		//calculate distance to nearest barrel on upper platform
 		//inputs[8] = normalize(findNearestObject("upperBarrel"));
 		//System.out.println("nearest upper-barrel: " + inputs[5]);
+		//System.out.println(ladderRight);
 	}
 	
 	
@@ -169,15 +181,17 @@ public class GameModel extends Observable implements constants {
 			mlp.trainNetwork();
 		}
 		while(epochs < constants.MAX_EPOCHS){
+			mario.setAction(0);
 			calculateInputs();
 			//present input to network
 			if(constants.testPhase){
 				mario.setAction(mlp.testNetwork(inputs));
 			}
-			//print inputs
-			//for(int i = 0; i < 8; i++){
-				//System.out.print(inputs[i] + " ");
-			//}
+			/*print inputs
+			for(int i = 0; i < 8; i++){
+				System.out.print(inputs[i] + " ");
+			}
+			System.out.println();*/
 			//System.out.println("Nearest barrel: " + inputs[7]);
 			//handle gravity
 			incrementTime();
@@ -225,6 +239,7 @@ public class GameModel extends Observable implements constants {
 						resetGame();
 					} else if(gameWon){
 						//if mario saved the princess, add 1000 points instead
+						System.out.println("Goal reached!!!!!!!!!!!!!!!!!!!!!");
 						gameWon = false;
 						score += 1000;
 						resetGame();

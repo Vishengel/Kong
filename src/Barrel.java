@@ -54,7 +54,7 @@ public class Barrel extends MovingObject{
 			if(canClimb && firstCanClimb && !collidingWithTop){
 				//System.out.println(collidingWithTop);
 				firstCanClimb = false;
-				if(actionSelector.nextInt(4) >= 2){
+				if(random.nextInt(4) >= 2){
 					//System.out.println(++i);
 
 					isClimbing = true;

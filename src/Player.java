@@ -53,10 +53,13 @@ public class Player extends MovingObject{
 			if(jump && goRight){
 				action = 6;
 			}
-			/*random mario behavior
-			if(constants.AI_MARIO){
-				action = actionSelector.nextInt(7);
-			}*/
+			//random mario behavior
+			/*if(constants.AI_MARIO){
+				if(random.nextInt(100) == 0){
+					action = random.nextInt(6);
+				}
+			}
+			*/
 		}
 		
 		
@@ -129,7 +132,7 @@ public void move(){
 		selectAction();
 		move();
 		
-		//System.out.println(action);
+		System.out.println(action);
 		
 		
 		//prevent jumping while climbing a ladder
