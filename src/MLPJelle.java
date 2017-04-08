@@ -26,7 +26,7 @@ public class MLPJelle {
 	private ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
 	private double learningRate = 0.6;
-	private double errorThreshold = 0.0000000004;
+	private double errorThreshold =  0.0000000004;
 	private double maxEpochs = 10000;  
 	private double momentum = 0.6; 
 	public MLPJelle() {
@@ -81,12 +81,11 @@ public class MLPJelle {
 	}
 	
 	public void trainNetwork() {
-		System.out.println("Training:");
 		double totalError = 0, previousTotalError; 
 		double epoch = 0;
 		do {
 			//print training progress
-			System.out.println(Math.round((epoch / maxEpochs) * 100) + "%");
+			System.out.println("Gathering barrels.. " + Math.round((epoch / maxEpochs) * 100) + "%");
 			//System.out.println(Math.round((epoch / maxEpochs) * 100) + "%");
 			//System.out.println("Training completed in " + epoch + " epochs");
 			previousTotalError = totalError;

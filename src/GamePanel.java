@@ -22,6 +22,8 @@ public class GamePanel extends JPanel implements Observer {
 	Image oil = new ImageIcon(getClass().getResource("images/oil.png")).getImage();
 	Image flame = new ImageIcon(getClass().getResource("images/flame.png")).getImage();
 	Image powerup = new ImageIcon(getClass().getResource("images/powerup.png")).getImage();
+	Image bonus = new ImageIcon(getClass().getResource("images/bonus.png")).getImage();
+	Image bStack = new ImageIcon(getClass().getResource("images/BarrelStack.png")).getImage();
 	
 	public GamePanel(GameModel model) throws IOException {
 		setOpaque(true);
@@ -37,7 +39,6 @@ public class GamePanel extends JPanel implements Observer {
 		super.paintComponent(g); 
 				
 		//Draw game objects
-		g.drawImage(kong, 60,165,100,100, null);
 		g.drawImage(peach,constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_WIDTH, constants.PEACH_HEIGHT, null);
 		g.drawImage(oil,constants.OIL_START_X,constants.OIL_START_Y,constants.OIL_WIDTH, constants.OIL_HEIGHT, null);
 		
@@ -56,7 +57,7 @@ public class GamePanel extends JPanel implements Observer {
         	
        
         g.setColor(Color.WHITE);
-        g.drawString("Score: " + model.getScore(), 500, 50); 
+       
         
         for (MovingObject object : model.getMOList()){
         	String name = object.getName();
@@ -74,6 +75,13 @@ public class GamePanel extends JPanel implements Observer {
         	g.drawImage(life, 0 + 30*i,10,30,39, null);
         }
         */
+        //draw cosmetic stuff
+        g.drawImage(kong, 60,165,100,100, null);
+        g.drawImage(bonus, 400, 50, 100, 50, null);
+        g.drawImage(bStack, 12, 190, 55, 70, null);
+        
+        //draw score
+        g.drawString(model.getScore() + "", 440, 82); 
     }
 	
 	public void update(Observable caller, Object data){

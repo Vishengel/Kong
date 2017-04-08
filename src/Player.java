@@ -74,17 +74,12 @@ public void move(){
 		//don't allow vertical movement when climbing
 		//move left
 		case 1:
-			//if(/!isClimbing){
-				dx += -xVel;
-			//}
+				dx += -xVel;	
 			break;
 		//move right
 		case 2: 
-			//if(!isClimbing){
-				dx += xVel;
-			//}
+			dx += xVel;
 			break;
-		//move up
 		case 3:
 			// We can move up if:
 			// -Mario is colliding with a ladder (canClimb)
@@ -123,10 +118,8 @@ public void move(){
 		//System.out.println("Standing: " + standing);
 		dx = 0;
 		dy = 0;
-		//reset action during demo phase
-		if(!jumping && constants.demoPhase){
-			action = 0;
-		}
+		
+		
 		
 		readInput();
 		selectAction();
@@ -134,21 +127,23 @@ public void move(){
 		
 		System.out.println(action);
 		
-		
 		//prevent jumping while climbing a ladder
 		if(isClimbing){
 			jumping = false;
 			dx = 0;
 			xPos = ladderXPos + constants.LADDER_WIDTH / 2 - constants.PLAYER_WIDTH / 2;
 		}
-
+		
+		//Elevate player if jumping
 		if(jumping){
 			dy += -jumpHeight;
 		}
+		//reset action when player is on the ground or when standing on a ladder
+		if(standing || isClimbing){ 
+			action = 0;
+		}
 			
 		super.act(time);
-		
-		//System.out.println(dy);
 		
 		xPos += dx;
 		yPos += dy;

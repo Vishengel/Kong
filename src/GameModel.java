@@ -11,7 +11,7 @@ public class GameModel extends Observable implements constants {
 	private int score = 0;
 	private int lives = 3;
 	private int spawnTimer = 0;	
-	private int barrelSpawnTime = 120;
+	private int barrelSpawnTime = 210;
 	private int smashedBarrelIndex = -1;
 	private int powerupTimer = 0;	
 	private int powerupDuration = 500;
@@ -181,7 +181,7 @@ public class GameModel extends Observable implements constants {
 			mlp.trainNetwork();
 		}
 		while(epochs < constants.MAX_EPOCHS){
-			mario.setAction(0);
+			//mario.setAction(0);
 			calculateInputs();
 			//present input to network
 			if(constants.testPhase){
@@ -191,14 +191,11 @@ public class GameModel extends Observable implements constants {
 			for(int i = 0; i < 8; i++){
 				System.out.print(inputs[i] + " ");
 			}
-			System.out.println();*/
-			//System.out.println("Nearest barrel: " + inputs[7]);
-			//handle gravity
+			*/
 			incrementTime();
 				
-			//spawn barrel
-			
-			/*if(spawnTimer == barrelSpawnTime){
+			//spawn barrels
+			if(spawnTimer == barrelSpawnTime){
 				spawnTimer = 0;
 				//The first barrel always goes directly down to the oil barrel
 				if (firstBarrel) {
@@ -207,7 +204,7 @@ public class GameModel extends Observable implements constants {
 				} else {
 					spawnBarrel(false);
 				}
-			}	*/
+			}	
 		
 			spawnTimer++;
 
