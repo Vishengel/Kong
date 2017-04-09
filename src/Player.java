@@ -125,7 +125,7 @@ public void move(){
 		selectAction();
 		move();
 		
-		System.out.println(action);
+		//System.out.println(action);
 		
 		//prevent jumping while climbing a ladder
 		if(isClimbing){
@@ -140,7 +140,7 @@ public void move(){
 		}
 		//reset action when player is on the ground or when standing on a ladder
 		if(standing || isClimbing){ 
-			action = 0;
+			//action = 0;
 		}
 			
 		super.act(time);
