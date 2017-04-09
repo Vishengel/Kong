@@ -6,7 +6,7 @@ public class Barrel extends MovingObject{
 	private boolean moveDownLadder;
 	//keep track of the distance fallen in order to change direction 
 	private int distanceFallen = 0;
-	private int i = 0;
+	//private int i = 0;
 	
 	public Barrel(int x, int y, int h, int w, boolean d, boolean falling) {
 		super(x, y, h, w);
@@ -14,10 +14,10 @@ public class Barrel extends MovingObject{
 		killOnCollision = false;
 		direction = true;
 		xVel = 2.2f;
-		yVel = 2.2f;
+		yVel = 1.7f;
 		pointAwarded = false;
 		name = "barrel";
-		this.falling = falling;
+		this.falling = false;
 	}
 	
 	public void act(int time) {

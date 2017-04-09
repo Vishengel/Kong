@@ -13,9 +13,9 @@ import java.util.Observable;
 public class GamePanel extends JPanel implements Observer {
 	private GameModel model;
 	private int animationTimer = 0;
+	private int barrelAnimationTimer = 0;
 	
-	//BufferedImage life;
-	//BufferedImage barrel;
+
 	Image marioLeft1 = new ImageIcon(getClass().getResource("images/left1.png")).getImage();
 	Image marioLeft2 = new ImageIcon(getClass().getResource("images/left2.png")).getImage();
 	Image marioLeft3 = new ImageIcon(getClass().getResource("images/left3.png")).getImage();
@@ -26,9 +26,20 @@ public class GamePanel extends JPanel implements Observer {
 	Image marioClimbRight = new ImageIcon(getClass().getResource("images/ClimbRight.png")).getImage();
 	Image marioJumpLeft = new ImageIcon(getClass().getResource("images/jumpLeft.png")).getImage();
 	Image marioJumpRight = new ImageIcon(getClass().getResource("images/jumpRight.png")).getImage();
+	
+	Image barrel1 = new ImageIcon(getClass().getResource("images/b1.png")).getImage();
+	Image barrel2 = new ImageIcon(getClass().getResource("images/b2.png")).getImage();
+	Image barrel3 = new ImageIcon(getClass().getResource("images/b3.png")).getImage();
+	Image barrel4 = new ImageIcon(getClass().getResource("images/b4.png")).getImage();
+	Image climbingBarrel1 = new ImageIcon(getClass().getResource("images/climbingBarrel1.png")).getImage();
+	Image climbingBarrel2 = new ImageIcon(getClass().getResource("images/climbingBarrel2.png")).getImage();
+	
+	Image peach1 = new ImageIcon(getClass().getResource("images/peach1.png")).getImage();
+	Image peach2 = new ImageIcon(getClass().getResource("images/peach2.png")).getImage();
+	Image help = new ImageIcon(getClass().getResource("images/help.png")).getImage();
+	
 	Image kong = new ImageIcon(getClass().getResource("images/konky_dong.gif")).getImage();
 	Image peach = new ImageIcon(getClass().getResource("images/peach.png")).getImage();
-	Image barrel = new ImageIcon(getClass().getResource("images/barrel.png")).getImage();
 	Image platform = new ImageIcon(getClass().getResource("images/platform.png")).getImage();
 	Image ladder = new ImageIcon(getClass().getResource("images/ladder.png")).getImage();
 	Image oil = new ImageIcon(getClass().getResource("images/oil.png")).getImage();
@@ -56,16 +67,24 @@ public class GamePanel extends JPanel implements Observer {
 		};
 		new Timer(20, animation).start();
 		
+		AbstractAction barrelAnimation = new AbstractAction(){
+			public void actionPerformed(ActionEvent e){
+				barrelAnimationTimer++;
+				//System.out.println("ani: " + animationTimer);
+				if(barrelAnimationTimer > 100){
+					barrelAnimationTimer = 0;
+				}
+			}			
+		};
+		new Timer(6, barrelAnimation).start();
+		
 		
 	}
 	
 	 public void paintComponent(Graphics g){
 		super.paintComponent(g); 
 				
-		//Draw game objects
-		g.drawImage(peach,constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_WIDTH, constants.PEACH_HEIGHT, null);
-		g.drawImage(oil,constants.OIL_START_X,constants.OIL_START_Y,constants.OIL_WIDTH, constants.OIL_HEIGHT, null);
-		
+		//Draw game objects	
         for (Platform p : model.getPlatformList()){
         	//if(p.getHasLadder()) {
         	g.drawImage(platform,(int)p.getXPos(), (int)p.getYPos(), (int)p.getWidth(), (int)p.getHeight(), null);
@@ -86,23 +105,28 @@ public class GamePanel extends JPanel implements Observer {
         for (MovingObject object : model.getMOList()){
         	String name = object.getName();
         	if(name == "barrel"){
-        		g.drawImage(barrel,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
+        		animateBarrel(g, object);
+        		//g.drawImage(barrel,(int)object.getXPos(), (int)object.getYPos(), (int)object.getWidth(), (int)object.getHeight(), null);
         	}
             if(name == "player"){
             	animateMario(g, object);
-            	//g.drawImage(mario, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);	
             }
-            if(name == "flame") {
+            /*if(name == "flame") {
             	g.drawImage(flame, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
-            }
+            }*/
         }
        /* for(int i = 0; i < model.getLives(); i++){    	
         	g.drawImage(life, 0 + 30*i,10,30,39, null);
         }
-        */
+        */ 
         //draw cosmetic stuff
         //kong
         g.drawImage(kong, 60,165,100,100, null);
+        //draw peach
+        animatePeach(g);
+        g.drawImage(help, constants.PEACH_START_X + 20, constants.PEACH_START_Y - 5, 40, 15, null);
+        //draw oil thingy
+		g.drawImage(oil,constants.OIL_START_X,constants.OIL_START_Y,constants.OIL_WIDTH, constants.OIL_HEIGHT, null);
         //bonus image
         g.drawImage(bonus, 400, 50, 100, 50, null);
         //barrel stack
@@ -115,7 +139,55 @@ public class GamePanel extends JPanel implements Observer {
         repaint();
     }
 	
-	
+	public void animatePeach(Graphics g){
+		if(animationTimer <= 5){
+			g.drawImage(peach1,constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_WIDTH, constants.PEACH_HEIGHT, null);
+		}
+		else{
+			g.drawImage(peach2,constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_WIDTH, constants.PEACH_HEIGHT, null);
+		}
+	}
+	public void animateBarrel(Graphics g, MovingObject object){
+		int action = object.getAction();
+		if(!object.isClimbing){
+			if(object.right()){
+				if(barrelAnimationTimer <= 25){
+					g.drawImage(barrel1, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+				}
+				else if(barrelAnimationTimer > 25 && barrelAnimationTimer <= 50){
+					g.drawImage(barrel2, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+				}
+				else if(barrelAnimationTimer > 50 && barrelAnimationTimer <= 75){
+					g.drawImage(barrel3, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+				}
+				else{
+					g.drawImage(barrel4, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+				}
+			}
+			else if(object.left()){
+				if(barrelAnimationTimer <= 25){
+					g.drawImage(barrel4, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+				}
+				else if(barrelAnimationTimer > 25 && barrelAnimationTimer <= 50){
+					g.drawImage(barrel3, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+				}
+				else if(barrelAnimationTimer > 50 && barrelAnimationTimer <= 75){
+					g.drawImage(barrel2, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+				}
+				else{
+					g.drawImage(barrel1, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+				}
+			}
+	    }
+		else{
+			if(barrelAnimationTimer <= 50){
+				g.drawImage(climbingBarrel1, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+			}
+			else{
+				g.drawImage(climbingBarrel2, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+			}
+		}
+	}
 	public void animateMario(Graphics g, MovingObject object){
 		int action = object.getAction();
 		switch(action){

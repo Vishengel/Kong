@@ -11,10 +11,10 @@ public class GameModel extends Observable implements constants {
 	private int score = 0;
 	private int lives = 3;
 	private int spawnTimer = 0;	
-	private int barrelSpawnTime = 210;
+	private int barrelSpawnTime = 150; 
 	private int smashedBarrelIndex = -1;
 	private int powerupTimer = 0;	
-	private int powerupDuration = 500;
+	private int powerupDuration = 300;
 	private int powerupIndex = -1;
 	private int epochs;
 	private int sleepTime = 15;
@@ -34,13 +34,13 @@ public class GameModel extends Observable implements constants {
 	private Player mario;
 	private Peach peach;
 	private Oil oil;
-	private Flame flame;
+	//private Flame flame;
 	
 	private boolean powerupActivated = false;
 	private boolean gameWon = false;
 	private boolean gameOver = false; 
-	private boolean firstBarrel = true;
-	private boolean firstFlameOilCollision = true;
+	//private boolean firstBarrel = true;
+	//private boolean firstFlameOilCollision = true;
 	
 	//one of the inputs, specifying whether a ladder is to the right of mario or not
 	private int ladderRight;
@@ -197,13 +197,16 @@ public class GameModel extends Observable implements constants {
 			//spawn barrels
 			if(spawnTimer == barrelSpawnTime){
 				spawnTimer = 0;
+				spawnBarrel(true);
+				
 				//The first barrel always goes directly down to the oil barrel
-				if (firstBarrel) {
+				/*if (firstBarrel) {
 					spawnBarrel(true);
 					firstBarrel = false;
 				} else {
 					spawnBarrel(false);
 				}
+				*/
 			}	
 		
 			spawnTimer++;
@@ -267,10 +270,10 @@ public class GameModel extends Observable implements constants {
 					}
 			}
 			
-			if(flame != null) {
+			/*if(flame != null) {
 				//The flame's direction depends on the player's direction, so we handle that here
 				flame.setDirection(mario.getXPos(), mario.getYPos());
-			}
+			}*/
 
 			//slow game model down, so that game can be played by human
 			if(GUI_ON){
@@ -302,7 +305,7 @@ public class GameModel extends Observable implements constants {
 		gravityTimes.clear();
 		initFirstLevel();
 		initMovingObjects();
-		firstBarrel = true;
+		//firstBarrel = true;
 		powerupActivated = false;
 	}
 	
@@ -413,7 +416,7 @@ public class GameModel extends Observable implements constants {
 			gameWon = true;
 		}
 		
-		//If a falling barrel hits the oil barrel, spawn a flame
+		/*If a falling barrel hits the oil barrel, spawn a flame
 		if(MO.isFalling() && isColliding(MO,oil) && firstFlameOilCollision) {
 			//This boolean makes sure a flame is only spawned once for each collision between the barrel and the oil
 			firstFlameOilCollision = false;
@@ -424,7 +427,7 @@ public class GameModel extends Observable implements constants {
 			gravityTimes.add(0);
 		} else if (MO.isFalling() && !isColliding(MO,oil)) {
 			firstFlameOilCollision = true;
-		}
+		}*/
 		
 		//Check whether Mario is colliding with a powerup
 		//Barrels never collide with a powerup, so we don't check the type of moving object

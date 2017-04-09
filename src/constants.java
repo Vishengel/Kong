@@ -36,7 +36,7 @@ public interface constants {
 	
 	//peach constants
 	int PEACH_START_X = SCREEN_X / 2 - PLATFORM_WIDTH;
-	int PEACH_START_Y = 160;
+	int PEACH_START_Y = 155;
 
 	int PEACH_HEIGHT = 35;
 	int PEACH_WIDTH = 20;
