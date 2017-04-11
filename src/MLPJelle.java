@@ -27,7 +27,7 @@ public class MLPJelle {
 	//Define the learning rate, error threshold and the maximum number of epochs
 	private double learningRate = 0.6;
 	private double errorThreshold =  0.0000000004;
-	private double maxEpochs = 10000;  
+	private double maxEpochs = 15000;  
 	private double momentum = 0.6; 
 	public MLPJelle() {
 		this.initNetwork();	

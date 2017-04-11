@@ -44,7 +44,8 @@ public class FileHandler {
 	public void writeToFile(double[] inputs, int action) throws IOException{
 		try
 		{
-		    String filename= "src/MyFile.csv";
+			String asd = "MyFile";
+		    String filename= "src/" + asd + ".csv";
 		    FileWriter fw = new FileWriter(filename,true);
 		    //write the inputs to the file
 		    for(int i = 0; i < inputs.length; i++){

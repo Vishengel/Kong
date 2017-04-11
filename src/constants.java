@@ -4,15 +4,17 @@ public interface constants {
 	//GUI on or off
 	boolean GUI_ON = true;
 	boolean demoPhase = false; 
-	boolean testPhase = true;  
+	boolean testPhase = false;  
+	
+	boolean BARREL_TRAINING = true;
 	//player or AI mario
 	boolean AI_MARIO = false;
 	
 	//When false, Mario cannot die
-	boolean DEATH = false;
+	boolean DEATH = true;
 	
 	//game logic constants
-	int MAX_EPOCHS = 1000000;
+	int MAX_EPOCHS = 10000;
 	
 	//screen constants
 	int SCREEN_X = 580;
@@ -21,6 +23,8 @@ public interface constants {
 	//player constants
 	int PLAYER_START_X = 160;
 	int PLAYER_START_Y = 600;
+	
+	
 
 	int PLAYER_HEIGHT = 32;
 	int PLAYER_WIDTH = 20;

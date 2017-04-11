@@ -64,8 +64,8 @@ public class GamePanel extends JPanel implements Observer {
 					animationTimer = 0;
 				}
 			}			
-		};
-		new Timer(20, animation).start();
+		}; 
+		new Timer(18, animation).start();
 		
 		AbstractAction barrelAnimation = new AbstractAction(){
 			public void actionPerformed(ActionEvent e){
