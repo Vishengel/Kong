@@ -12,7 +12,7 @@ public class Barrel extends MovingObject{
 		super(x, y, h, w);
 		symbol = 'O';
 		killOnCollision = false;
-		direction = true;
+		direction = d;
 		xVel = 2.2f;
 		yVel = 1.7f;
 		pointAwarded = false;

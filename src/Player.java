@@ -119,7 +119,13 @@ public void move(){
 		dx = 0;
 		dy = 0;
 		
+		if(!jumping && (constants.demoPhase || (!constants.demoPhase && !constants.testPhase))){
+			action = 0;
+		}
 		
+		/*if(standing && !jumping){
+			action = 0;
+		}*/
 		
 		readInput();
 		selectAction();
