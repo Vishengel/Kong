@@ -24,7 +24,7 @@ public abstract class MovingObject extends GameObject{
 	protected boolean isKilled = false;
 	protected boolean firstCanClimb = true;
 	protected boolean collidingWithTop;
-	protected Random actionSelector;
+	protected Random random;
 	
 	//represents the action that the object can take
 	protected int action;
@@ -33,7 +33,7 @@ public abstract class MovingObject extends GameObject{
 	
 	public MovingObject(int x, int y, int h, int w) {
 		super(x, y, h, w);	
-		actionSelector = new Random();
+		random = new Random();
 	}
 	
 	public void act(int time){

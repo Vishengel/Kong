@@ -19,8 +19,8 @@ public class Player extends MovingObject{
 	public Player(int x, int y, int h, int w) {
 		super(x, y, h, w);
 
-		xVel = 2f;
-		yVel = 2f;
+		xVel = 1.5f;
+		yVel = 1.5f;
 
 		killOnCollision = false;
 		name = "player";
@@ -33,22 +33,18 @@ public class Player extends MovingObject{
 	//1 : right
 	//2 : up
 	//3 : down
-	public void selectAction(){
-				
+	public void selectAction(){		
 		if(!jumping){
 			if(goLeft){
-				action = 0;
-			}
-			if(goRight){
 				action = 1;
 			}
-			if(goUp){
+			if(goRight){
 				action = 2;
 			}
-			if(goDown){
+			if(goUp){
 				action = 3;
 			}
-			if(jump){
+			if(goDown){
 				action = 4;
 			}
 			if(jump && goLeft){
@@ -58,9 +54,12 @@ public class Player extends MovingObject{
 				action = 6;
 			}
 			//random mario behavior
-			if(constants.AI_MARIO){
-				action = actionSelector.nextInt(7);
+			/*if(constants.AI_MARIO){
+				if(random.nextInt(100) == 0){
+					action = random.nextInt(6);
+				}
 			}
+			*/
 		}
 		
 		
@@ -74,19 +73,14 @@ public void move(){
 		switch(action){
 		//don't allow vertical movement when climbing
 		//move left
-		case 0:
-			if(!isClimbing){
-				dx += -xVel;
-			}
+		case 1:
+				dx += -xVel;	
 			break;
 		//move right
-		case 1: 
-			if(!isClimbing){
-				dx += xVel;
-			}
+		case 2: 
+			dx += xVel;
 			break;
-		//move up
-		case 2:
+		case 3:
 			// We can move up if:
 			// -Mario is colliding with a ladder (canClimb)
 			// -Mario is not jumping
@@ -97,7 +91,7 @@ public void move(){
 			}
 			break;
 		//move down
-		case 3:
+		case 4:
 			// We can move down if:
 			// -Mario is colliding with a ladder (canClimb)
 			// -Mario is not jumping
@@ -106,10 +100,6 @@ public void move(){
 				isClimbing = true;
 				dy += yVel/2;
 			}
-			break;
-		//jump up
-		case 4:
-			jumping = true;
 			break;
 		//jump left
 		case 5:
@@ -128,10 +118,7 @@ public void move(){
 		//System.out.println("Standing: " + standing);
 		dx = 0;
 		dy = 0;
-		//reset action
-		if(!jumping){
-			action = -1;
-		}
+		
 		
 		
 		readInput();
@@ -140,21 +127,23 @@ public void move(){
 		
 		//System.out.println(action);
 		
-		
 		//prevent jumping while climbing a ladder
 		if(isClimbing){
 			jumping = false;
 			dx = 0;
 			xPos = ladderXPos + constants.LADDER_WIDTH / 2 - constants.PLAYER_WIDTH / 2;
 		}
-
+		
+		//Elevate player if jumping
 		if(jumping){
 			dy += -jumpHeight;
 		}
+		//reset action when player is on the ground or when standing on a ladder
+		if(standing || isClimbing){ 
+			//action = 0;
+		}
 			
 		super.act(time);
-		
-		//System.out.println(dy);
 		
 		xPos += dx;
 		yPos += dy;
@@ -214,6 +203,16 @@ public void move(){
 	
 	public boolean isKilled(){
 		return isKilled;
+	}
+
+
+	public boolean isClimbing() {	
+		return isClimbing;
+	}
+
+
+	public boolean isJumping() {
+		return jumping;
 	}
 	
 }
