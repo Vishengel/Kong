@@ -119,7 +119,8 @@ public void move(){
 		dx = 0;
 		dy = 0;
 		
-		if(!jumping && (constants.demoPhase || (!constants.demoPhase && !constants.testPhase))){
+		//reset action for smoother player control when not controlled by AI
+		if(!jumping && !constants.TEST_PHASE_DODGING && !constants.TEST_PHASE_CLIMBING){
 			action = 0;
 		}
 		
@@ -144,10 +145,7 @@ public void move(){
 		if(jumping){
 			dy += -jumpHeight;
 		}
-		//reset action when player is on the ground or when standing on a ladder
-		if(standing || isClimbing){ 
-			//action = 0;
-		}
+		
 			
 		super.act(time);
 		

@@ -16,44 +16,58 @@ public class MLPJelle {
 	private double[][] target /*= new double[][] {{0.0,0.0,0.0}, {0.0,0.0,1.0}, {0.0,1.0,0.0}, {0.0,1.0,1.0}}*/;
 	//Define the number of nodes in input, hidden and output layers
 	private int nInput;
-	private int nHidden = 70; 
-	private int nOutput = 7; 
+	private int nHidden; 
+	private int nOutput; 
 	//Define the number of hidden layers
-	private int nHiddenLayers = 1; 
+	private int nHiddenLayers; 
 	//Define a list that contains a list of nodes for each hidden layer
 	private ArrayList<ArrayList<NeuronJelle>> hiddenList = new ArrayList<ArrayList<NeuronJelle>>();
 	//Define a list of output neurons
 	private ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
 	private double learningRate = 0.6;
-	private double errorThreshold =  0.0000000004;
-	private double maxEpochs = 15000;  
+	private double errorThreshold =  0.0000000000000000000004;
+	private double maxEpochs = 10000;  
 	private double momentum = 0.6; 
-	public MLPJelle() {
+	private String fileName;
+	
+	public MLPJelle(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName) {
+		this.nInput = nInput;
+		this.nHiddenLayers = nHiddenLayers;
+		this.nHidden = nHidden;
+		this.nOutput = nOutput;
+		this.fileName = fileName;
+		
 		this.initNetwork();	
 	}
 	
 	public void initNetwork() {
+		
+
 		//read the demonstration data to be learned from 
-		double[][] initialInput = FH.readFile();
-		input = new double[initialInput.length][7];
+		double[][] initialInput = FH.readFile(fileName, nInput);
+		input = new double[initialInput.length][nInput];
 		//filter out the target values from the input array
 		for(int i = 0; i < initialInput.length; i++){
 			//System.out.println("Pattern: " + i);
-			for(int j = 0; j < 6; j++){	
+			for(int j = 0; j < nInput; j++){	
 				input[i][j] = initialInput[i][j];
 				//System.out.print(input[i][j] + " ");
 			}
+			//System.out.println();
 			//add the -1 value at the end of the input
-			input[i][6] = -1;
+			input[i][nInput-1] = -1;		
 		}
+		
+		
 		//fill the target array with the target values 
 		target = new double[input.length][nOutput];
 		for(int i = 0; i < input.length; i++){
 			for(int j = 0; j < initialInput[0].length - input[0].length; j++){
-				target[i][j] = initialInput[i][j + initialInput[0].length - input[0].length - 1];
-				
+				target[i][j] = initialInput[i][j + nInput];
+				//System.out.print(target[i][j] + ",");				
 			}
+			//System.out.println();
 		}	
 		nInput = input[0].length;
 		
@@ -85,7 +99,7 @@ public class MLPJelle {
 		double epoch = 0;
 		do {
 			//print training progress
-			System.out.println("Gathering barrels.. " + Math.round((epoch / maxEpochs) * 100) + "%");
+			System.out.println("Learning.. " + Math.round((epoch / maxEpochs) * 100) + "%");
 			//System.out.println(Math.round((epoch / maxEpochs) * 100) + "%");
 			//System.out.println("Training completed in " + epoch + " epochs");
 			previousTotalError = totalError;
@@ -193,17 +207,7 @@ public class MLPJelle {
 		return totalError;
 	}
 	
-	//converts binary encoding of ouput nodes to an integer 
-	public int binaryToInt(){
-		int number = 0;
-		int multiplier = (int) Math.pow(2, nOutput - 1);
-		for(int i = 0; i < nOutput; i++){
-			int output = outputLayer.get(i).getActivation() >= 0? 1 : 0;
-			number += output * multiplier;
-			multiplier = multiplier /2;
-		}
-		return number;
-	}
+
 	
 	public int maxOutput(){
 		double max = 0;
@@ -219,6 +223,14 @@ public class MLPJelle {
 	}
 	
 	public int testNetwork(double[] input) {
+		
+		//print input
+		for(int i = 0; i < input.length; i++){
+			System.out.print(input[i] + ",");
+		}
+		System.out.println();
+		
+		
 		int testEpoch; 
 		double nCorrect = 0;
 		double output = 0;
@@ -226,12 +238,12 @@ public class MLPJelle {
 		//present game state to the network, calculate output
 		forwardPass(input);
 		//System.out.println(binaryToInt());	
-		/* activation of output nodes
-		for(int i = 0; i < nOutput; i++){
-			System.out.print("Output node " + i + ": " + outputLayer.get(i).getActivation());
-			System.out.println(" " + outputLayer.get(i).getOutput());
+		// activation of output nodes
+		//for(int i = 0; i < nOutput; i++){
+			//System.out.print("Output node " + i + ": " + outputLayer.get(i).getActivation());
+			//System.out.println(" " + outputLayer.get(i).getOutput());
 			
-		}*/
+		//}
 		return maxOutput();	
 		
 		/*
