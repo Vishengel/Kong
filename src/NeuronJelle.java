@@ -53,8 +53,12 @@ public class NeuronJelle {
 		return this.output;
 	}
 	
-	public void setOutput() {
+	public void setSigmoidOutput() {
 		this.output = sigmoid(this.activation);
+	}
+	
+	public void setSoftmaxOutput(ArrayList<NeuronJelle> outputLayer) {
+		this.output = softmax(this.activation, outputLayer);
 	}
 	
 	public double getGradient() {
@@ -104,6 +108,16 @@ public class NeuronJelle {
 	
 	public double sigmoidPrime(double activation){
 		return Math.pow(Math.E, activation) / ((1 + Math.pow(Math.E, activation))* (1 + Math.pow(Math.E, activation)));
+	}
+	
+	public double softmax(double activation, ArrayList<NeuronJelle> outputLayer) {
+		double activationSum = 0;
+		
+		for(NeuronJelle n : outputLayer) {
+			activationSum += Math.exp(n.getActivation());
+		}
+		
+		return Math.exp(activation) / activationSum;
 	}
 	
 	public void printWeights() {

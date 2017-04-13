@@ -153,7 +153,7 @@ public class MLPJelle {
 			for (int j=0; j<nHidden; j++) {
 				hiddenList.get(i).get(j).setInput(currentInput);
 				hiddenList.get(i).get(j).setActivation();
-				hiddenList.get(i).get(j).setOutput();
+				hiddenList.get(i).get(j).setSigmoidOutput();
 				outputArray[j] = hiddenList.get(i).get(j).getOutput();
 			}
 			//Store the output of the hidden layer as input for the next layer
@@ -163,7 +163,7 @@ public class MLPJelle {
 		for (NeuronJelle n : outputLayer) {
 			n.setInput(currentInput);
 			n.setActivation();
-			n.setOutput();
+			n.setSoftmaxOutput(outputLayer);
 			//n.printWeights();
 		}
 	}
@@ -238,12 +238,12 @@ public class MLPJelle {
 		//present game state to the network, calculate output
 		forwardPass(input);
 		//System.out.println(binaryToInt());	
-		// activation of output nodes
-		//for(int i = 0; i < nOutput; i++){
-			//System.out.print("Output node " + i + ": " + outputLayer.get(i).getActivation());
-			//System.out.println(" " + outputLayer.get(i).getOutput());
+		//activation of output nodes
+		for(int i = 0; i < nOutput; i++){
+			System.out.print("Output node " + i + ": " + outputLayer.get(i).getActivation());
+			System.out.println(" " + outputLayer.get(i).getOutput());
 			
-		//}
+		}
 		return maxOutput();	
 		
 		/*
