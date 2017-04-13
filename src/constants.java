@@ -3,7 +3,7 @@ public interface constants {
 
 	//GUI on or off
 	boolean GUI_ON = true;
-	boolean demoPhase = false; 
+	boolean demoPhase = true; 
 	boolean testPhase = false;  
 	
 	boolean BARREL_TRAINING = true;
@@ -14,7 +14,7 @@ public interface constants {
 	boolean DEATH = true;
 	
 	//game logic constants
-	int MAX_EPOCHS = 10000;
+	int MAX_EPOCHS = 100;
 	
 	//screen constants
 	int SCREEN_X = 580;

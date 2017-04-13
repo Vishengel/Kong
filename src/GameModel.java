@@ -20,8 +20,11 @@ public class GameModel extends Observable implements constants {
 	private int epochs;
 	private int sleepTime = 15;
 	
-	
-	
+	//Game objects
+	private Player mario;
+	private Peach peach;
+	private Oil oil;
+	//private Flame flame;
 	private ArrayList<Integer> gravityTimes;
 	private ArrayList<Platform> platformList;
 	private ArrayList<Ladder> ladderList;
@@ -34,11 +37,6 @@ public class GameModel extends Observable implements constants {
 	
 	
 	MLPJelle mlp;
-	
-	private Player mario;
-	private Peach peach;
-	private Oil oil;
-	//private Flame flame;
 	
 	private boolean powerupActivated = false;
 	private boolean gameWon = false;
@@ -332,6 +330,7 @@ public class GameModel extends Observable implements constants {
 		//write entire state-action array to training file
 		if(constants.demoPhase){
 			fh.writeToFile(climbInputs,mario.getAction());
+			fh.writeGameStateToFile();
 		}
 		
 	}	

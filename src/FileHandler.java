@@ -61,6 +61,29 @@ public class FileHandler {
 		    System.err.println("IOException: " + ioe.getMessage());
 		}
 	}
+	
+	public void writeGameStateToFile() throws IOException{
+		try
+		{
+			String fileName = "GameStateFile";
+		    String filePath= "src/" + fileName + ".csv";
+		    FileWriter fw = new FileWriter(filePath,true);
+		    //write the inputs to the file
+		    /*
+		    for(int i = 0; i < inputs.length; i++){
+			    fw.write(inputs[i] + ",");			    
+		    }
+		   
+		    //write the action taken to a file
+		    writeActionToFile(fw, action);*/
+		    fw.close();
+		}
+		catch(IOException ioe)
+		{
+		    System.err.println("IOException: " + ioe.getMessage());
+		}
+	}
+	
 	public double[][] readFile(){
 		int amountOfLines = 0;
 		//count amount of lines
