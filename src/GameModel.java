@@ -34,13 +34,16 @@ public class GameModel extends Observable implements constants {
 	private ArrayList<double[]> dodgeTrainingSet = new ArrayList<double[]>();
 	private ArrayList<double[]> climbTrainingSet = new ArrayList<double[]>();
 	
+	private ArrayList<ArrayList<MovingObject>> MOCollection = new ArrayList<ArrayList<MovingObject>>();
+	private ArrayList<ArrayList<Powerup>> PUCollection = new ArrayList<ArrayList<Powerup>>();
+	
 	MLPJelle dodgeMLP;
 	MLPJelle climbMLP;
 	
 	private Player mario;
 	private Peach peach;
 	private Oil oil;
-	//private Flame flame;
+	private Flame flame;
 	
 	private boolean powerupActivated = false;
 	private boolean gameWon = false;
@@ -267,6 +270,11 @@ public class GameModel extends Observable implements constants {
 			dodgeInputs = calculateDodgeInputs();
 			//System.out.println("Mario in danger: " + marioInDanger);
 			
+			if(constants.DEMO_PHASE_DODGING || constants.DEMO_PHASE_CLIMBING){
+				MOCollection.add(MOList);
+				PUCollection.add(PUList);
+			}
+			
 			//present input to networks
 			if(constants.TEST_PHASE_CLIMBING){
 				//if mario is in danger, present input to the dodge mlp
@@ -412,7 +420,9 @@ public class GameModel extends Observable implements constants {
 			
 		}
 		if(constants.DEMO_PHASE_CLIMBING){
-			fh.writeToFile(climbTrainingSet, "climbData");
+			//fh.writeToFile(climbTrainingSet, "climbData");
+			fh.writeGameStateToFile(MOCollection, PUCollection, platformList, ladderList, peach, oil, flame);
+			System.out.println("Game states written to file");
 		}
 		
 	}	

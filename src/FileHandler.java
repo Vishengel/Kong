@@ -66,7 +66,8 @@ public class FileHandler {
 		}
 	}
 	
-	public void writeGameStateToFile() throws IOException{
+	public void writeGameStateToFile(ArrayList<ArrayList<MovingObject>> MOCollection, ArrayList<ArrayList<Powerup>> PUCollection,
+			ArrayList<Platform> platformList, ArrayList<Ladder> ladderList, Peach peach, Oil oil, Flame flame) throws IOException{
 		try
 		{
 			String fileName = "GameStateFile";
