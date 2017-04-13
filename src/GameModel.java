@@ -12,17 +12,18 @@ import javax.swing.Timer;
 public class GameModel extends Observable implements constants {
 	private int score = 0;
 	private int lives = 3;
-	private int spawnTimer = 150;	
-	private int barrelSpawnTime = 150; 
+	private int spawnTimer = 300;	
+	private int barrelSpawnTime = 300; 
 	private int smashedBarrelIndex = -1;
 	private int powerupTimer = 0;	
 	private int powerupDuration = 300;
 	private int powerupIndex = -1;
 	private int epochs;
 	private int sleepTime = 15;
-	
-	private int nInputsClimb = 6;
-	private int nInputsDodge = 4;
+
+	private int nInputsClimb = 5;
+	private int nInputsDodge = 2;
+
 	private int nOutputs = 7;
 	
 	private ArrayList<Integer> gravityTimes;
@@ -50,6 +51,7 @@ public class GameModel extends Observable implements constants {
 	private boolean gameOver = false; 
 	private boolean marioInDanger = false;
 	
+	
 	//allow for alternating left and right barrel spawing during training
 	private boolean leftSpawned = true;
 	
@@ -61,6 +63,7 @@ public class GameModel extends Observable implements constants {
 	private int ladderRight;
 	private int barrelRight;
 	private int barrelOnSameLevel;
+	private int barrelClimbing;
 	
 	FileHandler fh = new FileHandler();
 		
@@ -144,7 +147,10 @@ public class GameModel extends Observable implements constants {
 				if(MOList.get(i).getName() == "barrel"){
 					Barrel b = (Barrel) MOList.get(i);
 					float distance = getEuclideanDistance(mario,MOList.get(i));
-					if(distance < minimumDistance){
+					
+					//only consider barrels that still wield a point when jumped over; 
+					//don't look at barrels that are no longer a threat
+					if(distance < minimumDistance && !b.pointAwarded()){
 							minimumDistance = distance;
 							//check if barrel is to the left or to the right
 							if(mario.getXPos() <= b.getXPos()){
@@ -154,12 +160,18 @@ public class GameModel extends Observable implements constants {
 								barrelRight = 0;
 							}
 					//if barrel is on the same level
-					if((b.getYPos() + b.getHeight()) >= (mario.getYPos() - 40)
+					if((b.getYPos() + b.getHeight()) >= (mario.getYPos())
 					    && (b.getYPos() + b.getHeight()) <= (mario.getYPos() + mario.getHeight()) ){
 					    	barrelOnSameLevel = 1;							
 					}
 					else{
 						barrelOnSameLevel = 0;
+					}
+					if(b.isClimbing){
+						barrelClimbing = 1;
+					}
+					else{
+						barrelClimbing = 0;
 					}
 				}
 			}
@@ -188,14 +200,28 @@ public class GameModel extends Observable implements constants {
 		
 		//climb mlp inputs
 		climbInputs[0] = mario.isClimbing() ? 1 : -1;
-		climbInputs[1] = mario.isJumping() ? 1 : -1;
+		//climbInputs[1] = mario.isJumping() ? 1 : -1;
 		//calculate distance to nearest power-up
-		climbInputs[2] = normalize(findNearestObject("powerup"));
+		//climbInputs[2] = normalize(findNearestObject("powerup"));
 		//calculate distance to nearest ladder
-		climbInputs[3] = normalize(findNearestObject("ladder"));	
-		climbInputs[4] = ladderRight;	
+		climbInputs[1] = normalize(findNearestObject("ladder"));	
+		climbInputs[2] = ladderRight;	
+		climbInputs[3] = normalizeForDodging(findNearestObject("barrel"));
+		climbInputs[4] = barrelRight;
+		climbInputs[5] = barrelClimbing;
+		climbInputs[6] = barrelOnSameLevel;
 		//calculate distance to peach 
-		climbInputs[5] = normalize(getEuclideanDistance(mario, peach));
+		//climbInputs[3] = normalize(getEuclideanDistance(mario, peach));
+		
+		System.out.println("1: Mario is climbing: " + mario.isClimbing());
+		System.out.println("2: Nearest Ladder: " + climbInputs[1]);
+		System.out.println("3: Ladder is to the right: " + climbInputs[2]);
+		System.out.println("4: Nearest barrel? " + climbInputs[3]);
+		System.out.println("5: Barrel to right? " + climbInputs[4]);
+		System.out.println("6: Barrel climbing? " + climbInputs[5]);
+		System.out.println("7: Barrel on same level? " + climbInputs[6]);
+		//System.out.println("Distance to peach: " + climbInputs[3]);
+		
 		
 		return climbInputs;
 	}	
@@ -216,18 +242,19 @@ public class GameModel extends Observable implements constants {
 	public double[] calculateDodgeInputs(){
 		double[] dodgeInputs = new double[nInputsDodge + nOutputs];
 		//dodge mlp inputs
-		dodgeInputs[0] = mario.isJumping() ? 1 : 0;
+		//dodgeInputs[0] = mario.isJumping() ? 1 : -1;
 		//dodgeInputs[1] = normalize(findNearestObject("ladder"));
 		//dodgeInputs[2] = ladderRight;
 		//calculate distance to the nearest barrel
-		dodgeInputs[1] = normalizeForDodging(findNearestObject("barrel"));
-		dodgeInputs[2] = barrelRight;
-		dodgeInputs[3] = barrelOnSameLevel;
+
+		dodgeInputs[0] = normalizeForDodging(findNearestObject("barrel"));
+		dodgeInputs[1] = barrelRight;
+		//dodgeInputs[3] = barrelOnSameLevel;
 		
-		//System.out.println("Mario is jumping: " + dodgeInputs[0]);
-		//System.out.println("Nearest barrel: " + dodgeInputs[1]);
-		//System.out.println("Nearest barrel direction: " + dodgeInputs[2]);
-		//System.out.println("Barrel on same level? : " + (dodgeInputs[3] == 1 ? "yes" : "no"));	
+		//System.out.println("Mario jumping? " + dodgeInputs[0]);
+		//System.out.println("Nearest barrel? " + dodgeInputs[0]);
+		//System.out.println("Barrel to right? " + dodgeInputs[1]);
+		//System.out.println("Barrel on same level? " + dodgeInputs[3]);
 		
 		//System.out.println("Nearest ladder: " + dodgeInputs[1]);
 		//System.out.println("Nearest barrel direction: " + dodgeInputs[2]);
@@ -238,8 +265,8 @@ public class GameModel extends Observable implements constants {
 		
 		//System.out.println("Nearest barrel direction: " + dodgeInputs[2]);
 		//System.out.println("Barrel on same level? : " + (dodgeInputs[3] == 1 ? "yes" : "no"));
-		if(findNearestObject("barrel") < 100){
-			marioInDanger = true;
+		if(findNearestObject("barrel") < 80){
+			//marioInDanger = true;
 		}
 		else{
 			marioInDanger = false;
@@ -257,14 +284,14 @@ public class GameModel extends Observable implements constants {
 		double[] testInputs;
 		//Create the MLP's and train them on their respective training datasets
 		if(constants.TEST_PHASE_DODGING){
-			dodgeMLP = new MLPJelle(nInputsDodge, 1, 70, nOutputs, "dodgeData");
+			dodgeMLP = new MLPJelle(nInputsDodge, 2, 70, nOutputs, "dodgeData");
 			dodgeMLP.trainNetwork();
 		}
 		if(constants.TEST_PHASE_CLIMBING){
 			climbMLP = new MLPJelle(nInputsClimb, 1, 70, nOutputs, "climbData");
 			climbMLP.trainNetwork();
 		}
-		while(epochs < constants.MAX_EPOCHS){
+		while(epochs < constants.MAX_EPOCHS && !gameWon){
 			//mario.setAction(0);
 			climbInputs = calculateClimbInputs();
 			dodgeInputs = calculateDodgeInputs();
@@ -361,7 +388,7 @@ public class GameModel extends Observable implements constants {
 					} else if(gameWon){
 						//if mario saved the princess, add 1000 points instead
 						System.out.println("Goal reached!!!!!!!!!!!!!!!!!!!!!");
-						gameWon = false;
+						//gameWon = false;
 						score += 1000;
 						resetGame();
 					}
@@ -402,10 +429,15 @@ public class GameModel extends Observable implements constants {
 			}
 			epochs++;
 			
+			if(constants.DEMO_PHASE_DODGING){
 			dodgeInputs[nInputsDodge + mario.getAction()] = 1.0;
 			dodgeTrainingSet.add(dodgeInputs);
-			//climbInputs[nInputsClimb + mario.getAction()] = 1.0;
-			//climbTrainingSet.add(climbInputs);
+			}
+			if(constants.DEMO_PHASE_CLIMBING){
+				climbInputs[nInputsClimb + mario.getAction()] = 1.0;
+				climbTrainingSet.add(climbInputs);
+			}
+			
 			//for(int i = 0; i < nInputsClimb + nOutputs; i++){
 				//System.out.print(climbInputs[i] + " ");
 			//}
@@ -415,7 +447,7 @@ public class GameModel extends Observable implements constants {
 		}
 
 		//write entire state-action array to training file(s)
-		if(constants.DEMO_PHASE_DODGING ){
+		if(constants.DEMO_PHASE_DODGING  ){
 			fh.writeToFile(dodgeTrainingSet, "dodgeData");
 			
 		}
@@ -844,7 +876,7 @@ public class GameModel extends Observable implements constants {
 		MOList = new ArrayList<MovingObject>();
 		//initialize player
 		if(constants.BARREL_TRAINING){
-			mario = new Player(constants.PLAYER_START_X + 100,constants.SCREEN_Y - 220,constants.PLAYER_HEIGHT,constants.PLAYER_WIDTH);	
+			mario = new Player(constants.PLAYER_START_X,constants.SCREEN_Y - 220,constants.PLAYER_HEIGHT,constants.PLAYER_WIDTH);	
 		}
 		else{
 			mario = new Player(constants.PLAYER_START_X,constants.PLAYER_START_Y,constants.PLAYER_HEIGHT,constants.PLAYER_WIDTH);	

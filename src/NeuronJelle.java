@@ -65,14 +65,17 @@ public class NeuronJelle {
 		return this.gradient;
 	}
 	
-	public void setHiddenGradient(int nodeIndex, ArrayList<NeuronJelle> nextLayer) {
+	public void setHiddenGradient(int nodeIndex, ArrayList<NeuronJelle> nextLayer, int hiddenLayer) {
 		double sum = 0;
-		
 		for (NeuronJelle n : nextLayer) {
 			sum += n.getGradient() * n.getWeights()[nodeIndex];
 		}
-		
-		this.gradient = sigmoidPrime(this.activation) * sum;
+		if(hiddenLayer == 0){
+			this.gradient = sigmoidPrime(this.activation) * sum;
+		}
+		else{
+			this.gradient = tanhPrime(this.activation) * sum;
+		}
 	}
 	
 	public void setOutputGradient(double target) {
@@ -83,10 +86,11 @@ public class NeuronJelle {
 		this.error = 0.5*(target - this.output)*(target - this.output);
 		this.crossEntropy = target * Math.log(this.output) + (1 - target)*Math.log(1 - this.output);
 		
+		
 		for(int i=0; i<this.weights.length; i++) {
 			this.weights[i] += learningRate*gradient*this.input[i] + (momentum * this.previousWeightChange);
 			this.previousWeightChange = learningRate*gradient*this.input[i] + (momentum * this.previousWeightChange);
-			
+			//System.out.println(this.weights[i]);
 		}
 	}
 	
@@ -104,10 +108,20 @@ public class NeuronJelle {
 	
 	public double sigmoid(double activation){
 		 return (1/( 1 + Math.pow(Math.E,(-1*activation))));
+		
 	}
 	
 	public double sigmoidPrime(double activation){
 		return Math.pow(Math.E, activation) / ((1 + Math.pow(Math.E, activation))* (1 + Math.pow(Math.E, activation)));
+		
+	}
+	
+	public double tanh(double activation){
+		return 2 / (1 + Math.pow(Math.E, -2*activation)) - 1;
+	}
+	
+	public double tanhPrime(double activation){
+		return 1 - Math.pow(tanh(activation), 2);
 	}
 	
 	public double softmax(double activation, ArrayList<NeuronJelle> outputLayer) {

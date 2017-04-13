@@ -6,7 +6,7 @@ public interface constants {
 	
 	//set these to true if you want to create training set(s)
 	boolean DEMO_PHASE_DODGING = false; 
-	boolean DEMO_PHASE_CLIMBING = false; 
+	boolean DEMO_PHASE_CLIMBING = false;  
 	
 	
 	//set these to true if you want to test dodging or climbing
@@ -17,7 +17,7 @@ public interface constants {
 	boolean BARREL_TRAINING = false;
 	
 	//player or AI mario
-	boolean AI_MARIO = false;
+	//boolean AI_MARIO = false;
 	
 	//When false, Mario cannot die
 	boolean DEATH = true;

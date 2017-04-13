@@ -69,7 +69,7 @@ public class Player extends MovingObject{
 	}
 	
 public void move(){
-		
+		//jumping = false;
 		switch(action){
 		//don't allow vertical movement when climbing
 		//move left
@@ -101,6 +101,7 @@ public void move(){
 				dy += yVel/2;
 			}
 			break;
+		//jumping is only possible if standing
 		//jump left
 		case 5:
 			jumping = true;
