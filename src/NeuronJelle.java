@@ -41,7 +41,7 @@ public class NeuronJelle {
 		this.activation = 0;
 
 		for(int i=0; i<this.input.length; i++) {
-			//System.out.println(this.input[i]);
+			//System.out.println(i + "; " + this.input[i]);
 			//System.out.println(this.weights[i]);
 			this.activation += this.input[i] * this.weights[i];
 		}

@@ -3,25 +3,35 @@ public interface constants {
 
 	//GUI on or off
 	boolean GUI_ON = true;
-	boolean demoPhase = true; 
-	boolean testPhase = false;  
 	
+	//set these to true if you want to create training set(s)
+	boolean DEMO_PHASE_DODGING = false; 
+	boolean DEMO_PHASE_CLIMBING = false; 
+	
+	
+	//set these to true if you want to test dodging or climbing
+	boolean TEST_PHASE_DODGING = false; 
+	boolean TEST_PHASE_CLIMBING = false;
+	
+	//setting this to true changes the level to the barrel dodging level
 	boolean BARREL_TRAINING = true;
+	
+	
 	//player or AI mario
 	boolean AI_MARIO = false;
 	
 	//When false, Mario cannot die
-	boolean DEATH = true;
+	boolean DEATH = false;
 	
 	//game logic constants
-	int MAX_EPOCHS = 100;
-	
+	int MAX_EPOCHS = 3000; 
+
 	//screen constants
 	int SCREEN_X = 580;
 	int SCREEN_Y = 680;
 	
 	//player constants
-	int PLAYER_START_X = 160;
+	int PLAYER_START_X = 220;
 	int PLAYER_START_Y = 600;
 	
 	
