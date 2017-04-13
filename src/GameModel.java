@@ -28,7 +28,7 @@ public class GameModel extends Observable implements constants {
 	private ArrayList<MovingObject> MOList;
 	private ArrayList<Powerup> PUList;
 	
-	//this array contains the 3 boolean and 5 float inputs for the ladder climbing MLP
+	//this array contains the 6 inputs for the ladder climbing MLP
 	private double[] climbInputs = new double[6];
 	private double[] dodgeInputs = new double[6];
 	
@@ -194,7 +194,7 @@ public class GameModel extends Observable implements constants {
 		//calculate distance to the nearest barrel
 		dodgeInputs[1] = findNearestObject("barrel");
 		dodgeInputs[2] = barrelRight;
-		//dodgeInputs[5] = barrelOnSameLevel;
+		dodgeInputs[5] = barrelOnSameLevel;
 		
 		
 		System.out.println("Mario is jumping: " + dodgeInputs[0]);
@@ -202,7 +202,7 @@ public class GameModel extends Observable implements constants {
 		//System.out.println("Nearest ladder direction: " + (dodgeInputs[2] == 1 ? "right" : "left"));
 		System.out.println("Nearest barrel: " + dodgeInputs[1]);
 		System.out.println("Nearest barrel direction: " + dodgeInputs[2]);
-		//System.out.println("Barrel on same level? : " + (dodgeInputs[5] == 1 ? "yes" : "no"));
+		System.out.println("Barrel on same level? : " + (dodgeInputs[5] == 1 ? "yes" : "no"));
 	}
 	
 	
