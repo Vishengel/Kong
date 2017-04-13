@@ -20,10 +20,10 @@ public interface constants {
 	//boolean AI_MARIO = false;
 	
 	//When false, Mario cannot die
-	boolean DEATH = true;
+	boolean DEATH = false;
 	
 	//game logic constants
-	int MAX_EPOCHS = 10000; 
+	int MAX_EPOCHS = 20000; 
 
 	//screen constants
 	int SCREEN_X = 580;
@@ -33,8 +33,6 @@ public interface constants {
 	int PLAYER_START_X = 220;
 	int PLAYER_START_Y = 600;
 	
-	
-
 	int PLAYER_HEIGHT = 32;
 	int PLAYER_WIDTH = 20;
 
