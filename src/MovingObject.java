@@ -15,9 +15,6 @@ public abstract class MovingObject extends GameObject{
 	//of the gravity pulling the object back to the ground
 	protected int time = 0;
 	protected float gravity = 0.12f;
-	//This value is true if the moving object is colliding with another object
-	//protected boolean hasCollision = false;
-	protected boolean killOnCollision;
 	protected boolean isClimbing = false;
 	protected boolean canClimb = false;
 	protected boolean standing = false;
@@ -37,8 +34,10 @@ public abstract class MovingObject extends GameObject{
 		random = new Random();
 	}
 	
-	public void act(int time){
+	public void act(){
 		dy += gravity * time;	
+		xPos += dx;
+		yPos += dy;
 	}
 	
 	//each subclass of this class implements its own version of the act, movement and collision

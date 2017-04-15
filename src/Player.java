@@ -18,23 +18,21 @@ public class Player extends MovingObject{
     
 	public Player(int x, int y, int h, int w) {
 		super(x, y, h, w);
-
 		xVel = 1.5f;
 		yVel = 1.5f;
-		killOnCollision = false;
-		name = "player";
-		
+		name = "player";	
 	}
 	
 	
-	//actions: 
-	//0 : stand still
-	//1 : left
-	//2 : right
-	//3 : climb up
-	//4 : climb down
-	//5 : jump left
-	//6 : jump right
+	/*actions: 
+	0 : stand still
+	1 : left
+	2 : right
+	3 : climb up
+	4 : climb down
+	5 : jump left
+	6 : jump right
+	*/
 	
 	//This function is only for human players, where action is selected based on keyboard input
 	public void selectAction(){		
@@ -105,7 +103,7 @@ public void move(){
 		}
 	} 
 	
-	public void act(int time){
+	public void act(){
 		dx = 0;
 		dy = 0;
 		
@@ -113,7 +111,6 @@ public void move(){
 		if(!jumping && !constants.TEST_PHASE_DODGING && !constants.TEST_PHASE_CLIMBING){
 			action = 0;
 		}
-		
 		
 		readInput();
 		selectAction();
@@ -134,10 +131,8 @@ public void move(){
 		}
 		
 			
-		super.act(time);
+		super.act();
 		
-		xPos += dx;
-		yPos += dy;
 		
 		//prevent player from walking out of the screen
 		if(xPos <= 0){

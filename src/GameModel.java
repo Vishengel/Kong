@@ -1,15 +1,10 @@
-import java.awt.event.ActionEvent;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Observer;
-import java.util.Observable;
-import java.util.Random;
 
-import javax.swing.AbstractAction;
-import javax.swing.Timer;
 
-public class GameModel extends Observable implements constants {
+public class GameModel implements constants {
 	private int score = 0;
 	private int lives = 3;
 	
@@ -79,17 +74,17 @@ public class GameModel extends Observable implements constants {
 	
 	//Create a new barrel object 
 	public void spawnBarrel(boolean falling){
-		MOList.add(new Barrel(constants.BARREL_START_X,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, true, falling));
+		MOList.add(new Barrel(constants.BARREL_START_X,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, 1));
 	}
 	
 	//these two functions are used for alternative spawning of barrels, to be used during dodge training
 	//in the alternative dodge level
 	public void spawnLeftBarrel(){
-		MOList.add(new Barrel(0,constants.SCREEN_Y-220,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, true, false));
+		MOList.add(new Barrel(0,constants.SCREEN_Y-220,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, 1));
 	}
 	
 	public void spawnRightBarrel(){
-		MOList.add(new Barrel(constants.SCREEN_X, constants.SCREEN_Y-220,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, false, false));
+		MOList.add(new Barrel(constants.SCREEN_X, constants.SCREEN_Y-220,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, 1));
 	}
 	
 	
@@ -217,13 +212,14 @@ public class GameModel extends Observable implements constants {
 		//calculate distance to peach 
 		//climbInputs[3] = normalize(getEuclideanDistance(mario, peach));
 		
-		System.out.println("1: Mario is climbing: " + mario.isClimbing());
+		/*System.out.println("1: Mario is climbing: " + mario.isClimbing());
 		System.out.println("2: Nearest Ladder: " + climbInputs[1]);
 		System.out.println("3: Ladder is to the right: " + climbInputs[2]);
 		System.out.println("4: Nearest barrel? " + climbInputs[3]);
 		System.out.println("5: Barrel to right? " + climbInputs[4]);
 		System.out.println("6: Barrel climbing? " + climbInputs[5]);
 		System.out.println("7: Barrel on same level? " + climbInputs[6]);
+		*/
 		//System.out.println("Distance to peach: " + climbInputs[3]);
 		
 		
@@ -331,7 +327,7 @@ public class GameModel extends Observable implements constants {
 				MovingObject MO = checkCollisions(MOList.get(i));
 				MOList.set(i, MO); 
 				//make all moving objects act/move
-				MOList.get(i).act(MO.getTime());					
+				MOList.get(i).act();					
 				//if mario is hit, subtract a life
 				if(MOList.get(0).isKilled){	
 					lives--;
