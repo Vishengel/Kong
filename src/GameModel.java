@@ -20,6 +20,7 @@ public class GameModel extends Observable implements constants {
 	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
 	private int powerupTimer = 0;	
+	//This value determines how long the powerup lasts when Mario picks it up
 	private int powerupDuration = 300;
 	private int powerupIndex = -1;
 	
@@ -35,7 +36,6 @@ public class GameModel extends Observable implements constants {
 	private int nInputsDodge = 2;
 	private int nOutputs = 7;
 	
-	private ArrayList<Integer> gravityTimes;
 	
 	//These lists contain all the game objects
 	private ArrayList<Platform> platformList;
@@ -79,39 +79,35 @@ public class GameModel extends Observable implements constants {
 	
 	//Create a new barrel object 
 	public void spawnBarrel(boolean falling){
-		gravityTimes.add(0);
 		MOList.add(new Barrel(constants.BARREL_START_X,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, true, falling));
 	}
 	
 	//these two functions are used for alternative spawning of barrels, to be used during dodge training
 	//in the alternative dodge level
 	public void spawnLeftBarrel(){
-		gravityTimes.add(0);
 		MOList.add(new Barrel(0,constants.SCREEN_Y-220,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, true, false));
 	}
 	
 	public void spawnRightBarrel(){
-		gravityTimes.add(0);
 		MOList.add(new Barrel(constants.SCREEN_X, constants.SCREEN_Y-220,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, false, false));
 	}
 	
 	
-	public void incrementTime(){
-		for(int i = 0; i < MOList.size(); i++){
-			MovingObject MO = MOList.get(i);
-			//reset gravity when standing or climbing
-			if((MO.standing )|| MO.isClimbing){
-				gravityTimes.set(i, 0);
-				if(MO instanceof Player){
-					((Player) MOList.get(i)).setJump(false);
-				}			
-			}
-			else{
-				gravityTimes.set(i, (gravityTimes.get(i)) + 1) ;
+	public void incrementTime(MovingObject MO){
+		//reset gravity when standing or climbing
+		if((MO.standing )|| MO.isClimbing){
+			MO.setTime(0);
+			if(MO instanceof Player){
+				((Player) MO).setJump(false);
 			}		
 		}	
+		else{
+			MO.setTime(MO.getTime() + 1);
+		}		
+			
 	}
 	
+	//This function returns the Euclidean distance between two game objects
 	public float getEuclideanDistance(GameObject go1, GameObject go2) {
 		float x1 = go1.getXPos() + go1.getWidth() / 2;
 		float x2 = go2.getXPos() + go2.getWidth() / 2;
@@ -120,13 +116,14 @@ public class GameModel extends Observable implements constants {
 		return (float) Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) );
 	}
 	
+	
+	//Find the distance between Mario and another closest object
 	public float findNearestObject(String objectName){
 		float minimumDistance = 300;
 		if(objectName == "ladder"){
 			for(int i = 0; i < ladderList.size(); i++){
 				Ladder l = ladderList.get(i);
 				float distance = getEuclideanDistance(mario,ladderList.get(i));
-				//if platform is closest to mario, save the distance
 				//only do this if the platform is between the top and middle of mario
 				if(distance < minimumDistance && (l.getYPos() + l.getHeight()) > mario.getYPos()
 				&& (l.getYPos() + l.getHeight()) < (mario.getYPos() + mario.getHeight() / 2)){
@@ -142,6 +139,7 @@ public class GameModel extends Observable implements constants {
 			}
 			
 		}
+		//distance between Mario and closest powerup
 		else if(objectName == "powerup"){
 			for(int i = 0; i < PUList.size(); i++){
 				float distance = getEuclideanDistance(mario,PUList.get(i));
@@ -209,9 +207,6 @@ public class GameModel extends Observable implements constants {
 		
 		//climb mlp inputs
 		climbInputs[0] = mario.isClimbing() ? 1 : -1;
-		//climbInputs[1] = mario.isJumping() ? 1 : -1;
-		//calculate distance to nearest power-up
-		//climbInputs[2] = normalize(findNearestObject("powerup"));
 		//calculate distance to nearest ladder
 		climbInputs[1] = normalize(findNearestObject("ladder"));	
 		climbInputs[2] = ladderRight;	
@@ -261,7 +256,6 @@ public class GameModel extends Observable implements constants {
 	
 	//main game loop
 	public void runGame() throws InterruptedException, IOException{
-		int counter = 0;
 		double[] climbInputs;
 		double[] dodgeInputs;
 		double[] testInputs;
@@ -275,10 +269,9 @@ public class GameModel extends Observable implements constants {
 			climbMLP.trainNetwork();
 		}
 		while(epochs < constants.MAX_EPOCHS && !gameWon){
-			//mario.setAction(0);
+			//calculate the inputs to the MLP's 
 			climbInputs = calculateClimbInputs();
 			dodgeInputs = calculateDodgeInputs();
-			//System.out.println("Mario in danger: " + marioInDanger);
 			
 			//present input to networks
 			if(constants.TEST_PHASE_CLIMBING){
@@ -291,10 +284,11 @@ public class GameModel extends Observable implements constants {
 				testInputs = Arrays.copyOfRange(dodgeInputs, 0, nInputsDodge);
 				mario.setAction(dodgeMLP.testNetwork(testInputs));
 			}
+			
+			
+
 				
-			incrementTime();
-				
-			//spawn barrels
+			//Spawn a barrel, determine by the spawn timer
 			if(spawnTimer == barrelSpawnTime){
 				spawnTimer = 0;
 				if(constants.BARREL_TRAINING){
@@ -331,35 +325,36 @@ public class GameModel extends Observable implements constants {
 			
 			
 			for(int i = 0; i < MOList.size(); i++){
-					//make all moving objects act/move
+				//Increment the air time of moving objects, to properly apply gravity 
+				incrementTime(MOList.get(i));
+				//check collisions and update moving object states
 				MovingObject MO = checkCollisions(MOList.get(i));
 				MOList.set(i, MO); 
-					MOList.get(i).act(gravityTimes.get(i));
-					//check collisions and update moving object states
-						
-					//if mario is hit, subtract a life
-					if(MOList.get(0).isKilled){	
-						lives--;
-						resetGame();
-					} else if(gameWon){
+				//make all moving objects act/move
+				MOList.get(i).act(MO.getTime());					
+				//if mario is hit, subtract a life
+				if(MOList.get(0).isKilled){	
+					lives--;
+					resetGame();
+				} 
+				else if(gameWon){
 						//if mario saved the princess, add 1000 points instead
-						System.out.println("Goal reached!!!!!!!!!!!!!!!!!!!!!");
+						System.out.println("Princess saved!");
 						//gameWon = false;
 						score += 1000;
 						resetGame();
-					}
+				}
 										
-					//If object falls out of the game screen, delete it
-					else if(MOList.get(i).getYPos() >= constants.SCREEN_Y){
+					//If object falls or rolls out of the game screen, delete it
+					else if(MOList.get(i).getXPos() < 0){
 						MOList.remove(i);
-						gravityTimes.remove(i);
+						
 					}
 					
 					//If a barrel has been smashed, the value of smashedBarrelIndex >= 0
 					//We remove the barrel using this index
 					else if (smashedBarrelIndex >= 0) {
 						MOList.remove(smashedBarrelIndex);
-						gravityTimes.remove(smashedBarrelIndex);
 						smashedBarrelIndex = -1;
 					}
 
@@ -394,12 +389,6 @@ public class GameModel extends Observable implements constants {
 				climbTrainingSet.add(climbInputs);
 			}
 			
-			//for(int i = 0; i < nInputsClimb + nOutputs; i++){
-				//System.out.print(climbInputs[i] + " ");
-			//}
-			//System.out.println();
-			
-			
 		}
 
 		//write entire state-action array to training file(s)
@@ -425,7 +414,6 @@ public class GameModel extends Observable implements constants {
 	public void resetGame() {
 		MOList.clear();
 		PUList.clear();
-		gravityTimes.clear();
 		initObjects();
 		initMovingObjects();
 		//firstBarrel = true;
@@ -468,7 +456,6 @@ public class GameModel extends Observable implements constants {
 				MO.setLadderXPos(ladder.getXPos());
 				if (MO.getYPos() > ladder.getYPos()) {
 					MO.setCollidingWithTop(true);
-					//System.out.println("COLLIDING WITH LADDER");
 				}
 				
 			}
@@ -506,7 +493,6 @@ public class GameModel extends Observable implements constants {
 							MO.setYPos(platform.getYPos() - MO.getHeight());
 						}
 	
-						//System.out.println("Standing on platform!");
 					}			
 
 				}
@@ -539,18 +525,6 @@ public class GameModel extends Observable implements constants {
 			gameWon = true;
 		}
 		
-		/*If a falling barrel hits the oil barrel, spawn a flame
-		if(MO.isFalling() && isColliding(MO,oil) && firstFlameOilCollision) {
-			//This boolean makes sure a flame is only spawned once for each collision between the barrel and the oil
-			firstFlameOilCollision = false;
-			//Initialize flame
-			flame = new Flame(constants.FLAME_START_X,constants.FLAME_START_Y,constants.FLAME_HEIGHT,constants.FLAME_WIDTH);	
-			//Add flame to Moving Object list
-			MOList.add(flame);
-			gravityTimes.add(0);
-		} else if (MO.isFalling() && !isColliding(MO,oil)) {
-			firstFlameOilCollision = true;
-		}*/
 		
 		//Check whether Mario is colliding with a powerup
 		//Barrels never collide with a powerup, so we don't check the type of moving object
@@ -685,7 +659,6 @@ public class GameModel extends Observable implements constants {
 		y = constants.SCREEN_Y - 60;
 		for(int i = 0; i < 2*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
 			y -= constants.LADDER_HEIGHT;
-			//ladderList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
 		}
 		
 		y -= constants.PLATFORM_HEIGHT + 5 * platformYDiff;
@@ -802,20 +775,7 @@ public class GameModel extends Observable implements constants {
 			ladderList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
 		}
 		
-		/*x -= 3 * constants.PLATFORM_WIDTH;
-		y += 7 * constants.LADDER_HEIGHT;
-		for(int i = 0; i < 15*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
-			y -= constants.LADDER_HEIGHT;
-			GOList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
-		}
 		
-		x -= constants.PLATFORM_WIDTH;
-		y += 16 * constants.LADDER_HEIGHT;
-		for(int i = 0; i < 15*constants.LADDER_HEIGHT; i += constants.LADDER_HEIGHT){
-			y -= constants.LADDER_HEIGHT;
-			GOList.add(new Ladder(x,y,constants.LADDER_HEIGHT,constants.LADDER_WIDTH));
-		}
-		*/
 		peach = new Peach(constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_HEIGHT,constants.PEACH_WIDTH);
 		PUList.add(new Powerup(425,500,constants.POWERUP_HEIGHT,constants.POWERUP_WIDTH));
 		PUList.add(new Powerup(50,285,constants.POWERUP_HEIGHT,constants.POWERUP_WIDTH));
@@ -824,10 +784,9 @@ public class GameModel extends Observable implements constants {
 	}
 	
 	private void initMovingObjects() {
-		gravityTimes = new ArrayList<Integer>();
-		//initialize list
+		//initialize moving object list
 		MOList = new ArrayList<MovingObject>();
-		//initialize player
+		//initialize player. Position depends on the level
 		if(constants.BARREL_TRAINING){
 			mario = new Player(constants.PLAYER_START_X,constants.SCREEN_Y - 220,constants.PLAYER_HEIGHT,constants.PLAYER_WIDTH);	
 		}
@@ -837,11 +796,6 @@ public class GameModel extends Observable implements constants {
 		}
 		//add objects to list of moving objects
 		MOList.add(mario);	
-		
-		//initalize the gravity timers of the moving objects
-		for(int i = 0; i < MOList.size(); i++){
-			gravityTimes.add(0);
-		}
 	}
 	
 	public void setPlayerAction(int action){
