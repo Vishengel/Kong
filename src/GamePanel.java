@@ -1,16 +1,11 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.Observer;
-import java.util.Observable;
 
-public class GamePanel extends JPanel implements Observer {
+
+public class GamePanel extends JPanel {
 	private GameModel model;
 	private int animationTimer = 0;
 	private int barrelAnimationTimer = 0;
@@ -42,18 +37,14 @@ public class GamePanel extends JPanel implements Observer {
 	Image peach = new ImageIcon(getClass().getResource("images/peach.png")).getImage();
 	Image platform = new ImageIcon(getClass().getResource("images/platform.png")).getImage();
 	Image ladder = new ImageIcon(getClass().getResource("images/ladder.png")).getImage();
-	Image oil = new ImageIcon(getClass().getResource("images/oil.png")).getImage();
-	Image flame = new ImageIcon(getClass().getResource("images/flame.png")).getImage();
 	Image powerup = new ImageIcon(getClass().getResource("images/powerup.png")).getImage();
 	Image bonus = new ImageIcon(getClass().getResource("images/bonus.png")).getImage();
 	Image bStack = new ImageIcon(getClass().getResource("images/BarrelStack.png")).getImage();
 	
 	public GamePanel(GameModel model) throws IOException {
 		setOpaque(true);
-        setBackground(Color.BLACK);
-        
+        setBackground(Color.BLACK);      
 		this.model = model;
-		this.model.addObserver(this);
 		
 		
 		AbstractAction animation = new AbstractAction(){
@@ -111,33 +102,23 @@ public class GamePanel extends JPanel implements Observer {
             if(name == "player"){
             	animateMario(g, object);
             }
-            /*if(name == "flame") {
-            	g.drawImage(flame, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
-            }*/
         }
-       /* for(int i = 0; i < model.getLives(); i++){    	
-        	g.drawImage(life, 0 + 30*i,10,30,39, null);
-        }
-        */ 
-        //draw cosmetic stuff
-        //kong
+           
+        //The following images are drawn for cosmetic purposes
+            
+        //draw Donkey Kong
         g.drawImage(kong, 60,165,100,100, null);
         //draw peach
         animatePeach(g);
         g.drawImage(help, constants.PEACH_START_X + 20, constants.PEACH_START_Y - 5, 40, 15, null);
-        //draw oil thingy
-		g.drawImage(oil,constants.OIL_START_X,constants.OIL_START_Y,constants.OIL_WIDTH, constants.OIL_HEIGHT, null);
-        //bonus image
+        //draw bonus image
         g.drawImage(bonus, 400, 50, 100, 50, null);
-        //barrel stack
+        //draw the stack of barrels next to Donkey Kong
         g.drawImage(bStack, 12, 190, 55, 70, null);  
         //draw score
-        g.drawString(model.getScore() + "", 440, 82); 
+        g.drawString(model.getScore() + "", 440, 82);
     }
 	
-	public void update(Observable caller, Object data){
-        repaint();
-    }
 	
 	public void animatePeach(Graphics g){
 		if(animationTimer <= 5){

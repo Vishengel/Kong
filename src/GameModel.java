@@ -12,66 +12,79 @@ import javax.swing.Timer;
 public class GameModel extends Observable implements constants {
 	private int score = 0;
 	private int lives = 3;
+	
+	//these values determine how fast barrels are spawned in the game
 	private int spawnTimer = 300;	
 	private int barrelSpawnTime = 300; 
+	
+	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
 	private int powerupTimer = 0;	
 	private int powerupDuration = 300;
 	private int powerupIndex = -1;
+	
+	//This value determines for how many epochs the game has been running already
 	private int epochs;
+	//This value determines how long the game model should sleep or slow down, in order to make the game playable
+	//for a human
 	private int sleepTime = 15;
 	
+	//These values determine the rspective amount of inputs to the Multi-layer Perceptron for learning
+	//to climb ladders or dodging barrels
 	private int nInputsClimb = 5;
 	private int nInputsDodge = 2;
 	private int nOutputs = 7;
 	
 	private ArrayList<Integer> gravityTimes;
+	
+	//These lists contain all the game objects
 	private ArrayList<Platform> platformList;
 	private ArrayList<Ladder> ladderList;
 	private ArrayList<MovingObject> MOList;
 	private ArrayList<Powerup> PUList;
 	
+	//These lists contain the entire respective inputs + targets training setfor each epoch. These arrays 
+	//are later written to a file
 	private ArrayList<double[]> dodgeTrainingSet = new ArrayList<double[]>();
 	private ArrayList<double[]> climbTrainingSet = new ArrayList<double[]>();
 	
+	//These variables are the two multi-layer perceptrons that are used for learning 
 	MLPJelle dodgeMLP;
 	MLPJelle climbMLP;
 	
 	private Player mario;
 	private Peach peach;
-	private Oil oil;
-	//private Flame flame;
 	
 	private boolean powerupActivated = false;
 	private boolean gameWon = false;
 	private boolean gameOver = false; 
-	private boolean marioInDanger = false;
 	
 	
 	//allow for alternating left and right barrel spawing during training
 	private boolean leftSpawned = true;
 	
-	
-	//private boolean firstBarrel = true;
-	//private boolean firstFlameOilCollision = true;
-	
-	//one of the inputs, specifying whether a ladder is to the right of mario or not
+	//These values relate to specific inputs necessary for learning to jump over barrels
 	private int ladderRight;
 	private int barrelRight;
 	private int barrelOnSameLevel;
 	private int barrelClimbing;
 	
+	
+	//The file handler is used to write to and read from the text files
 	FileHandler fh = new FileHandler();
 		
 	public GameModel(){
 		initGame();
 	}
 	
+	//Create a new barrel object 
 	public void spawnBarrel(boolean falling){
 		gravityTimes.add(0);
 		MOList.add(new Barrel(constants.BARREL_START_X,constants.BARREL_START_Y,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, true, falling));
 	}
 	
+	//these two functions are used for alternative spawning of barrels, to be used during dodge training
+	//in the alternative dodge level
 	public void spawnLeftBarrel(){
 		gravityTimes.add(0);
 		MOList.add(new Barrel(0,constants.SCREEN_Y-220,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, true, false));
@@ -234,40 +247,14 @@ public class GameModel extends Observable implements constants {
 			return -1;
 		}
 	}
-		
+	
+	//This function calculates the inputs necessary for dodging barrels
 	public double[] calculateDodgeInputs(){
 		double[] dodgeInputs = new double[nInputsDodge + nOutputs];
-		//dodge mlp inputs
-		//dodgeInputs[0] = mario.isJumping() ? 1 : -1;
-		//dodgeInputs[1] = normalize(findNearestObject("ladder"));
-		//dodgeInputs[2] = ladderRight;
 		//calculate distance to the nearest barrel
 		dodgeInputs[0] = normalizeForDodging(findNearestObject("barrel"));
-		dodgeInputs[1] = barrelRight;
-		//dodgeInputs[3] = barrelOnSameLevel;
-		
-		//System.out.println("Mario jumping? " + dodgeInputs[0]);
-		//System.out.println("Nearest barrel? " + dodgeInputs[0]);
-		//System.out.println("Barrel to right? " + dodgeInputs[1]);
-		//System.out.println("Barrel on same level? " + dodgeInputs[3]);
-		
-		
-		//System.out.println("Nearest ladder: " + dodgeInputs[1]);
-		//System.out.println("Nearest barrel direction: " + dodgeInputs[2]);
-		//System.out.println("Barrel on same level? : " + (dodgeInputs[3] == 1 ? "yes" : "no"));
-		
-		
-		//System.out.println("Nearest ladder direction: " + (dodgeInputs[2] == 1 ? "right" : "left"));
-		
-		//System.out.println("Nearest barrel direction: " + dodgeInputs[2]);
-		//System.out.println("Barrel on same level? : " + (dodgeInputs[3] == 1 ? "yes" : "no"));
-		if(findNearestObject("barrel") < 80){
-			//marioInDanger = true;
-		}
-		else{
-			marioInDanger = false;
-		}
-		
+		//determine whether or not a barrel is to the left or to the right of Mario
+		dodgeInputs[1] = barrelRight;	
 		
 		return dodgeInputs;
 	}
@@ -295,16 +282,8 @@ public class GameModel extends Observable implements constants {
 			
 			//present input to networks
 			if(constants.TEST_PHASE_CLIMBING){
-				//if mario is in danger, present input to the dodge mlp
-				if(marioInDanger){
-					testInputs = Arrays.copyOfRange(dodgeInputs, 0, nInputsDodge);
-					mario.setAction(dodgeMLP.testNetwork(testInputs));
-				}
-				//otherwise, present input to climb mlp
-				else{
-					testInputs = Arrays.copyOfRange(climbInputs, 0, nInputsClimb);
-					mario.setAction(climbMLP.testNetwork(testInputs));
-				}
+				testInputs = Arrays.copyOfRange(climbInputs, 0, nInputsClimb);
+				mario.setAction(climbMLP.testNetwork(testInputs));
 			}
 			
 			//if only training on dodging barrels, only present input to dodging MLP
@@ -313,12 +292,6 @@ public class GameModel extends Observable implements constants {
 				mario.setAction(dodgeMLP.testNetwork(testInputs));
 			}
 				
-			
-			/*print inputs
-			for(int i = 0; i < 8; i++){
-				System.out.print(inputs[i] + " ");
-			}
-			*/
 			incrementTime();
 				
 			//spawn barrels
@@ -338,14 +311,6 @@ public class GameModel extends Observable implements constants {
 					spawnBarrel(true);
 				}
 				
-				//The first barrel always goes directly down to the oil barrel
-				/*if (firstBarrel) {
-					spawnBarrel(true);
-					firstBarrel = false;
-				} else {
-					spawnBarrel(false);
-				}
-				*/
 			}	
 		
 			spawnTimer++;
@@ -852,7 +817,6 @@ public class GameModel extends Observable implements constants {
 		}
 		*/
 		peach = new Peach(constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_HEIGHT,constants.PEACH_WIDTH);
-		oil = new Oil(constants.OIL_START_X,constants.OIL_START_Y,constants.OIL_HEIGHT,constants.OIL_WIDTH);
 		PUList.add(new Powerup(425,500,constants.POWERUP_HEIGHT,constants.POWERUP_WIDTH));
 		PUList.add(new Powerup(50,285,constants.POWERUP_HEIGHT,constants.POWERUP_WIDTH));
 		//Check for each platform whether it collides with a ladder
