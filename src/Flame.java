@@ -6,10 +6,10 @@ public class Flame extends MovingObject{
 
 	public Flame(int x, int y, int h, int w) {
 		super(x, y, h, w);
-		killOnCollision = true;
+		//killOnCollision = true;
 		name = "flame";
 		
-		killOnCollision = false;
+		//killOnCollision = false;
 		direction = true;
 		xVel = 1f;
 		yVel = 1f;
@@ -21,7 +21,9 @@ public class Flame extends MovingObject{
 		
 		dx += (direction ? xVel : -xVel);
 		
-		super.act(time);
+		//super.act(time);
+		super.act();
+		
 		xPos += dx;
 		yPos += dy;
 	}

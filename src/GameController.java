@@ -2,7 +2,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
-import java.util.Scanner;
 
 import javax.swing.AbstractAction;
 import javax.swing.Timer;
@@ -36,7 +35,7 @@ public class GameController {
 		  
 		thread.start();
 				
-		//If GUI is on, add framerate and update timer
+		//If GUI is on, add frame rate and update timer
 		if(constants.GUI_ON){
 			view = new GameView(model);
 			view.addKeyListener(inputController);

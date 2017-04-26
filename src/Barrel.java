@@ -1,49 +1,43 @@
 import java.util.ArrayList;
 
 public class Barrel extends MovingObject{
-	//false : left   true : right
-	private boolean direction;
 	private boolean moveDownLadder;
 	//keep track of the distance fallen in order to change direction 
 	private int distanceFallen = 0;
-	//private int i = 0;
 	
-	public Barrel(int x, int y, int h, int w, boolean d, boolean falling) {
+	public Barrel(int x, int y, int h, int w, int action) {
 		super(x, y, h, w);
-		symbol = 'O';
-		killOnCollision = false;
-		direction = d;
+		this.action = action;
 		xVel = 2.2f;
 		yVel = 1.7f;
 		pointAwarded = false;
 		name = "barrel";
-		this.falling = false;
 	}
 	
-	public void act(int time) {
+	/*actions: 
+	0 : move left
+	1 : move right
+	*/
+	
+	
+	
+	public void act() {
 		dx = 0;
 		dy = 0;
 		
-		if(!falling) {
-			//if falling for longer than 2 time units, change direction
-			if(distanceFallen > 25 && standing){
-				direction = !direction;
-				//System.out.println(direction);
-				}
-			//System.out.println(distanceFallen);
+		//if falling for longer than 25 pixels in the vertical direction, change horizontal direction
+		if(distanceFallen > 25 && standing){
+			action = 1 - action;
+		}
 			
-			if(standing){
-				//reset distance fallen
-				distanceFallen = 0;
-				
-				if(direction){
-					dx += xVel;
-				}
-				else{
-					dx += -xVel;
-				}
+		//Only move a barrel in the horizontal direction if it is standing on a platform
+		if(standing){
+			distanceFallen = 0;
+			if(action == 1){
+				dx += xVel;
 			}
 			else{
+		/*
 				//Only let a barrel pause in its horizontal movement if it falls a long distance
 				if(distanceFallen > 3){
 					dx = 0f;
@@ -76,22 +70,41 @@ public class Barrel extends MovingObject{
 		} else {
 			//The falling barrel ignores gravity
 			dy += 3;
+		*/
+				dx += -xVel;
+			}
 		}
 		
-		xPos += dx;
-		yPos += dy;
-	}
+			
+		//If barrel is on a ladder, 50% chance to fall down ladder
+		if(canClimb && firstCanClimb && !collidingWithTop){
+			firstCanClimb = false;
+			if(random.nextInt(4) >= 2){
+				isClimbing = true;
+				standing = false;
+			}
+		} 
+		
+		//If a barrel is rolling down a ladder, snap its x-position to the middle of the ladder.
+		if(isClimbing){
+			dx = 0;
+			xPos = ladderXPos + constants.LADDER_WIDTH / 2 - constants.BARREL_WIDTH / 2;
+			dy += yVel;
+		}
+		super.act();
+		
+		//increment the distance fallen
+		distanceFallen += dy;
+	} 
 	
-	public boolean checkCollisions(ArrayList<GameObject> GOList) {
-		return false;
-	}
+	
 	
 	public boolean left() {
-		return !direction;
+		return action == 0;
 	}
 	
 	public boolean right() {
-		return direction;
+		return action == 1;
 	}
 	
 	public boolean up() {

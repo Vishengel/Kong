@@ -18,21 +18,23 @@ public class Player extends MovingObject{
     
 	public Player(int x, int y, int h, int w) {
 		super(x, y, h, w);
-
 		xVel = 1.5f;
 		yVel = 1.5f;
-
-		killOnCollision = false;
-		name = "player";
-		
+		name = "player";	
 	}
 	
 	
-	//actions: 
-	//0 : left
-	//1 : right
-	//2 : up
-	//3 : down
+	/*actions: 
+	0 : stand still
+	1 : left
+	2 : right
+	3 : climb up
+	4 : climb down
+	5 : jump left
+	6 : jump right
+	*/
+	
+	//This function is only for human players, where action is selected based on keyboard input
 	public void selectAction(){		
 		if(!jumping){
 			if(goLeft){
@@ -53,28 +55,14 @@ public class Player extends MovingObject{
 			if(jump && goRight){
 				action = 6;
 			}
-			//random mario behavior
-			/*if(constants.AI_MARIO){
-				if(random.nextInt(100) == 0){
-					action = random.nextInt(6);
-				}
-			}
-			*/
-		}
-		
-		
-		
-		
-		
+		}		
 	}
 	
 public void move(){
-		//jumping = false;
 		switch(action){
-		//don't allow vertical movement when climbing
 		//move left
 		case 1:
-				dx += -xVel;	
+			dx += -xVel;	
 			break;
 		//move right
 		case 2: 
@@ -115,8 +103,7 @@ public void move(){
 		}
 	} 
 	
-	public void act(int time){
-		//System.out.println("Standing: " + standing);
+	public void act(){
 		dx = 0;
 		dy = 0;
 		
@@ -124,10 +111,6 @@ public void move(){
 		if(!jumping && !constants.TEST_PHASE_DODGING && !constants.TEST_PHASE_CLIMBING){
 			action = 0;
 		}
-		
-		/*if(standing && !jumping){
-			action = 0;
-		}*/
 		
 		readInput();
 		selectAction();
@@ -148,10 +131,8 @@ public void move(){
 		}
 		
 			
-		super.act(time);
+		super.act();
 		
-		xPos += dx;
-		yPos += dy;
 		
 		//prevent player from walking out of the screen
 		if(xPos <= 0){
@@ -165,7 +146,7 @@ public void move(){
 	}
 	
 	
-	
+	//Read keyboard input
 	public void readInput() {
 		// There are two control schemes: WASD + shift and arrows + space bar
 		goLeft = keysDown[65] || keysDown[37];
