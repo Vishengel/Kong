@@ -21,7 +21,7 @@ public class GameModel extends Observable implements constants {
 	private int epochs;
 	private int sleepTime = 15;
 
-	private int nInputsClimb = 5;
+	private int nInputsClimb = 7;
 	private int nInputsDodge = 2;
 
 	private int nOutputs = 7;

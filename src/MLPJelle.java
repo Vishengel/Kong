@@ -27,7 +27,7 @@ public class MLPJelle {
 	//Define the learning rate, error threshold and the maximum number of epochs
 	private double learningRate = 0.6; 
 	private double errorThreshold =  0.0000000000000009;
-	private double maxEpochs = 20000;  
+	private double maxEpochs = 30000;  
 	private double momentum = 0.6; 
 	private String fileName;
 	
@@ -168,7 +168,7 @@ public class MLPJelle {
 			softmaxSum += n.getOutput();
 			//n.printWeights();
 		}
-		System.out.println("Sum of softmax output: " + softmaxSum);
+		//System.out.println("Sum of softmax output: " + softmaxSum);
 	}
 	
 	public double backwardPass(int patternIndex) {
