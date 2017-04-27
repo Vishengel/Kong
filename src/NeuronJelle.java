@@ -53,6 +53,10 @@ public class NeuronJelle {
 		return this.output;
 	}
 	
+	public void setOutput(double output) {
+		this.output = output;
+	}
+	
 	public void setSigmoidOutput() {
 		this.output = sigmoid(this.activation);
 	}
