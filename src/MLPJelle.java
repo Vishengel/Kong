@@ -170,9 +170,11 @@ public class MLPJelle {
 		for (NeuronJelle n : outputLayer) {
 			n.setInput(currentInput);
 			n.setActivation();
+		}
+		
+		for (NeuronJelle n : outputLayer) {
 			n.setSoftmaxOutput(outputLayer);
 			softmaxSum += n.getOutput();
-			//n.printWeights();
 		}
 		//System.out.println("Sum of softmax output: " + softmaxSum);
 	}
