@@ -85,12 +85,12 @@ public class MLPJelle {
 				hiddenLayer.add(new NeuronJelle(nWeights));
 			}
 			//Add a node for the bias
-			hiddenLayer.add(new NeuronJelle(0));
+			//hiddenLayer.add(new NeuronJelle(0));
 			//Set the amount of weights for each neuron in the next layer
 			//to be the same as the amount of hidden neurons in the current layer
 			nWeights = hiddenLayer.size();
 			//Make sure the output of the bias neuron is -1
-			hiddenLayer.get(nWeights-1).setOutput(-1);
+			//hiddenLayer.get(nWeights-1).setOutput(-1);
 			//Add the hidden layer to the list of hidden layers
 			hiddenList.add(hiddenLayer);
 		}
