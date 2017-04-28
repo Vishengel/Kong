@@ -27,7 +27,7 @@ public class MLPJelle {
 	//Define the learning rate, error threshold and the maximum number of epochs
 	private double learningRate = 0.6; 
 	private double errorThreshold =  0.0000000000000009;
-	private double maxEpochs = 10000;  
+	private double maxEpochs = 30000;  
 	private double momentum = 0.6; 
 	private String fileName;
 	
@@ -84,7 +84,13 @@ public class MLPJelle {
 				//Afterwards, this amount is equal to the number of nodes in the previous layer
 				hiddenLayer.add(new NeuronJelle(nWeights));
 			}
+			//Add a node for the bias
+			//hiddenLayer.add(new NeuronJelle(0));
+			//Set the amount of weights for each neuron in the next layer
+			//to be the same as the amount of hidden neurons in the current layer
 			nWeights = hiddenLayer.size();
+			//Make sure the output of the bias neuron is -1
+			//hiddenLayer.get(nWeights-1).setOutput(-1);
 			//Add the hidden layer to the list of hidden layers
 			hiddenList.add(hiddenLayer);
 		}
@@ -153,19 +159,22 @@ public class MLPJelle {
 			for (int j=0; j<nHidden; j++) {
 				hiddenList.get(i).get(j).setInput(currentInput);
 				hiddenList.get(i).get(j).setActivation();
-				hiddenList.get(i).get(j).setOutput(i);
+				hiddenList.get(i).get(j).setSigmoidOutput();
+
 				outputArray[j] = hiddenList.get(i).get(j).getOutput();
 			}
 			//Store the output of the hidden layer as input for the next layer
 			currentInput = outputArray;
 		}
-		
+		double softmaxSum = 0;
 		for (NeuronJelle n : outputLayer) {
 			n.setInput(currentInput);
 			n.setActivation();
-			n.setOutput(0);
+			n.setSoftmaxOutput(outputLayer);
+			softmaxSum += n.getOutput();
 			//n.printWeights();
 		}
+		//System.out.println("Sum of softmax output: " + softmaxSum);
 	}
 	
 	public double backwardPass(int patternIndex) {
@@ -244,7 +253,9 @@ public class MLPJelle {
 		//present game state to the network, calculate output
 		forwardPass(input);
 		//System.out.println(binaryToInt());	
-		// activation of output nodes
+		
+		//activation of output nodes
+
 		for(int i = 0; i < nOutput; i++){
 			System.out.print("Output node " + i + ": " + outputLayer.get(i).getActivation());
 			System.out.println(" " + outputLayer.get(i).getOutput());

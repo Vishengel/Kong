@@ -24,31 +24,37 @@ public class GameModel implements constants {
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
 	private int sleepTime = 15;
-	
-	//These values determine the rspective amount of inputs to the Multi-layer Perceptron for learning
+
+	//These values determine the respective amount of inputs to the Multi-layer Perceptron for learning
 	//to climb ladders or dodging barrels
 	private int nInputsClimb = 5;
 	private int nInputsDodge = 2;
+
 	private int nOutputs = 7;
 	
-	
-	//These lists contain all the game objects
 	private ArrayList<Platform> platformList;
 	private ArrayList<Ladder> ladderList;
 	private ArrayList<MovingObject> MOList;
 	private ArrayList<Powerup> PUList;
-	
+
 	//These lists contain the entire respective inputs + targets training setfor each epoch. These arrays 
 	//are later written to a file
 	private ArrayList<double[]> dodgeTrainingSet = new ArrayList<double[]>();
 	private ArrayList<double[]> climbTrainingSet = new ArrayList<double[]>();
 	
+	private ArrayList<ArrayList<MovingObject>> MOCollection = new ArrayList<ArrayList<MovingObject>>();
+	private ArrayList<ArrayList<Powerup>> PUCollection = new ArrayList<ArrayList<Powerup>>();
+	
 	//These variables are the two multi-layer perceptrons that are used for learning 
+
 	MLPJelle dodgeMLP;
 	MLPJelle climbMLP;
 	
 	private Player mario;
 	private Peach peach;
+
+	private Oil oil;
+	private Flame flame;
 	
 	private boolean powerupActivated = false;
 	private boolean gameWon = false;
@@ -243,6 +249,7 @@ public class GameModel implements constants {
 	public double[] calculateDodgeInputs(){
 		double[] dodgeInputs = new double[nInputsDodge + nOutputs];
 		//calculate distance to the nearest barrel
+
 		dodgeInputs[0] = normalizeForDodging(findNearestObject("barrel"));
 		//determine whether or not a barrel is to the left or to the right of Mario
 		dodgeInputs[1] = barrelRight;	
@@ -268,6 +275,11 @@ public class GameModel implements constants {
 			//calculate the inputs to the MLP's 
 			climbInputs = calculateClimbInputs();
 			dodgeInputs = calculateDodgeInputs();
+			
+			if(constants.DEMO_PHASE_DODGING || constants.DEMO_PHASE_CLIMBING){
+				MOCollection.add(MOList);
+				PUCollection.add(PUList);
+			}
 			
 			//present input to networks
 			if(constants.TEST_PHASE_CLIMBING){
@@ -393,7 +405,9 @@ public class GameModel implements constants {
 			
 		}
 		if(constants.DEMO_PHASE_CLIMBING){
-			fh.writeToFile(climbTrainingSet, "climbData");
+			//fh.writeToFile(climbTrainingSet, "climbData");
+			fh.writeGameStateToFile(MOCollection, PUCollection, platformList, ladderList, peach, oil, flame);
+			System.out.println("Game states written to file");
 		}
 		
 	}	

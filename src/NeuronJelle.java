@@ -53,13 +53,16 @@ public class NeuronJelle {
 		return this.output;
 	}
 	
-	public void setOutput(int hiddenLayer) {
-		if(hiddenLayer == 0){
-			this.output = sigmoid(this.activation);
-		}
-		else{
-			this.output = tanh(this.activation);
-		}
+	public void setOutput(double output) {
+		this.output = output;
+	}
+	
+	public void setSigmoidOutput() {
+		this.output = sigmoid(this.activation);
+	}
+	
+	public void setSoftmaxOutput(ArrayList<NeuronJelle> outputLayer) {
+		this.output = softmax(this.activation, outputLayer);
 	}
 	
 	public double getGradient() {
@@ -123,6 +126,16 @@ public class NeuronJelle {
 	
 	public double tanhPrime(double activation){
 		return 1 - Math.pow(tanh(activation), 2);
+	}
+	
+	public double softmax(double activation, ArrayList<NeuronJelle> outputLayer) {
+		double activationSum = 0;
+		
+		for(NeuronJelle n : outputLayer) {
+			activationSum += Math.exp(n.getActivation());
+		}
+		
+		return Math.exp(activation) / activationSum;
 	}
 	
 	public void printWeights() {

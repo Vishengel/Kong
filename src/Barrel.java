@@ -8,7 +8,7 @@ public class Barrel extends MovingObject{
 	public Barrel(int x, int y, int h, int w, int action) {
 		super(x, y, h, w);
 		this.action = action;
-		xVel = 2.2f;
+		xVel = 1.5f;
 		yVel = 1.7f;
 		pointAwarded = false;
 		name = "barrel";
@@ -33,13 +33,46 @@ public class Barrel extends MovingObject{
 		//Only move a barrel in the horizontal direction if it is standing on a platform
 		if(standing){
 			distanceFallen = 0;
+			
 			if(action == 1){
 				dx += xVel;
 			}
 			else{
 				dx += -xVel;
 			}
-		}
+
+		
+			//Only let a barrel pause in its horizontal movement if it falls a long distance
+			if(distanceFallen > 3){
+				dx = 0f;
+			}
+			
+			
+
+			//If barrel is on a ladder, 50% chance to fall down ladder
+			if(canClimb && firstCanClimb && !collidingWithTop){
+				//System.out.println(collidingWithTop);
+				firstCanClimb = false;
+				
+				if(random.nextInt(4) >= 2){
+					//System.out.println(++i);
+					isClimbing = true;
+					standing = false;
+				}
+				//dy += yVel;
+			} 
+			
+			if(isClimbing){
+				//System.out.println("Climbing");
+				dx = 0;
+				xPos = ladderXPos + constants.LADDER_WIDTH / 2 - constants.BARREL_WIDTH / 2;
+				dy += yVel;
+			}
+			super.act();
+			distanceFallen += dy;
+		} 
+
+		
 		
 			
 		//If barrel is on a ladder, 50% chance to fall down ladder

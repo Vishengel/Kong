@@ -6,10 +6,10 @@ public interface constants {
 	//This boolean determines whether the visual representation of the game should be on or off
 	//Turning this value off will cause the game model to speed up significantly
 	boolean GUI_ON = true;
-	
+
 	//These values determine whether the datasets about dodging or climbing should be created, respectively.
 	boolean DEMO_PHASE_DODGING = false; 
-	boolean DEMO_PHASE_CLIMBING = false;  
+	boolean DEMO_PHASE_CLIMBING = true;  
 	
 	
 	//These values determine whether mario should learn and test dodging or climbing, respectively.
@@ -22,7 +22,7 @@ public interface constants {
 	
 	//This value determines whether Mario can die in the game when touching a barrel
 	boolean DEATH = true;
-	
+
 	//This value determines for how many epochs the game should run
 	int MAX_EPOCHS = 200000; 
 	
@@ -35,6 +35,7 @@ public interface constants {
 	//player position and dimensions
 	int PLAYER_START_X = 220;
 	int PLAYER_START_Y = 600;
+
 	int PLAYER_HEIGHT = 32;
 	int PLAYER_WIDTH = 20;
 
