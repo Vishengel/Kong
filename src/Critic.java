@@ -4,8 +4,8 @@ import java.util.ArrayList;
 //This MLP represents the value function:  state ---> stateValue
 public class Critic extends MLPJelle {
 	
-	double discount = 0.6;
-	
+	double discount = 0.5;
+	double actorLearningRate = 0.5;
 	
 	public Critic(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName) {
 		super(nInput, nHiddenLayers, nHidden, nOutput, fileName);
@@ -35,7 +35,7 @@ public class Critic extends MLPJelle {
 			forwardPass(previousState);
 			backwardPass(0);
 			//printNetwork(); 
-			System.out.println("State value: " + outputLayer.get(0).getOutput());
+			//System.out.println("State value: " + outputLayer.get(0).getOutput());
 		}
 		
 		//This function calculated the feedback that the critic feeds back to the actor
@@ -44,11 +44,14 @@ public class Critic extends MLPJelle {
 			double stateValue = outputLayer.get(0).getOutput();
 			forwardPass(previousState);
 			double previousStateValue = outputLayer.get(0).getOutput();
-			return reward + (discount * stateValue) - previousStateValue;
+			return actorLearningRate * ( reward + (discount * stateValue) - previousStateValue );
 		}
 	
 	
 	public void setTarget(double value){
-		target[0][0] = value;
+		System.out.println("Feedback: " + value);
+		for(int i = 0; i < nOutput; i++){
+			target[0][i] = value;
+		}
 	}
 }

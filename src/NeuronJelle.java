@@ -116,7 +116,7 @@ public class NeuronJelle {
 			this.gradient = ReLUPrime(this.activation * (target - this.output));
 		}
 		else{
-			
+			this.gradient = sigmoidPrime(this.activation) * (target - this.output);
 		}
 		
 	}

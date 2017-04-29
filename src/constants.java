@@ -27,7 +27,7 @@ public interface constants {
 	boolean DEATH = true;
 
 	//This value determines for how many epochs the game should run
-	int MAX_EPOCHS = 200000; 
+	int MAX_EPOCHS = 200000000; 
 	
 	//The following values determine positions and dimensions for game objects
 	

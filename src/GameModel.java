@@ -9,8 +9,8 @@ public class GameModel implements constants {
 	private int lives = 3;
 	
 	//these values determine how fast barrels are spawned in the game
-	private int spawnTimer = 300;	
-	private int barrelSpawnTime = 300; 
+	private int spawnTimer = 600;	
+	private int barrelSpawnTime = 600; 
 	
 	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
@@ -23,8 +23,8 @@ public class GameModel implements constants {
 	private int epochs;
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
-	private int sleepTime = 15;
-
+	private int sleepTime = 0; 
+	
 	//These values determine the respective amount of inputs to the Multi-layer Perceptron for learning
 	//to climb ladders or dodging barrels
 	//private int nInputsClimb = 7;
@@ -75,6 +75,7 @@ public class GameModel implements constants {
 	private boolean touchedPowerUp = false;
 	private boolean jumpedOverBarrel = false;
 	private boolean destroyedBarrel = false;
+	private boolean steppedOnLadder = false;
 	
 	//allow for alternating left and right barrel spawing during training
 	private boolean leftSpawned = true;
@@ -305,7 +306,7 @@ public class GameModel implements constants {
 	public double calculateReward(){
 		int reward = 0;
 		if(gameWon){
-			reward += 1000;
+			reward += 3000;
 		}
 		if(hitByBarrel){
 			System.out.println("Hit by barrel!");
@@ -317,20 +318,21 @@ public class GameModel implements constants {
 		}
 		if(jumpedOverBarrel){
 			System.out.println("Jumped over a barrel!");
-			reward += 200;
+			reward += 500;
 		}
 		else if(destroyedBarrel){
 			System.out.println("Smashed a barrel!");
 			reward += 150;
 		}
-		if(mario.isClimbing()){
-			reward += 5;
+		if(steppedOnLadder){
+			reward += 20;
 		}
 		hitByBarrel = false;
 		gameWon = false;
 		touchedPowerUp = false;
 		jumpedOverBarrel = false;
 		destroyedBarrel = false;
+		steppedOnLadder = false;
 		
 		return reward;
 	}
@@ -338,8 +340,8 @@ public class GameModel implements constants {
 	
 	//main game loop
 	public void runGame() throws InterruptedException, IOException{
-		double[] climbInputs;
-		double[] dodgeInputs;
+		//double[] climbInputs;
+		//double[] dodgeInputs;
 		double[] testInputs;
 		
 		state = new double[NstateInputs];
@@ -365,7 +367,7 @@ public class GameModel implements constants {
 		critic = new Critic(NstateInputs, 1, 5, 1, "");
 		
 		
-		while(epochs < constants.MAX_EPOCHS && !gameWon){
+		while(!gameWon){
 			//calculate the inputs to the MLP's 
 			//climbInputs = calculateClimbInputs();
 			//dodgeInputs = calculateDodgeInputs();
@@ -433,6 +435,7 @@ public class GameModel implements constants {
 			}
 			
 			double reward = 0;
+			double feedback = 0;
 			reward = calculateReward(); 
 			//System.out.println(reward);				
 			//train the critic using the current state, the previous state and the observed reward
@@ -442,6 +445,11 @@ public class GameModel implements constants {
 				critic.trainCritic(state, previousState, reward);
 			}
 			
+			//calculate the critic's feedback
+			feedback = critic.calculateFeedback(state, previousState, reward);
+			//backpropagate the feedback to the actor in the form of a TD-error (Temporal-Difference)
+			actor.setTarget(nOutputs, feedback);
+			actor.backwardPass(0);
 			
 			
 			for(int i = 0; i < MOList.size(); i++){
@@ -451,7 +459,10 @@ public class GameModel implements constants {
 				MovingObject MO = checkCollisions(MOList.get(i));
 				MOList.set(i, MO); 
 				//make all moving objects act/move
-				MOList.get(i).act();					
+				MOList.get(i).act();
+				if(mario.isClimbing()){
+					steppedOnLadder = true;
+				}
 				//if mario is hit, subtract a life
 				if(MOList.get(0).isKilled){	
 					hitByBarrel = true;

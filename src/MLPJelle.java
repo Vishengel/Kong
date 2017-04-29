@@ -26,8 +26,8 @@ public class MLPJelle {
 	protected ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
 	protected double learningRate = 0.6; 
-	private double errorThreshold =  0.000002;
-	private double maxEpochs = 1000;  
+	private double errorThreshold =  0.000000005;
+	private double maxEpochs = 30000;  
 	private double momentum = 0.3; 
 	private String fileName;
 	
@@ -209,7 +209,7 @@ public class MLPJelle {
 		for(int i = 0; i < nOutput; i++){
 			outputLayer.get(i).updateWeights(target[patternIndex][i], learningRate, momentum);
 			//totalError += outputLayer.get(i).getError();
-			totalError += outputLayer.get(i).getError();
+			totalError += outputLayer.get(i).getCrossEntropy();
 			//System.out.println(totalError);
 		}
 		
@@ -261,8 +261,6 @@ public class MLPJelle {
 		
 		
 		//present game state to the network, calculate output
-		System.out.println("Before error:");
-		System.out.println(input.length);
 		forwardPass(input);
 		//System.out.println(binaryToInt());	
 		
@@ -340,5 +338,9 @@ public class MLPJelle {
 			System.out.println(target[i]);
 		}
 	}
-		
+	public void setTarget(int nOutputs, double feedback){
+		for(int i = 0; i < nOutputs; i++){
+			target[0][i] = feedback;
+		}
+	}
 }
