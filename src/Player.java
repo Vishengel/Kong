@@ -108,7 +108,7 @@ public void move(){
 		dy = 0;
 		
 		//reset action for smoother player control when not controlled by AI
-		if(!jumping && !constants.TEST_PHASE_DODGING && !constants.TEST_PHASE_CLIMBING){
+		if(!jumping && !constants.TEST_PHASE){
 			action = 0;
 		}
 		

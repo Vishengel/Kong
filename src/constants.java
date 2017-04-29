@@ -8,13 +8,16 @@ public interface constants {
 	boolean GUI_ON = true;
 
 	//These values determine whether the datasets about dodging or climbing should be created, respectively.
-	boolean DEMO_PHASE_DODGING = false; 
-	boolean DEMO_PHASE_CLIMBING = true;  
+	//boolean DEMO_PHASE_DODGING = false; 
+	//boolean DEMO_PHASE_CLIMBING = false;  
 	
-	
+	boolean DEMO_PHASE = false;
+		
 	//These values determine whether mario should learn and test dodging or climbing, respectively.
-	boolean TEST_PHASE_DODGING = false; 
-	boolean TEST_PHASE_CLIMBING = true;
+	//boolean TEST_PHASE_DODGING = false; 
+	//boolean TEST_PHASE_CLIMBING = false;
+	
+	boolean TEST_PHASE = true;
 	
 	//This value determines whether the game should create the standard level, or the alternative level 
 	//created for training to jump over barrels.
@@ -48,7 +51,7 @@ public interface constants {
 	int LADDER_HEIGHT = 10;
 	
 	//Position and dimension of princess Peach
-	int PEACH_START_X = SCREEN_X / 2 - PLATFORM_WIDTH;
+	int PEACH_START_X = SCREEN_X / 2 - PLATFORM_WIDTH + 100;
 	int PEACH_START_Y = 155;
 	int PEACH_HEIGHT = 35;
 	int PEACH_WIDTH = 20;
