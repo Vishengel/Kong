@@ -14,7 +14,7 @@ public interface constants {
 	
 	//These values determine whether mario should learn and test dodging or climbing, respectively.
 	boolean TEST_PHASE_DODGING = false; 
-	boolean TEST_PHASE_CLIMBING = false;
+	boolean TEST_PHASE_CLIMBING = true;
 	
 	//This value determines whether the game should create the standard level, or the alternative level 
 	//created for training to jump over barrels.

@@ -13,17 +13,17 @@ public class MLPJelle {
 	//All four possible input combinations of two input boolean values, plus the threshold multiplier
 	private double[][] input;
 	//The target values corresponding with each input				
-	private double[][] target /*= new double[][] {{0.0,0.0,0.0}, {0.0,0.0,1.0}, {0.0,1.0,0.0}, {0.0,1.0,1.0}}*/;
+	protected double[][] target /*= new double[][] {{0.0,0.0,0.0}, {0.0,0.0,1.0}, {0.0,1.0,0.0}, {0.0,1.0,1.0}}*/;
 	//Define the number of nodes in input, hidden and output layers
-	private int nInput;
-	private int nHidden; 
-	private int nOutput; 
+	protected int nInput;
+	protected int nHidden; 
+	protected int nOutput; 
 	//Define the number of hidden layers
-	private int nHiddenLayers; 
+	protected int nHiddenLayers; 
 	//Define a list that contains a list of nodes for each hidden layer
-	private ArrayList<ArrayList<NeuronJelle>> hiddenList = new ArrayList<ArrayList<NeuronJelle>>();
+	protected ArrayList<ArrayList<NeuronJelle>> hiddenList = new ArrayList<ArrayList<NeuronJelle>>();
 	//Define a list of output neurons
-	private ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
+	protected ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
 	private double learningRate = 0.6; 
 	private double errorThreshold =  0.0000000000000009;
