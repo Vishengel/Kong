@@ -12,6 +12,8 @@ public interface constants {
 	//boolean DEMO_PHASE_CLIMBING = false;  
 	
 	boolean DEMO_PHASE = false;
+	
+	boolean RANDOM_ACTOR = true;
 		
 	//These values determine whether mario should learn and test dodging or climbing, respectively.
 	//boolean TEST_PHASE_DODGING = false; 
@@ -21,7 +23,7 @@ public interface constants {
 	
 	//This value determines whether the game should create the standard level, or the alternative level 
 	//created for training to jump over barrels.
-	boolean BARREL_TRAINING = false;
+	boolean BARREL_TRAINING = true;
 	
 	//This value determines whether Mario can die in the game when touching a barrel
 	boolean DEATH = true;
@@ -59,8 +61,8 @@ public interface constants {
 	//barrel position and dimensions
 	int BARREL_START_X = 120;
 	int BARREL_START_Y = 250;	
-	int BARREL_HEIGHT = 20;
-	int BARREL_WIDTH = 22;
+	int BARREL_HEIGHT = 10;
+	int BARREL_WIDTH = 10;
 	
 	//powerup dimensions
 	int POWERUP_HEIGHT = 27;

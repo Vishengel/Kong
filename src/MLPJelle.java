@@ -208,8 +208,14 @@ public class MLPJelle {
 		//Update the weights for nodes in the output layer
 		for(int i = 0; i < nOutput; i++){
 			outputLayer.get(i).updateWeights(target[patternIndex][i], learningRate, momentum);
-			//totalError += outputLayer.get(i).getError();
-			totalError += outputLayer.get(i).getCrossEntropy();
+			
+			//Critic cannot use getcross entropy together with the ReLU units; this causes NaN values
+			if(this instanceof Critic){
+				totalError += outputLayer.get(i).getError();
+			}
+			else{
+				totalError += outputLayer.get(i).getCrossEntropy();
+			}
 			//System.out.println(totalError);
 		}
 		
@@ -338,9 +344,37 @@ public class MLPJelle {
 			System.out.println(target[i]);
 		}
 	}
-	public void setTarget(int nOutputs, double feedback){
-		for(int i = 0; i < nOutputs; i++){
-			target[0][i] = feedback;
+	
+	public void propagateFeedback(double feedback, double[] state){
+		//Weaken or strengthen the weights in the output node with the feedback
+		double activation;
+		double maxActivation = -99999999;
+		int mostActiveNodeIndex = 0;
+		//find the output node with the highest activation
+		for(int i = 0; i < nOutput; i++){
+			activation = outputLayer.get(i).getActivation();
+			if(activation > maxActivation){
+				maxActivation = activation;
+				mostActiveNodeIndex = i;
+			}
 		}
+		//System.out.println("Most active output: " + mostActiveNodeIndex);
+		//present previous state to network
+		forwardPass(state);
+		//add feedback to weights of output node
+		outputLayer.get(mostActiveNodeIndex).addFeedbackToWeights(feedback);
+		
+		/*
+		//weaken or strenghten the hidden layers
+		for(int i = 0; i < nHiddenLayers; i++){
+			for(int j = 0; j < nHidden; j++){
+				hiddenList.get(i).get(j).addFeedbackToWeights(feedback);
+			}
+		}
+		*/
 	}
+	
+	
+	
+	
 }

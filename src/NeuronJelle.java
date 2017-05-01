@@ -25,6 +25,12 @@ public class NeuronJelle {
 		}
 	}
 	
+	public void addFeedbackToWeights(double feedback){
+		for(int i=0; i<nInputs; i++) {
+			weights[i] = weights[i] + feedback;
+		}
+	}
+	
 	public double[] getInput() {
 		return this.input;
 	}
