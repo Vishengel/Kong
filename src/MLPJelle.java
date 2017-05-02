@@ -26,9 +26,9 @@ public class MLPJelle {
 	protected ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
 	protected double learningRate = 0.6; 
-	private double errorThreshold =  0.000000005;
+	private double errorThreshold =  0.0000000009;
 	private double maxEpochs = 30000;  
-	private double momentum = 0.3; 
+	private double momentum = 0.6; 
 	private String fileName;
 	
 	public MLPJelle(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName) {
@@ -274,8 +274,7 @@ public class MLPJelle {
 
 		for(int i = 0; i < nOutput; i++){
 			System.out.print("Output node " + i + ": " + outputLayer.get(i).getActivation());
-			System.out.println(" " + outputLayer.get(i).getOutput());
-			
+			System.out.println(" " + outputLayer.get(i).getOutput());	
 		}
 		return maxOutput();	
 		
@@ -362,6 +361,7 @@ public class MLPJelle {
 		//present previous state to network
 		forwardPass(state);
 		//add feedback to weights of output node
+		System.out.println("Most active node: " + mostActiveNodeIndex);
 		outputLayer.get(mostActiveNodeIndex).addFeedbackToWeights(feedback);
 		
 		/*

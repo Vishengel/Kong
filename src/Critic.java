@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Critic extends MLPJelle {
 	
 	double discount = 0.5;
-	double actorLearningRate = 0.000001;
+	double actorLearningRate = 0;
 	
 	public Critic(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName) {
 		super(nInput, nHiddenLayers, nHidden, nOutput, fileName);
