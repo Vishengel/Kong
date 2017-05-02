@@ -284,13 +284,13 @@ public class GameModel implements constants {
 			//present input to networks
 			if(constants.TEST_PHASE_CLIMBING){
 				testInputs = Arrays.copyOfRange(climbInputs, 0, nInputsClimb);
-				mario.setAction(climbMLP.testNetwork(testInputs));
+				mario.setAction(climbMLP.presentInput(testInputs));
 			}
 			
 			//if only training on dodging barrels, only present input to dodging MLP
 			else if(constants.BARREL_TRAINING && constants.TEST_PHASE_DODGING){
 				testInputs = Arrays.copyOfRange(dodgeInputs, 0, nInputsDodge);
-				mario.setAction(dodgeMLP.testNetwork(testInputs));
+				mario.setAction(dodgeMLP.presentInput(testInputs));
 			}
 			
 			
@@ -389,8 +389,8 @@ public class GameModel implements constants {
 			epochs++;
 			
 			if(constants.DEMO_PHASE_DODGING){
-			dodgeInputs[nInputsDodge + mario.getAction()] = 1.0;
-			dodgeTrainingSet.add(dodgeInputs);
+				dodgeInputs[nInputsDodge + mario.getAction()] = 1.0;
+				dodgeTrainingSet.add(dodgeInputs);
 			}
 			if(constants.DEMO_PHASE_CLIMBING){
 				climbInputs[nInputsClimb + mario.getAction()] = 1.0;
