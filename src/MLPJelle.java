@@ -26,9 +26,9 @@ public class MLPJelle {
 	protected ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
 	protected double learningRate = 0.6; 
-	private double errorThreshold =  0.0000000009;
-	private double maxEpochs = 30000;  
-	private double momentum = 0.6; 
+	private double errorThreshold =  0.0000000001;
+	private double maxEpochs = 1000;  
+	private double momentum = 0; 
 	private String fileName;
 	
 	public MLPJelle(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName) {

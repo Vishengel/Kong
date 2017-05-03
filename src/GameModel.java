@@ -10,7 +10,7 @@ public class GameModel implements constants {
 	
 	//these values determine how fast barrels are spawned in the game
 	private int spawnTimer = 500;	
-	private int barrelSpawnTime = 500; 
+	private int barrelSpawnTime = -1; 
 	
 	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
@@ -256,7 +256,7 @@ public class GameModel implements constants {
 		//return climbInputs;
 	//}  
 	
-	public float normalizeForDodging(float distance){
+	/*public float normalizeForDodging(float distance){
 		if(distance < 130){
 			return 1;
 			
@@ -292,6 +292,7 @@ public class GameModel implements constants {
 			return -1;
 		}
 	}
+	*/
 	
 	//This function calculates the inputs necessary for dodging barrels
 	/*public double[] calculateDodgeInputs(){
@@ -357,13 +358,13 @@ public class GameModel implements constants {
 		//categorical distance to peach
 		state[10] = getEuclideanDistance(mario, peach);
 		//System.out.println("Distance to peach?: " + state[10]);
-		
+		//add bias
 		state[NstateInputs - 1] = -1;
 		//System.out.println("Bias: " + state[NstateInputs - 1]);
 		//System.out.println("-----------------------------------");
-		//add bias
+		
 		state = rescaleState(state);
-		for(int i = 0; i < NstateInputs + 1; i++){
+		for(int i = 0; i < NstateInputs; i++){
 			System.out.print(state[i] + " ");
 		}
 		System.out.println();
@@ -429,7 +430,7 @@ public class GameModel implements constants {
 		
 		//don't create the actor and critic if in the demonstration phase
 		if(!constants.DEMO_PHASE){
-			actor = new MLPJelle(NstateInputs, 1, 25, nOutputs, "trainingSet2");
+			actor = new MLPJelle(NstateInputs, 1, 70, nOutputs, "trainingSet2");
 			critic = new Critic(NstateInputs, 1, 50, 1, "");
 		}
 		if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){
@@ -463,10 +464,10 @@ public class GameModel implements constants {
 			}
 			
 			//reset mario's action when not jumping
-			if(mario.standing){
-				mario.setAction(0);
-			}
-			if(constants.TEST_PHASE && !mario.isJumping()){
+			//if(mario.standing){
+				//mario.setAction(0);
+			//}
+			if(constants.TEST_PHASE /*&& !mario.isJumping()*/){
 				testInputs = Arrays.copyOfRange(state, 0, NstateInputs);
 				mario.setAction(actor.testNetwork(testInputs));
 			}
