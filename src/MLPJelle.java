@@ -26,7 +26,7 @@ public class MLPJelle {
 	private ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
 	private double learningRate = 0.6; 
-	private double errorThreshold =  0.0003;
+	private double errorThreshold =  0.03;
 	private double maxEpochs = 30000;  
 	private double momentum = 0.3; 
 	private String fileName;
@@ -85,12 +85,12 @@ public class MLPJelle {
 				hiddenLayer.add(new NeuronJelle(nWeights));
 			}
 			//Add a node for the bias
-			hiddenLayer.add(new NeuronJelle(0));
+			//hiddenLayer.add(new NeuronJelle(0));
 			//Set the amount of weights for each neuron in the next layer
-			//to be the same as the amount of hidden neurons in the current layer
-			nWeights = hiddenLayer.size();
+			//to be the same as the amount of hidden neurons in the current layer, plus one for the bias
+			nWeights = hiddenLayer.size() + 1;
 			//Make sure the output of the bias neuron is -1
-			hiddenLayer.get(nWeights-1).setOutput(-1);
+			//hiddenLayer.get(nWeights-1).setOutput(-1);
 			//Add the hidden layer to the list of hidden layers
 			hiddenList.add(hiddenLayer);
 		}
@@ -153,7 +153,7 @@ public class MLPJelle {
 		//First, feed the input to the first hidden layer
 		double[] currentInput = input;
 		//Stores the output to be fed to the next hidden layer as input
-		double[] outputArray = new double[nHidden];
+		double[] outputArray = new double[nHidden + 1];
 		//Loop through hidden layers
 		for (int i=0; i<nHiddenLayers; i++) {
 			//Calculate the output for each node in the hidden layer
@@ -164,6 +164,8 @@ public class MLPJelle {
 
 				outputArray[j] = hiddenList.get(i).get(j).getOutput();
 			}
+			//Set the final output to be the bias
+			outputArray[nHidden] = -1.0;
 			//Store the output of the hidden layer as input for the next layer
 			currentInput = outputArray;
 		}
@@ -186,7 +188,7 @@ public class MLPJelle {
 		
 		//Calculate gradients for nodes in the output layer
 		for(int i = 0; i < nOutput; i++){
-			outputLayer.get(i).setOutputGradient(target[patternIndex][i]);
+			outputLayer.get(i).setSigmoidOutputGradient(target[patternIndex][i]);
 		}
 		
 		nextLayer = outputLayer;

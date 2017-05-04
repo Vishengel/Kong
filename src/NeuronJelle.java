@@ -82,8 +82,13 @@ public class NeuronJelle {
 		}
 	}
 	
-	public void setOutputGradient(double target) {
+	
+	public void setSigmoidOutputGradient(double target) {
 		this.gradient = sigmoidPrime(this.activation) * (target - this.output);
+	}
+	
+	public void setSoftmaxOutputGradient () {
+		
 	}
 	
 	public void updateWeights(double target, double learningRate, double momentum) {

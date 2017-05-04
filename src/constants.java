@@ -9,12 +9,12 @@ public interface constants {
 
 	//These values determine whether the datasets about dodging or climbing should be created, respectively.
 	boolean DEMO_PHASE_DODGING = false; 
-	boolean DEMO_PHASE_CLIMBING = false;  
+	boolean DEMO_PHASE_CLIMBING = true;  
 	
 	
 	//These values determine whether mario should learn and test dodging or climbing, respectively.
 	boolean TEST_PHASE_DODGING = false; 
-	boolean TEST_PHASE_CLIMBING = true;
+	boolean TEST_PHASE_CLIMBING = false;
 	
 	//This value determines whether the game should create the standard level, or the alternative level 
 	//created for training to jump over barrels.
@@ -24,7 +24,7 @@ public interface constants {
 	boolean DEATH = true;
 	
 	//This value determines for how many epochs the game should run
-	int MAX_EPOCHS = 200000; 
+	int MAX_EPOCHS = 1; 
 	
 	//The following values determine positions and dimensions for game objects
 	
