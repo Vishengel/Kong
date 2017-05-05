@@ -512,7 +512,7 @@ public class GameModel implements constants {
 				//calculate the critic's feedback
 				feedback = critic.calculateFeedback(state, previousState, reward);
 				//backpropagate the feedback to the actor in the form of a TD-error (Temporal-Difference)
-				actor.propagateFeedback(feedback, previousState);		
+				
 			}
 			
 			//System.out.print("Epoch: " + epochs);

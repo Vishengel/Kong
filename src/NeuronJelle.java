@@ -24,11 +24,6 @@ public class NeuronJelle {
 		}
 	}
 	
-	public void addFeedbackToWeights(double feedback){
-		for(int i=0; i<nInputs; i++) {
-			weights[i] = weights[i] + feedback;
-		}
-	}
 	
 	public double[] getInput() {
 		return this.input;
@@ -50,6 +45,11 @@ public class NeuronJelle {
 			//System.out.println(this.weights[i]);
 			//System.out.println(weights.length);
 			this.activation += this.input[i] * this.weights[i];
+			//System.out.println(this.weights[i]);
+			//System.out.println("-------------");
+			//System.out.println(this.input.length);
+			//System.out.println(this.input[i]);
+			//System.out.println("-------------");
 		}
 		//System.out.println(this.activation);
 		//System.out.println("___");
@@ -67,8 +67,9 @@ public class NeuronJelle {
 		this.output = sigmoid(this.activation);
 	}
 	
-	public void setReLuOutput(){
-		this.output = ReLU(this.activation);
+	public void setLinearOutput(){
+		this.output = this.activation;
+		//System.out.println("Linear output of output node: " + this.output);
 	}
 	
 	public void setSoftmaxOutput(ArrayList<NeuronJelle> outputLayer) {
@@ -79,52 +80,22 @@ public class NeuronJelle {
 		return this.gradient;
 	}
 	
-	public void setHiddenGradient(int nodeIndex, ArrayList<NeuronJelle> nextLayer, int hiddenLayer, boolean isCritic) {
+	public void setHiddenGradient(int nodeIndex, ArrayList<NeuronJelle> nextLayer, int hiddenLayer) {
 		double sum = 0;
 		for (NeuronJelle n : nextLayer) {
 			sum += n.getGradient() * n.getWeights()[nodeIndex];
 		}
-		if(isCritic){
-			this.gradient = ReLUPrime(this.activation) * sum;
-		}
-		else{
-			this.gradient = sigmoidPrime(this.activation) * sum;
+			this.gradient = sigmoidPrime(this.activation) * sum;		
+	}
+
+	
+	
+	public void setOutputGradient(double target) {
+			this.gradient = this.activation * (target - this.output);
+			System.out.println(this.output);
 		}
 		
-	}
 	
-	public void setHiddenOutputFunction(boolean isCritic){
-		//The critic uses the ReLU function instead of the sigmoid function
-		if(isCritic){
-			setReLuOutput();
-		}
-		else{
-			setSigmoidOutput();
-		}
-	}
-	
-	
-	public void setOutputFunction(ArrayList<NeuronJelle> outputLayer, boolean isCritic){
-		//The critic uses the linear activation instead of the softmax output for regression
-		if(isCritic){
-			this.output = ReLU(this.activation);
-		}
-		else{
-			setSoftmaxOutput(outputLayer);
-		}
-	}
-	
-	
-	public void setOutputGradient(double target, boolean isCritic) {
-		//The critic uses the activation instead of sigmoid in the output layer
-		if(isCritic){
-			this.gradient = ReLUPrime(this.activation * (target - this.output));
-		}
-		else{
-			this.gradient = sigmoidPrime(this.activation) * (target - this.output);
-		}
-		
-	}
 	
 	public void updateWeights(double target, double learningRate) {
 		this.error = 0.5*(target - this.output)*(target - this.output);
@@ -152,30 +123,11 @@ public class NeuronJelle {
 	public double sigmoid(double activation){
 		 return (1/( 1 + Math.pow(Math.E,(-1*activation))));	
 	}
-	
-	
-	
+		
 	public double sigmoidPrime(double activation){
 		return Math.pow(Math.E, activation) / ((1 + Math.pow(Math.E, activation))* (1 + Math.pow(Math.E, activation)));	
 	}
 	
-	public double ReLU(double activation){
-		return Math.max(0, activation);
-	}
-	
-	public double ReLUPrime(double activation){
-		if(activation < 0){
-			return 0;
-		}
-		return 1;
-	}
-	public double tanh(double activation){
-		return 2 / (1 + Math.pow(Math.E, -2*activation)) - 1;
-	}
-	
-	public double tanhPrime(double activation){
-		return 1 - Math.pow(tanh(activation), 2);
-	}
 	
 	public double softmax(double activation, ArrayList<NeuronJelle> outputLayer) {
 		double activationSum = 0;

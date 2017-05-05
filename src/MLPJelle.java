@@ -73,20 +73,16 @@ public class MLPJelle {
 	public void initNetwork() {
 		//read the demonstration data to be learned from 
 		double[][] initialInput = FH.readFile(fileName, nInput, nOutput);
-		input = new double[initialInput.length][nInput + 1];
+		input = new double[initialInput.length][nInput];
 		//filter out the target values from the input array
 		for(int i = 0; i < initialInput.length; i++){
 			//System.out.println("Pattern: " + i);
 			for(int j = 0; j < nInput; j++){	
 				input[i][j] = initialInput[i][j];
 				//System.out.print(input[i][j] + " ");
-			}
-			//System.out.println();
-			//add the -1 value at the end of the input
-			input[i][nInput] = -1;		
+			}	
 		}
-		
-		
+			
 		//fill the target array with the target values 
 		target = new double[input.length][nOutput];
 		for(int i = 0; i < input.length; i++){
@@ -152,11 +148,11 @@ public class MLPJelle {
 	
 	public void forwardPass(double[] input) {
 		//First, feed the input to the first hidden layer
-		double[] currentInput = new double[input.length + 1];
+		double[] currentInput = new double[input.length];
 		for(int i = 0; i < input.length; i++){
 			currentInput[i] = input[i];
 		}
-		currentInput[input.length] = -1;
+		//currentInput[input.length] = -1;
 		//Stores the output to be fed to the next hidden layer as input
 		double[] outputArray = new double[nHidden];
 		//Loop through hidden layers
@@ -165,7 +161,7 @@ public class MLPJelle {
 			for (int j=0; j<nHidden; j++) {
 				hiddenList.get(i).get(j).setInput(currentInput);
 				hiddenList.get(i).get(j).setActivation();
-				hiddenList.get(i).get(j).setHiddenOutputFunction(this instanceof Critic);
+				hiddenList.get(i).get(j).setSigmoidOutput();
 
 				outputArray[j] = hiddenList.get(i).get(j).getOutput();
 			}
@@ -176,7 +172,7 @@ public class MLPJelle {
 		for (NeuronJelle n : outputLayer) {
 			n.setInput(currentInput);
 			n.setActivation();
-			n.setOutputFunction(outputLayer, this instanceof Critic);
+			n.setLinearOutput();
 			softmaxSum += n.getOutput();
 			//n.printWeights();
 		}
@@ -189,7 +185,7 @@ public class MLPJelle {
 		
 		//Calculate gradients for nodes in the output layer
 		for(int i = 0; i < nOutput; i++){
-			outputLayer.get(i).setOutputGradient(target[patternIndex][i], this instanceof Critic);
+			outputLayer.get(i).setOutputGradient(target[patternIndex][i]);
 		}
 		
 		nextLayer = outputLayer;
@@ -199,7 +195,7 @@ public class MLPJelle {
 			//Train each node in the hidden layer
 			for (int j=0; j<nHidden; j++) {
 				//Calculate gradients for nodes in each hidden layer
-				hiddenList.get(i).get(j).setHiddenGradient(j, nextLayer, i, this instanceof Critic);
+				hiddenList.get(i).get(j).setHiddenGradient(j, nextLayer, i);
 			}
 			nextLayer = hiddenList.get(i);
 		}
@@ -207,14 +203,7 @@ public class MLPJelle {
 		//Update the weights for nodes in the output layer
 		for(int i = 0; i < nOutput; i++){
 			outputLayer.get(i).updateWeights(target[patternIndex][i], learningRate);
-			
-			//Critic cannot use getcross entropy together with the ReLU units; this causes NaN values
-			if(this instanceof Critic){
-				totalError += outputLayer.get(i).getError();
-			}
-			else{
-				totalError += outputLayer.get(i).getCrossEntropy();
-			}
+			totalError += outputLayer.get(i).getCrossEntropy();
 			//System.out.println(totalError);
 		}
 		
@@ -342,38 +331,6 @@ public class MLPJelle {
 		for (int i=0; i<target.length; i++) {
 			System.out.println(target[i]);
 		}
-	}
-	
-	public void propagateFeedback(double feedback, double[] state){
-		//Weaken or strengthen the weights in the output node with the feedback
-		double activation;
-		double maxActivation = -99999999;
-		int mostActiveNodeIndex = 0;
-		//find the output node with the highest activation
-		for(int i = 0; i < nOutput; i++){
-			activation = outputLayer.get(i).getActivation();
-			if(activation > maxActivation){
-				maxActivation = activation;
-				mostActiveNodeIndex = i;
-			}
-		}
-		//System.out.println("Most active output: " + mostActiveNodeIndex);
-		//present previous state to network
-		forwardPass(state);
-		//add feedback to weights of output node
-		outputLayer.get(mostActiveNodeIndex).addFeedbackToWeights(feedback);
-		
-		/*
-		//weaken or strenghten the hidden layers
-		for(int i = 0; i < nHiddenLayers; i++){
-			for(int j = 0; j < nHidden; j++){
-				hiddenList.get(i).get(j).addFeedbackToWeights(feedback);
-			}
-		}
-		*/
-	}
-	
-	
-	
+	}	
 	
 }
