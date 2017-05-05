@@ -26,7 +26,7 @@ public class MLPJelle {
 	private ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
 	private double learningRate = 0.03; 
-	private double errorThreshold =  0.0003;
+	private double errorThreshold =  0.03;
 	private double maxEpochs = 30000;  
 	private double momentum = 0.3; 
 	private String fileName;
@@ -160,7 +160,7 @@ public class MLPJelle {
 				hiddenList.get(i).get(j).setInput(currentInput);
 				hiddenList.get(i).get(j).setActivation();
 				hiddenList.get(i).get(j).setSigmoidOutput();
-				System.out.println(hiddenList.get(i).get(j).getActivation());
+				//System.out.println("Act.: " + hiddenList.get(i).get(j).getActivation());
 				outputArray[j] = hiddenList.get(i).get(j).getOutput();
 			}
 			//Set the final output to be the bias
@@ -187,7 +187,8 @@ public class MLPJelle {
 		
 		//Calculate gradients for nodes in the output layer
 		for(int i = 0; i < nOutput; i++){
-			outputLayer.get(i).setSigmoidOutputGradient(target[patternIndex][i]);
+			//outputLayer.get(i).setSigmoidOutputGradient(target[patternIndex][i]);
+			outputLayer.get(i).setSoftmaxOutputGradient(target[patternIndex][i]);
 		}
 		
 		nextLayer = outputLayer;
