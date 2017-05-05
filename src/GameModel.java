@@ -9,8 +9,8 @@ public class GameModel implements constants {
 	private int lives = 3;
 	
 	//these values determine how fast barrels are spawned in the game
-	private int spawnTimer = 100;	
-	private int barrelSpawnTime = 200;  
+	private int spawnTimer = 400;	
+	private int barrelSpawnTime = 400;  
 	
 	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
@@ -23,7 +23,7 @@ public class GameModel implements constants {
 	private int epochs;
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
-	private int sleepTime = 5; 
+	private int sleepTime = 5;  
 	
 	//These values determine the respective amount of inputs to the Multi-layer Perceptron for learning
 	//to climb ladders or dodging barrels
@@ -365,29 +365,29 @@ public class GameModel implements constants {
 		if(hitByBarrel){
 			System.out.println("Hit by barrel!");
 			reward -= 700;
-			score -= 700;	
+			//score -= 700;	
 		}
 		
 		else if(jumpedOverBarrel){
 			System.out.println("Jumped over a barrel!");
 			reward += 150;
-			score += 150;
+			//score += 150;
 		}
 		else if(destroyedBarrel){
 			System.out.println("Smashed a barrel!");
 			reward += 100;
-			score += 100;
+			//score += 100;
 		}
 		
 		if(touchedPowerUp){
 			System.out.println("Picked up powerup!");
 			reward += 10;
-			score += 10;
+			//score += 10;
 		}
 		
 		if(steppedOnLadder){
 			reward += 30;
-			score += 30;
+			//score += 30;
 		}
 		hitByBarrel = false;
 		gameWon = false;

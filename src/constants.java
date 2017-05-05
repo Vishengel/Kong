@@ -26,7 +26,7 @@ public interface constants {
 	boolean BARREL_TRAINING = false;
 	
 	//This value determines whether Mario can die in the game when touching a barrel
-	boolean DEATH = false;
+	boolean DEATH = true;
 
 	//This value determines for how many epochs the game should run
 	int MAX_EPOCHS = 200000000; 

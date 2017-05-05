@@ -25,9 +25,9 @@ public class MLPJelle {
 	//Define a list of output neurons
 	protected ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
-	protected double learningRate = 0.01; 
-	private double errorThreshold =  0.74;
-	private double maxEpochs = 30000;  
+	protected double learningRate = 0.05; 
+	private double errorThreshold =  0.725;
+	private double maxEpochs = 1000;  
 	private String fileName;
 	
 	public MLPJelle(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName) {
@@ -170,7 +170,7 @@ public class MLPJelle {
 			//Store the output of the hidden layer as input for the next layer
 			currentInput = outputArray;
 		}
-		double softmaxSum = 0;
+		//double softmaxSum = 0;
 		for (NeuronJelle n : outputLayer) {
 			n.setInput(currentInput);
 			n.setActivation();
@@ -181,7 +181,7 @@ public class MLPJelle {
 			if(!(this instanceof Critic)){
 				n.setSoftmaxOutput(outputLayer);
 			}
-			softmaxSum += n.getOutput();
+			//softmaxSum += n.getOutput();
 		}
 		//System.out.println("Sum of softmax output: " + softmaxSum);
 	}
@@ -232,7 +232,20 @@ public class MLPJelle {
 		
 	}
 	
-
+	public int pickOutputByProbability() {
+		double p = Math.random();
+		double cumulativeProbability = 0.0;
+		
+		for (NeuronJelle n : outputLayer) {
+		    cumulativeProbability += n.getOutput();
+		    
+		    if (p <= cumulativeProbability) {
+		        return outputLayer.indexOf(n);
+		    }
+		}
+		
+		return 0;
+	}
 	
 	public int maxOutput(){
 		double max = 0;
@@ -322,10 +335,6 @@ public class MLPJelle {
 		//System.out.println("Barrel to right? " + input[2]);
 		//System.out.println("Barrel on same level? " + input[3]);
 		
-		int testEpoch; 
-		double nCorrect = 0;
-		double output = 0;
-		double tar;
 		//present game state to the network, calculate output
 		forwardPass(input);
 		//System.out.println(binaryToInt());	
@@ -337,7 +346,7 @@ public class MLPJelle {
 			System.out.println(" " + outputLayer.get(i).getOutput());
 		}
 		
-		return maxOutput();	
+		return pickOutputByProbability();	
 		
 	}
 	
