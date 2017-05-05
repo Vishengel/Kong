@@ -25,9 +25,10 @@ public class MLPJelle {
 	//Define a list of output neurons
 	protected ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
-	protected double learningRate = 0.05; 
-	private double errorThreshold =  0.0000001;
-	private double maxEpochs = 30000;  
+
+	protected double learningRate = 0.03; 
+	private double errorThreshold =  1.5;
+	private double maxEpochs = 1000;  
 	private String fileName;
 	
 	public MLPJelle(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName) {
@@ -57,8 +58,8 @@ public class MLPJelle {
 			//Add a node for the bias
 			//hiddenLayer.add(new NeuronJelle(0));
 			//Set the amount of weights for each neuron in the next layer
-			//to be the same as the amount of hidden neurons in the current layer
-			nWeights = hiddenLayer.size();
+			//to be the same as the amount of hidden neurons in the current layer, plus one for the bias
+			nWeights = hiddenLayer.size() + 1;
 			//Make sure the output of the bias neuron is -1
 			//hiddenLayer.get(nWeights-1).setOutput(-1);
 			//Add the hidden layer to the list of hidden layers
@@ -110,9 +111,9 @@ public class MLPJelle {
 			
 			this.shuffleInput();
 			
-			for (int i=0; i<this.input.length; i++) {
+			for (int i=0; i < this.input.length; i++) {
 				this.forwardPass(this.input[i]);
-				totalError = this.backwardPass(i);
+				totalError += this.backwardPass(i);
 			}
 			
 			totalError /= -1*this.input.length;
@@ -154,7 +155,7 @@ public class MLPJelle {
 		}
 		//currentInput[input.length] = -1;
 		//Stores the output to be fed to the next hidden layer as input
-		double[] outputArray = new double[nHidden];
+		double[] outputArray = new double[nHidden + 1];
 		//Loop through hidden layers
 		for (int i=0; i<nHiddenLayers; i++) {
 			//Calculate the output for each node in the hidden layer
@@ -162,9 +163,10 @@ public class MLPJelle {
 				hiddenList.get(i).get(j).setInput(currentInput);
 				hiddenList.get(i).get(j).setActivation();
 				hiddenList.get(i).get(j).setSigmoidOutput();
-
 				outputArray[j] = hiddenList.get(i).get(j).getOutput();
 			}
+			//Set the final output to be the bias
+			outputArray[nHidden] = -1.0;
 			//Store the output of the hidden layer as input for the next layer
 			currentInput = outputArray;
 		}
@@ -185,7 +187,8 @@ public class MLPJelle {
 		
 		//Calculate gradients for nodes in the output layer
 		for(int i = 0; i < nOutput; i++){
-			outputLayer.get(i).setOutputGradient(target[patternIndex][i]);
+			//outputLayer.get(i).setSigmoidOutputGradient(target[patternIndex][i]);
+			outputLayer.get(i).setSoftmaxOutputGradient(target[patternIndex][i]);
 		}
 		
 		nextLayer = outputLayer;

@@ -90,11 +90,12 @@ public class NeuronJelle {
 
 	
 	
-	public void setOutputGradient(double target) {
-			this.gradient = target - this.output;
-			
-		}
-		
+
+	
+	public void setSoftmaxOutputGradient (double target) {
+		this.gradient = (target - this.output);
+	}
+
 	
 	
 	public void updateWeights(double target, double learningRate) {
@@ -103,8 +104,9 @@ public class NeuronJelle {
 		
 		
 		for(int i=0; i<this.weights.length; i++) {
+			//this.weights[i] += learningRate*gradient*this.input[i] + (momentum * this.previousWeightChange);
+			//this.previousWeightChange = learningRate*gradient*this.input[i] + (momentum * this.previousWeightChange);
 			this.weights[i] += learningRate*gradient*this.input[i];
-			
 		}
 	}
 	

@@ -608,8 +608,13 @@ public class GameModel implements constants {
 		}
 		if(constants.DEMO_PHASE_CLIMBING){
 			//fh.writeToFile(climbTrainingSet, "climbData");
+<<<<<<< HEAD
 			fh.writeGameStateToFile(MOCollection, PUCollection, platformList, ladderList, peach, oil, flame);
 			System.out.println("Game states written to file");
+=======
+			fh.writeGameStateToFile(MOCollection, PUCollection, platformList, ladderList, peach, oil, flame, "./TrainingData/gameStateData");
+			System.out.println("Game states written to file");
+>>>>>>> refs/heads/jelle_mlp
 		}
 		*/
 	}	

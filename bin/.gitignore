@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 /Critic.class
+=======
+/TrainingData/
+>>>>>>> refs/heads/jelle_mlp
 /climbData.csv
+<<<<<<< HEAD
 /trainingSet2.csv
 /trainingSet.csv
 /XORData.csv
+=======
+/dodgeData.csv
+>>>>>>> refs/heads/jelle_mlp
