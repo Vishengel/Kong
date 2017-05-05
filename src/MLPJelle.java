@@ -25,7 +25,7 @@ public class MLPJelle {
 	//Define a list of output neurons
 	private ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
-	private double learningRate = 0.6; 
+	private double learningRate = 0.03; 
 	private double errorThreshold =  0.03;
 	private double maxEpochs = 30000;  
 	private double momentum = 0.3; 

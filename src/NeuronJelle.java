@@ -97,9 +97,10 @@ public class NeuronJelle {
 		
 		
 		for(int i=0; i<this.weights.length; i++) {
-			this.weights[i] += learningRate*gradient*this.input[i] + (momentum * this.previousWeightChange);
-			this.previousWeightChange = learningRate*gradient*this.input[i] + (momentum * this.previousWeightChange);
-			//System.out.println(this.weights[i]);
+			//this.weights[i] += learningRate*gradient*this.input[i] + (momentum * this.previousWeightChange);
+			//this.previousWeightChange = learningRate*gradient*this.input[i] + (momentum * this.previousWeightChange);
+			this.weights[i] += learningRate*gradient*this.input[i];
+			this.previousWeightChange = learningRate*gradient*this.input[i];
 		}
 	}
 	

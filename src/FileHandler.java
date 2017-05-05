@@ -5,7 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-
+//import org.json.*;
 
 
 
@@ -68,6 +68,9 @@ public class FileHandler {
 	
 	public void writeGameStateToFile(ArrayList<ArrayList<MovingObject>> MOCollection, ArrayList<ArrayList<Powerup>> PUCollection,
 			ArrayList<Platform> platformList, ArrayList<Ladder> ladderList, Peach peach, Oil oil, Flame flame, String fileName) throws IOException{
+		
+		//JSONObject peach = new JSONObject();
+		
 		try
 		{
 		    String filePath= "src/" + fileName + ".csv";
