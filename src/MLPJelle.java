@@ -26,7 +26,7 @@ public class MLPJelle {
 	protected ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
 	protected double learningRate = 0.05; 
-	private double errorThreshold =  0.000000003;
+	private double errorThreshold =  0.0000001;
 	private double maxEpochs = 30000;  
 	private String fileName;
 	
@@ -116,7 +116,7 @@ public class MLPJelle {
 			}
 			
 			totalError /= -1*this.input.length;
-			
+		
 			//System.out.println(totalError);
 			
 			System.out.println("Error: " + totalError);
@@ -172,7 +172,7 @@ public class MLPJelle {
 		for (NeuronJelle n : outputLayer) {
 			n.setInput(currentInput);
 			n.setActivation();
-			n.setLinearOutput();
+			n.setSoftmaxOutput(outputLayer);
 			softmaxSum += n.getOutput();
 			//n.printWeights();
 		}

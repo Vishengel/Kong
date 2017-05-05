@@ -9,7 +9,7 @@ public class GameModel implements constants {
 	private int lives = 3;
 	
 	//these values determine how fast barrels are spawned in the game
-	private int spawnTimer = 100;	
+	private int spawnTimer = 500;	
 	private int barrelSpawnTime = -1;  
 	
 	//These values relate to powerups and destroying barrels
@@ -412,7 +412,7 @@ public class GameModel implements constants {
 		//don't create the actor and critic if in the demonstration phase
 		if(!constants.DEMO_PHASE){
 			actor = new MLPJelle(NstateInputs, 1, 70, nOutputs, "trainingSet");
-			critic = new Critic(NstateInputs, 1, 5, 1, "");
+			critic = new Critic(NstateInputs, 1, 20, 1, "");
 		}
 		if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){
 			actor.trainNetwork();

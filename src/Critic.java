@@ -5,11 +5,10 @@ import java.util.ArrayList;
 public class Critic extends MLPJelle {
 	
 	double discount = 0.5;
-	double actorLearningRate = 0;
 	
 	public Critic(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName) {
 		super(nInput, nHiddenLayers, nHidden, nOutput, fileName);
-		learningRate = 0.6;
+		learningRate = 0.05;
 	}
 	
 	public void initNetwork(){
@@ -34,10 +33,11 @@ public class Critic extends MLPJelle {
 			forwardPass(previousState);
 			//System.out.print("Target: " + target);
 			//System.out.println(" Value: " + outputLayer.get(0).getOutput());
-			backwardPass(0);
-			//System.out.println("Critic error: " + backwardPass(0));
+			
+			System.out.println("State value: " + outputLayer.get(0).getOutput());
+			System.out.println("Critic error: " + backwardPass(0));
 			//printNetwork(); 
-			//System.out.println("State value: " + outputLayer.get(0).getOutput());
+			
 			
 		}
 		
@@ -47,7 +47,7 @@ public class Critic extends MLPJelle {
 			double stateValue = outputLayer.get(0).getOutput();
 			forwardPass(previousState);
 			double previousStateValue = outputLayer.get(0).getOutput();
-			double feedback = actorLearningRate * ( reward + (discount * stateValue) - previousStateValue );
+			double feedback = reward + (discount * stateValue) - previousStateValue;
 			//if(feedback >= 0){
 				//System.out.println("Feedback: " + feedback);
 			//}

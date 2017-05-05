@@ -91,8 +91,8 @@ public class NeuronJelle {
 	
 	
 	public void setOutputGradient(double target) {
-			this.gradient = this.activation * (target - this.output);
-			System.out.println(this.output);
+			this.gradient = target - this.output;
+			
 		}
 		
 	
