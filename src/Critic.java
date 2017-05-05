@@ -13,6 +13,7 @@ public class Critic extends MLPJelle {
 	
 	public void initNetwork(){
 		initializeLayers();
+		//System.out.println(nInput);
 		//the target array contains the target: reward(next_state) + ( discount * value(next_state) )
 		target = new double[1][1];
 		
@@ -33,7 +34,6 @@ public class Critic extends MLPJelle {
 			forwardPass(previousState);
 			//System.out.print("Target: " + target);
 			//System.out.println(" Value: " + outputLayer.get(0).getOutput());
-			
 			System.out.println("State value: " + outputLayer.get(0).getOutput());
 			System.out.println("Critic error: " + backwardPass(0));
 			//printNetwork(); 

@@ -9,8 +9,8 @@ public class GameModel implements constants {
 	private int lives = 3;
 	
 	//these values determine how fast barrels are spawned in the game
-	private int spawnTimer = 500;	
-	private int barrelSpawnTime = -1;  
+	private int spawnTimer = 100;	
+	private int barrelSpawnTime = 200;  
 	
 	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
@@ -345,10 +345,10 @@ public class GameModel implements constants {
 		//System.out.println("-----------------------------------");
 		//add bias
 		
-		/*for(int i = 0; i < NstateInputs + 1; i++){
+		for(int i = 0; i < NstateInputs; i++){
 			System.out.print(state[i] + " ");
 		}
-		System.out.println();*/
+		System.out.println();
 		return state;
 	}
 	
@@ -412,7 +412,7 @@ public class GameModel implements constants {
 		//don't create the actor and critic if in the demonstration phase
 		if(!constants.DEMO_PHASE){
 			actor = new MLPJelle(NstateInputs, 1, 70, nOutputs, "trainingSet");
-			critic = new Critic(NstateInputs, 1, 20, 1, "");
+			critic = new Critic(NstateInputs, 1, 50, 1, "");
 		}
 		if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){
 			actor.trainNetwork();
@@ -450,7 +450,7 @@ public class GameModel implements constants {
 			}
 			if(constants.TEST_PHASE && !mario.isJumping()){
 				testInputs = Arrays.copyOfRange(state, 0, NstateInputs);
-				mario.setAction(actor.testNetwork(testInputs));
+				mario.setAction(actor.presentInput(testInputs));
 			}
 			
 			
@@ -510,7 +510,7 @@ public class GameModel implements constants {
 			if(!constants.DEMO_PHASE){
 				critic.trainCritic(state, previousState, reward);
 				//calculate the critic's feedback
-				feedback = critic.calculateFeedback(state, previousState, reward);
+				//feedback = critic.calculateFeedback(state, previousState, reward);
 				//backpropagate the feedback to the actor in the form of a TD-error (Temporal-Difference)
 				
 			}
