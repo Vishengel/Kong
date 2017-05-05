@@ -9,8 +9,8 @@ public class GameModel implements constants {
 	private int lives = 3;
 	
 	//these values determine how fast barrels are spawned in the game
-	private int spawnTimer = 500;	
-	private int barrelSpawnTime = -1; 
+	private int spawnTimer = 100;	
+	private int barrelSpawnTime = -1;  
 	
 	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
@@ -23,7 +23,7 @@ public class GameModel implements constants {
 	private int epochs;
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
-	private int sleepTime = 4; 
+	private int sleepTime = 5; 
 	
 	//These values determine the respective amount of inputs to the Multi-layer Perceptron for learning
 	//to climb ladders or dodging barrels
@@ -32,14 +32,6 @@ public class GameModel implements constants {
 	
 	
 	private int NstateInputs = 12;
-	private int booleanInputs = 7;
-	
-	//these arrays are used for rescaling and normalizing the continuous input features
-	private double[] mean = new double[NstateInputs - booleanInputs - 1];
-	private double[] meanSqrd = new double[NstateInputs - booleanInputs -1];
-	private double[] max = new double[NstateInputs - booleanInputs -1];
-	private double[] min = new double[NstateInputs - booleanInputs -1];
-	private double[] std = new double[NstateInputs - booleanInputs -1];
 
 	private int nOutputs = 7;
 	
@@ -256,7 +248,7 @@ public class GameModel implements constants {
 		//return climbInputs;
 	//}  
 	
-	/*public float normalizeForDodging(float distance){
+	public float normalizeForDodging(float distance){
 		if(distance < 130){
 			return 1;
 			
@@ -292,7 +284,6 @@ public class GameModel implements constants {
 			return -1;
 		}
 	}
-	*/
 	
 	//This function calculates the inputs necessary for dodging barrels
 	/*public double[] calculateDodgeInputs(){
@@ -306,68 +297,58 @@ public class GameModel implements constants {
 		return dodgeInputs;
 	}*/
 	
-	public double[] rescaleState(double[] state){
-		double min = 0;
-		double max = Math.sqrt(((constants.SCREEN_X * constants.SCREEN_X) + (constants.SCREEN_X * constants.SCREEN_X)));
-		for(int i = 0; i < NstateInputs - booleanInputs - 1; i++){
-			state[i + booleanInputs] = ((2 * state[i + booleanInputs]) - max - min) / (max - min);
-		}
-		return state;
-	}
-	
 	public double[] calculateState(){
 		double[] state = new double[NstateInputs + nOutputs];
 		//System.out.println(state.length);
 		
+		//state variables about ladders, climbing and jumping
 		//System.out.println("-----------------------------------");
-		//BOOLEAN INPUTS
 		//1 if mario is jumping, -1 otherwise
 		state[0] = mario.isJumping() ? 1 : -1;
 		//System.out.println("Mario jumping: " + state[0]);
 		//1 if mario is climbing, -1 otherwise
 		state[1] = mario.isClimbing() ? 1 : -1;
-		//1 if closest barrel is to the right of mario, -1 if not
-		state[2] = barrelRight;
-		//System.out.println("Barrel right?: " + state[5]);
-		//1 if the closest barrel is rolling down a ladder, -1 if not
-		state[3] = barrelClimbing;
-		//System.out.println("Barrel on ladder?: " + state[6]);
-		//1 if the nearest barrel is on the same platform level as mario, -1 if not
-		state[4] = barrelOnSameLevel;
-		//System.out.println("Barrel on same level?: " + state[7]);
-		//System.out.println("Mario climbing: " + state[1]);	
-		//1 if nearest ladder is to the right of mario, -1 otherwise
-		state[5] = ladderRight;	
-		state[6] = powerupActivated ? 1 : -1;
-		//categorical distance to nearest ladder	
-		state[7] = findNearestObject("ladder");
+		//System.out.println("Mario climbing: " + state[1]);
+		//categorical distance to nearest ladder
+		state[2] = normalizeForLadders(findNearestObject("ladder"));
 		//System.out.println("Nearest ladder: " + state[2]);
-		
+		//1 if nearest ladder is to the right of mario, -1 otherwise
+		state[3] = ladderRight;	
 		//System.out.println("Ladder right?: " + state[3]);
 		
 		//state variables about barrels and jumping
 		//categorical distance to nearest barrel
-		state[8] = findNearestObject("barrel");
+		state[4] = normalizeForDodging(findNearestObject("barrel"));
 		//System.out.println("Nearest barrel: " + state[4]);
-		
+		//1 if closest barrel is to the right of mario, -1 if not
+		state[5] = barrelRight;
+		//System.out.println("Barrel right?: " + state[5]);
+		//1 if the closest barrel is rolling down a ladder, -1 if not
+		state[6] = barrelClimbing;
+		//System.out.println("Barrel on ladder?: " + state[6]);
+		//1 if the nearest barrel is on the same platform level as mario, -1 if not
+		state[7] = barrelOnSameLevel;
+		//System.out.println("Barrel on same level?: " + state[7]);
+		//state variables about powerups
 		//categorical distance to nearest powerup
-		state[9] = findNearestObject("powerup");
+		state[8] = normalizepowerup(findNearestObject("powerup"));
 		//System.out.println("Nearest powerup: " + state[8]);
-		//1 if mario is powered up and can destroy barrel, -1 if not	
+		//1 if mario is powered up and can destroy barrel, -1 if not
+		state[9] = powerupActivated ? 1 : -1;	
 		//System.out.println("Powered-up?: " + state[9]);
 		//categorical distance to peach
-		state[10] = getEuclideanDistance(mario, peach);
+		state[10] = normalizePeach(getEuclideanDistance(mario, peach));
 		//System.out.println("Distance to peach?: " + state[10]);
-		//add bias
+		
 		state[NstateInputs - 1] = -1;
 		//System.out.println("Bias: " + state[NstateInputs - 1]);
 		//System.out.println("-----------------------------------");
+		//add bias
 		
-		state = rescaleState(state);
-		for(int i = 0; i < NstateInputs; i++){
+		/*for(int i = 0; i < NstateInputs + 1; i++){
 			System.out.print(state[i] + " ");
 		}
-		System.out.println();
+		System.out.println();*/
 		return state;
 	}
 	
@@ -430,8 +411,8 @@ public class GameModel implements constants {
 		
 		//don't create the actor and critic if in the demonstration phase
 		if(!constants.DEMO_PHASE){
-			actor = new MLPJelle(NstateInputs, 1, 70, nOutputs, "trainingSet2");
-			critic = new Critic(NstateInputs, 1, 50, 1, "");
+			actor = new MLPJelle(NstateInputs, 1, 70, nOutputs, "trainingSet");
+			critic = new Critic(NstateInputs, 1, 5, 1, "");
 		}
 		if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){
 			actor.trainNetwork();
@@ -463,11 +444,11 @@ public class GameModel implements constants {
 				PUCollection.add(PUList);
 			}
 			
-			//reset mario's action when not jumping
-			//if(mario.standing){
-				//mario.setAction(0);
-			//}
-			if(constants.TEST_PHASE /*&& !mario.isJumping()*/){
+			//reset mario's action when standing
+			if(mario.standing){
+				mario.setAction(0);
+			}
+			if(constants.TEST_PHASE && !mario.isJumping()){
 				testInputs = Arrays.copyOfRange(state, 0, NstateInputs);
 				mario.setAction(actor.testNetwork(testInputs));
 			}
@@ -617,10 +598,7 @@ public class GameModel implements constants {
 		}
 		
 		if(constants.DEMO_PHASE){
-			computeStatistics();
-			//normalize(); 
-			rescale();
-			fh.writeToFile(trainingSet, "trainingSet2");
+			fh.writeToFile(trainingSet, "trainingSet");
 		}
 
 		//write entire state-action array to training file(s)
@@ -635,79 +613,6 @@ public class GameModel implements constants {
 		}
 		*/
 	}	
-	//compute mean, std, min and max of the continuous input features and store them in the corresponding arrays
-	public void computeStatistics(){
-		
-		//initialize min and max values for each continuous input
-		for(int i = 0; i < NstateInputs - booleanInputs - 1; i++){
-			max[i] = -1;
-			min[i] = 9999999;
-		}
-		
-		for(double[] state: trainingSet){
-				
-			for(int i = 0; i < NstateInputs - booleanInputs - 1; i++){
-				//sum the values of the continuous inputs for every state
-				mean[i] += state[i + booleanInputs];
-				//keep track of the max
-				if(state[i + booleanInputs] > max[i]){
-					max[i] = state[i + booleanInputs];
-				
-				}
-				//keep track of the min
-				if(state[i + booleanInputs] < min[i]){
-					min[i] = state[i + booleanInputs];
-				}
-				
-			}
-		}
-		
-		for(int i = 0; i < mean.length; i++){
-			System.out.println("-------Input " + i + ": " + "--------");
-			//compute the mean by dividing the inputs by the total amount of states
-			mean[i] = mean[i] / trainingSet.size();	
-			System.out.println("Mean: " + mean[i]);
-			System.out.println("Max: " + max[i]);
-			System.out.println("Min: " + min[i]);
-		}
-		
-		//compute standard deviation for every continuous input feature:
-		for(double[] state: trainingSet){
-			for(int i = 0; i < NstateInputs - booleanInputs - 1; i++){
-				//1. subtract mean
-				std[i] = state[i + booleanInputs] - mean[i];
-				//2. square the result
-				std[i] = std[i] * std[i];	
-				//store sum of squared differences
-				meanSqrd[i] += std[i];
-			}
-		}
-		for(int i = 0; i < meanSqrd.length; i++){
-			//3. compute mean of squared differences
-			meanSqrd[i] = meanSqrd[i] / trainingSet.size();
-			std[i] = Math.sqrt((meanSqrd[i]));
-			System.out.println(std[i]);
-		}
-		
-	}
-	
-	//normalize continuous inputs: value = (value - mean) / standard deviation
-	public void normalize(){
-		for(double[] state: trainingSet){
-			for(int i = 0; i < NstateInputs - booleanInputs - 1; i++){
-				state[i + booleanInputs] = (state[i] - mean[i]) / std[i];
-			}
-		}
-	}
-	
-	//rescale the continuous input to the range (-1,1)
-	public void rescale(){
-		for(double[] state: trainingSet){
-			for(int i = 0; i < NstateInputs - booleanInputs - 1; i++){
-				state[i + booleanInputs] = ((2 * state[i + booleanInputs]) - max[i] - min[i]) / (max[i] - min[i]);
-			}
-		}
-	}
 	
 	//This function is called at the start of the game and runs the entire model
 	public void initGame() {

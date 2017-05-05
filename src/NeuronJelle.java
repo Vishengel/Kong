@@ -9,8 +9,7 @@ public class NeuronJelle {
 	private double output;
 	private double error;
 	private double crossEntropy;
-	//store previous weight changes for momentum
-	private double previousWeightChange = 0;
+	
 	
 	public NeuronJelle(int nInputs) {
 		this.nInputs = nInputs;
@@ -21,7 +20,7 @@ public class NeuronJelle {
 	
 	public void initWeights() {
 		for(int i=0; i<nInputs; i++) {
-			weights[i] = -1.0 + (Math.random() * 2.0);
+			weights[i] = 0.01*(-1.0 + (Math.random() * 2.0));
 		}
 	}
 	
@@ -127,15 +126,14 @@ public class NeuronJelle {
 		
 	}
 	
-	public void updateWeights(double target, double learningRate, double momentum) {
+	public void updateWeights(double target, double learningRate) {
 		this.error = 0.5*(target - this.output)*(target - this.output);
 		this.crossEntropy = target * Math.log(this.output) + (1 - target)*Math.log(1 - this.output);
 		
 		
 		for(int i=0; i<this.weights.length; i++) {
-			this.weights[i] += learningRate*gradient*this.input[i] + (momentum * this.previousWeightChange);
-			this.previousWeightChange = learningRate*gradient*this.input[i] + (momentum * this.previousWeightChange);
-			//System.out.println(this.weights[i]);
+			this.weights[i] += learningRate*gradient*this.input[i];
+			
 		}
 	}
 	

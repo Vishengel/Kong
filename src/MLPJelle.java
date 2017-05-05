@@ -25,10 +25,9 @@ public class MLPJelle {
 	//Define a list of output neurons
 	protected ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
-	protected double learningRate = 0.6; 
-	private double errorThreshold =  0.0000000001;
-	private double maxEpochs = 1000;  
-	private double momentum = 0; 
+	protected double learningRate = 0.05; 
+	private double errorThreshold =  0.000000003;
+	private double maxEpochs = 30000;  
 	private String fileName;
 	
 	public MLPJelle(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName) {
@@ -73,7 +72,7 @@ public class MLPJelle {
 	
 	public void initNetwork() {
 		//read the demonstration data to be learned from 
-		double[][] initialInput = FH.readFile(fileName, nInput);
+		double[][] initialInput = FH.readFile(fileName, nInput, nOutput);
 		input = new double[initialInput.length][nInput + 1];
 		//filter out the target values from the input array
 		for(int i = 0; i < initialInput.length; i++){
@@ -207,7 +206,7 @@ public class MLPJelle {
 		
 		//Update the weights for nodes in the output layer
 		for(int i = 0; i < nOutput; i++){
-			outputLayer.get(i).updateWeights(target[patternIndex][i], learningRate, momentum);
+			outputLayer.get(i).updateWeights(target[patternIndex][i], learningRate);
 			
 			//Critic cannot use getcross entropy together with the ReLU units; this causes NaN values
 			if(this instanceof Critic){
@@ -223,7 +222,7 @@ public class MLPJelle {
 			//Train each node in the hidden layer
 			for (int j=0; j<nHidden; j++) {
 				//Update the weights for each node in the hidden layer
-				hiddenList.get(i).get(j).updateWeights(target[patternIndex][i], learningRate, momentum);
+				hiddenList.get(i).get(j).updateWeights(target[patternIndex][i], learningRate);
 			}
 		}
 		//System.out.println(totalError);
@@ -274,7 +273,8 @@ public class MLPJelle {
 
 		for(int i = 0; i < nOutput; i++){
 			System.out.print("Output node " + i + ": " + outputLayer.get(i).getActivation());
-			System.out.println(" " + outputLayer.get(i).getOutput());	
+			System.out.println(" " + outputLayer.get(i).getOutput());
+			
 		}
 		return maxOutput();	
 		
@@ -361,7 +361,6 @@ public class MLPJelle {
 		//present previous state to network
 		forwardPass(state);
 		//add feedback to weights of output node
-		System.out.println("Most active node: " + mostActiveNodeIndex);
 		outputLayer.get(mostActiveNodeIndex).addFeedbackToWeights(feedback);
 		
 		/*

@@ -89,7 +89,7 @@ public class FileHandler {
 		}
 	}
 	
-	public double[][] readFile(String fileName, int nInputs){
+	public double[][] readFile(String fileName, int nInput, int nOutput){
 		BufferedReader in;
 		
 		int amountOfLines = 0;
@@ -112,11 +112,10 @@ public class FileHandler {
 	    } catch (IOException e) {
 	        System.out.println("File Read Error");
 	    }
-		double[][] inputs = new double[amountOfLines][7 + nInputs];
+		double[][] inputs = new double[amountOfLines][nInput + nOutput];
 		try {
 	        in = new BufferedReader(new FileReader("src/" + fileName + ".csv"));
 	        String str;
-	        str = in.readLine();
 	        int line = 0;
 	        while ((str = in.readLine()) != null) {
 	            String[] ar =str.split(",");

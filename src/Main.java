@@ -17,9 +17,9 @@ public class Main {
 		//fh.readFile(floats,booleans,5);
 		//n.printResults();
 		
-		//MLPJelle mlp = new MLPJelle();
+		//MLPJelle mlp = new MLPJelle(2, 1, 2, 3, "XORData");
 		//mlp.trainNetwork();
-	    //mlp.testNetwork(null);
+	    //mlp.testNetwork();
 		//mlp.printNetwork();
 		
 		/*for(int i=0; i<10; i++) {
