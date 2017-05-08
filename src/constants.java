@@ -19,7 +19,7 @@ public interface constants {
 	//boolean TEST_PHASE_DODGING = false; 
 	//boolean TEST_PHASE_CLIMBING = false;
 	
-	boolean TEST_PHASE = true;
+	boolean TEST_PHASE = true; 
 	
 	//This value determines whether the game should create the standard level, or the alternative level 
 	//created for training to jump over barrels.

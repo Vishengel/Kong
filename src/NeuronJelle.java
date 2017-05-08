@@ -9,8 +9,7 @@ public class NeuronJelle {
 	private double output;
 	private double error;
 	private double crossEntropy;
-	//store previous weight changes for momentum
-	private double previousWeightChange = 0;
+
 	
 	public NeuronJelle(int nInputs) {
 		this.nInputs = nInputs;
@@ -83,11 +82,9 @@ public class NeuronJelle {
 	}
 	
 	
-	public void setSigmoidOutputGradient(double target) {
-		this.gradient = sigmoidPrime(this.activation) * (target - this.output);
-	}
 	
-	public void setSoftmaxOutputGradient (double target) {
+	
+	public void setOutputGradient (double target) {
 		this.gradient = (target - this.output);
 	}
 	

@@ -9,8 +9,8 @@ public class GameModel implements constants {
 	private int lives = 3;
 	
 	//these values determine how fast barrels are spawned in the game
-	private int spawnTimer = 400;	
-	private int barrelSpawnTime = 400;  
+	private int spawnTimer = 500; 	
+	private int barrelSpawnTime = 500;  
 	
 	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
@@ -23,7 +23,7 @@ public class GameModel implements constants {
 	private int epochs;
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
-	private int sleepTime = 5;  
+	private int sleepTime = 15;   
 	
 	//These values determine the respective amount of inputs to the Multi-layer Perceptron for learning
 	//to climb ladders or dodging barrels
@@ -56,7 +56,6 @@ public class GameModel implements constants {
 	MLPJelle actor;
 	
 	Critic critic;
-	double discount = 0.6;
 	double[] state;
 	double[] previousState;
 	
@@ -345,10 +344,10 @@ public class GameModel implements constants {
 		//System.out.println("-----------------------------------");
 		//add bias
 		
-		for(int i = 0; i < NstateInputs; i++){
+		/*for(int i = 0; i < NstateInputs; i++){
 			System.out.print(state[i] + " ");
 		}
-		System.out.println();
+		System.out.println();*/
 		return state;
 	}
 	
@@ -359,36 +358,37 @@ public class GameModel implements constants {
 		int reward = 0;
 
 		if(gameWon){
-			reward += 1000;
-			score += 1000;
+			reward += 100;
+			score += 100;
 		}
 		if(hitByBarrel){
 			System.out.println("Hit by barrel!");
-			reward -= 700;
-			//score -= 700;	
+			reward -= 20;
+			score -= 20;	
 		}
 		
 		else if(jumpedOverBarrel){
 			System.out.println("Jumped over a barrel!");
-			reward += 150;
-			//score += 150;
+			reward += 10;
+			score += 10;
 		}
 		else if(destroyedBarrel){
 			System.out.println("Smashed a barrel!");
-			reward += 100;
-			//score += 100;
+			reward += 10;
+			score += 10;
 		}
 		
 		if(touchedPowerUp){
 			System.out.println("Picked up powerup!");
-			reward += 10;
-			//score += 10;
+			reward += 5;
+			score += 5;
 		}
-		
-		if(steppedOnLadder){
-			reward += 30;
+		//reward -= 0.1;
+		//score -= 0.1;
+		//if(steppedOnLadder){
+			//reward += 30;
 			//score += 30;
-		}
+		//}
 		hitByBarrel = false;
 		gameWon = false;
 		touchedPowerUp = false;
@@ -433,7 +433,11 @@ public class GameModel implements constants {
 		
 		double reward = 0;
 		double feedback = 0;
+		int previousAction = 0;
+		double previousEpoch = 0;
 		while(!gameWon){
+			System.out.println("--------------------------");
+			System.out.println("Current epoch: " + epochs);
 			//calculate the inputs to the MLP's 
 			//climbInputs = calculateClimbInputs();
 			//dodgeInputs = calculateDodgeInputs();
@@ -508,16 +512,16 @@ public class GameModel implements constants {
 			//in the current state
 			state = calculateState();		
 			if(!constants.DEMO_PHASE){
-				critic.trainCritic(state, previousState, reward);
+				critic.trainCritic(state, previousState, reward, mario.isKilled());
 				//calculate the critic's feedback
-				//feedback = critic.calculateFeedback(state, previousState, reward);
+				feedback = critic.calculateFeedback(state, previousState, reward, mario.isKilled());
+				//System.out.println("Previous epoch: " + previousEpoch);
+				//System.out.println("Feedback: " + feedback);
 				//backpropagate the feedback to the actor in the form of a TD-error (Temporal-Difference)
+				actor.propagateFeedback(previousState, feedback, previousAction);
 				
 			}
 			
-			//System.out.print("Epoch: " + epochs);
-			//System.out.print(" Reward: " + reward);
-			//System.out.println(" Value: " + critic.outputLayer.get(0).getOutput());
 				
 			
 			for(int i = 0; i < MOList.size(); i++){
@@ -567,8 +571,9 @@ public class GameModel implements constants {
 					}
 			}
 			
+			//calculate the reward for the current state 
 			reward = calculateReward(); 
-			
+			System.out.println("Reward received: " + reward);
 			/*if(flame != null) {
 				//The flame's direction depends on the player's direction, so we handle that here
 				flame.setDirection(mario.getXPos(), mario.getYPos());
@@ -578,7 +583,7 @@ public class GameModel implements constants {
 			if(GUI_ON){
 				Thread.sleep(sleepTime);
 			}
-			epochs++;
+			
 			if(constants.DEMO_PHASE){
 				state[NstateInputs + mario.getAction()] = 1.0;
 				trainingSet.add(state);
@@ -594,6 +599,10 @@ public class GameModel implements constants {
 			*/
 			//this state becomes the previous state in the next iteration
 			previousState = Arrays.copyOf(state, state.length);
+			//previousEpoch = epochs;
+			//The action taken in this state becomes the previous action
+			previousAction = mario.getAction();
+			epochs++;
 			
 		}
 		

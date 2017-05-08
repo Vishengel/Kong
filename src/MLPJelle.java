@@ -177,8 +177,12 @@ public class MLPJelle {
 		}
 		
 		for (NeuronJelle n : outputLayer) {
-			//Don't use softmax for regression in the critic 
-			if(!(this instanceof Critic)){
+			//Use linear activation for the Critic
+			if(this instanceof Critic){
+				n.setOutput(n.getActivation());
+			}
+			//Use softmax for the Actor 
+			else{
 				n.setSoftmaxOutput(outputLayer);
 			}
 			//softmaxSum += n.getOutput();
@@ -192,12 +196,7 @@ public class MLPJelle {
 		
 		//Calculate gradients for nodes in the output layer
 		for(int i = 0; i < nOutput; i++){
-			//outputLayer.get(i).setSigmoidOutputGradient(target[patternIndex][i]);
-			
-			//The critic doesn't use the softmax function
-			if(!(this instanceof Critic)){
-				outputLayer.get(i).setSoftmaxOutputGradient(target[patternIndex][i]);
-			}
+			outputLayer.get(i).setOutputGradient(target[patternIndex][i]);		
 		}
 		
 		nextLayer = outputLayer;
@@ -245,6 +244,24 @@ public class MLPJelle {
 		}
 		
 		return 0;
+	}
+	
+	public void propagateFeedback(double[] state, double feedback, int action){
+		System.out.println("Action used: " + action);
+		//Create the new targets, using the feedback from the critic: 
+		target = new double[1][nOutput];
+		//new_target = old_target + feedback
+		for(int i = 0; i < nOutput; i++){
+			target[0][i] = outputLayer.get(i).getOutput();
+		}
+		//Action taken in previous state has to be positively or negatively reinforced
+		target[0][action] = target[0][action] + feedback; 
+		for(int i = 0; i < nOutput; i++){
+			System.out.println("New target: " + target[0][i]);
+		} 
+		//Present the state, then backpropagate for improvement
+		forwardPass(state); 
+		backwardPass(0);
 	}
 	
 	public int maxOutput(){
