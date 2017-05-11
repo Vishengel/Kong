@@ -20,7 +20,8 @@ public class GameModel implements constants {
 	private int powerupIndex = -1;
 	
 	//This value determines for how many epochs the game has been running already
-	private int epochs;
+	private int epochs = 0;
+	private int maxEpochs = 1;
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
 	private int sleepTime = 5; 
@@ -433,7 +434,9 @@ public class GameModel implements constants {
 		
 		double reward = 0;
 		double feedback = 0;
-		while(!gameWon){
+
+		//while(!gameWon){
+		while (epochs < maxEpochs) {
 			//calculate the inputs to the MLP's 
 			//climbInputs = calculateClimbInputs();
 			//dodgeInputs = calculateDodgeInputs();
@@ -578,7 +581,7 @@ public class GameModel implements constants {
 			if(GUI_ON){
 				Thread.sleep(sleepTime);
 			}
-			epochs++;
+			
 			if(constants.DEMO_PHASE){
 				state[NstateInputs + mario.getAction()] = 1.0;
 				trainingSet.add(state);
@@ -595,10 +598,13 @@ public class GameModel implements constants {
 			//this state becomes the previous state in the next iteration
 			previousState = Arrays.copyOf(state, state.length);
 			
+			epochs++;
 		}
 		
 		if(constants.DEMO_PHASE){
-			fh.writeToFile(trainingSet, "trainingSet");
+			//fh.writeToFile(trainingSet, "trainingSet");
+			fh.writeGameStateToFile(MOCollection, PUCollection, platformList, ladderList, peach, oil, flame, "./TrainingData/gameStateData");
+			System.out.println("Game states written to file");
 		}
 
 		//write entire state-action array to training file(s)

@@ -13,7 +13,7 @@ public class Player extends MovingObject{
 	private boolean jumping = false;
 	private float jumpHeight = 2.6f;
 	private boolean hasWon = false;
-	private boolean isKilled = false;
+	//private boolean isKilled = false;
 	
     
 	public Player(int x, int y, int h, int w) {
@@ -179,6 +179,11 @@ public void move(){
 	public boolean jump() {
 		return jump;
 	}
+	
+	public boolean getIsJumping() {
+		return jumping;
+	}
+	
 	public void setJump(boolean b){
 		jumping = b;
 	}

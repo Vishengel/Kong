@@ -34,6 +34,8 @@ public class Main {
 		MLP mlp = new MLP();
 		mlp.trainNetwork();
 		*/
+		
+		//JSONTest jt = new JSONTest();
 
 	}
 }

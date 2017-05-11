@@ -98,6 +98,10 @@ public abstract class MovingObject extends GameObject{
 		return falling;
 	}
 	
+	public boolean getIsKilled() {
+		return isKilled;
+	}
+	
 	public void setLadderXPos(float ladderXPos) {
 		this.ladderXPos = ladderXPos;
 	}

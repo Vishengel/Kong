@@ -11,7 +11,7 @@ public interface constants {
 	//boolean DEMO_PHASE_DODGING = false; 
 	//boolean DEMO_PHASE_CLIMBING = false;  
 	
-	boolean DEMO_PHASE = false;
+	boolean DEMO_PHASE = true;
 	
 	boolean RANDOM_ACTOR = false;
 		
@@ -19,11 +19,11 @@ public interface constants {
 	//boolean TEST_PHASE_DODGING = false; 
 	//boolean TEST_PHASE_CLIMBING = false;
 	
-	boolean TEST_PHASE = true;
+	boolean TEST_PHASE = false;
 	
 	//This value determines whether the game should create the standard level, or the alternative level 
 	//created for training to jump over barrels.
-	boolean BARREL_TRAINING = true;
+	boolean BARREL_TRAINING = false;
 	
 	//This value determines whether Mario can die in the game when touching a barrel
 	boolean DEATH = true;
