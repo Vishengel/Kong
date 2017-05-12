@@ -18,20 +18,30 @@ public abstract class MovingObject extends GameObject{
 	protected boolean isClimbing = false;
 	protected boolean canClimb = false;
 	protected boolean standing = false;
+	protected boolean jumping = false;
 	protected boolean falling = false;
 	protected boolean pointAwarded = true;
 	protected boolean isKilled = false;
 	protected boolean firstCanClimb = true;
 	protected boolean collidingWithTop;
+	protected boolean hasWon = false;
 	protected Random random;
 	
 	//represents the action that the object can take
 	protected int action;
 	
-	
 	public MovingObject(int x, int y, int h, int w) {
 		super(x, y, h, w);	
 		random = new Random();
+	}
+	
+	public MovingObject(MovingObject MO) {
+		super(MO);
+		this.isClimbing = MO.isClimbing();
+		this.canClimb = MO.getCanClimb();
+		this.standing = MO.getStanding();
+		this.falling = MO.getFalling();
+		this.isKilled = MO.getIsKilled();
 	}
 	
 	public void act(){
@@ -114,11 +124,23 @@ public abstract class MovingObject extends GameObject{
 		this.standing = standing;
 	}
 	
+	public boolean isJumping() {
+		return jumping;
+	}
+	
+	public void setJump(boolean b){
+		jumping = b;
+	}
+	
+	public boolean hasWon(){
+		return hasWon;
+	}
+	
 	public boolean getCanClimb() {
 		return canClimb;
 	}
 	
-	public boolean getIsClimbing() {
+	public boolean isClimbing() {
 		return isClimbing;
 	}
 	
@@ -126,8 +148,16 @@ public abstract class MovingObject extends GameObject{
 		this.isClimbing = isClimbing;
 	}
 	
+	public boolean getFalling() {
+		return falling;
+	}
+	
 	public void setFirstCanClimb(boolean firstCanClimb) {
 		this.firstCanClimb = firstCanClimb;
+	}
+	
+	public boolean isKilled(){
+		return isKilled;
 	}
 	
 	public boolean getCollidingWithTop() {

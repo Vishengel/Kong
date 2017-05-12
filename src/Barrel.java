@@ -14,6 +14,15 @@ public class Barrel extends MovingObject{
 		name = "barrel";
 	}
 	
+	public Barrel(MovingObject MO) {
+		super(MO);
+		this.action = action;
+		xVel = 1.5f;
+		yVel = 1.7f;
+		pointAwarded = false;
+		name = "barrel";
+	}
+	
 	/*actions: 
 	0 : move left
 	1 : move right
