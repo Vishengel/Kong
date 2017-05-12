@@ -10,7 +10,7 @@ public class GameModel implements constants {
 	
 	//these values determine how fast barrels are spawned in the game
 	private int spawnTimer = 100;	
-	private int barrelSpawnTime = -1;  
+	private int barrelSpawnTime = 100;  
 	
 	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
@@ -21,10 +21,10 @@ public class GameModel implements constants {
 	
 	//This value determines for how many epochs the game has been running already
 	private int epochs = 0;
-	private int maxEpochs = 1;
+	private int maxEpochs = 2;
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
-	private int sleepTime = 5; 
+	private int sleepTime = 15; 
 	
 	//These values determine the respective amount of inputs to the Multi-layer Perceptron for learning
 	//to climb ladders or dodging barrels
@@ -403,9 +403,9 @@ public class GameModel implements constants {
 	
 	//main game loop
 	public void runGame() throws InterruptedException, IOException{
-		//double[] climbInputs;
-		//double[] dodgeInputs;
 		double[] testInputs;
+		double reward = 0;
+		double feedback = 0;
 		
 		state = new double[NstateInputs];
 		previousState = new double[NstateInputs];
@@ -418,22 +418,6 @@ public class GameModel implements constants {
 		if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){
 			actor.trainNetwork();
 		}
-		
-		
-		//Create the MLP's and train them on their respective training datasets
-		/*if(constants.TEST_PHASE_DODGING){
-			dodgeMLP = new MLPJelle(nInputsDodge, 2, 70, nOutputs, "dodgeData");
-			dodgeMLP.trainNetwork();
-		}
-		if(constants.TEST_PHASE_CLIMBING){
-			climbMLP = new MLPJelle(nInputsClimb, 1, 70, nOutputs, "climbData");
-			climbMLP.trainNetwork();
-		}*/
-		
-		
-		
-		double reward = 0;
-		double feedback = 0;
 
 		//while(!gameWon){
 		while (epochs < maxEpochs) {
@@ -443,8 +427,8 @@ public class GameModel implements constants {
 			
 			
 			if(constants.DEMO_PHASE){
-				MOCollection.add(MOList);
-				PUCollection.add(PUList);
+				MOCollection.add(copyMOList());
+				PUCollection.add(copyPUList());
 			}
 			
 			//reset mario's action when standing
@@ -707,12 +691,12 @@ public class GameModel implements constants {
 			if(!MO.getStanding()){
 				if(isColliding){ 
 
-					if(!(MO.getIsClimbing() && platform.getHasLadder())) {
+					if(!(MO.isClimbing() && platform.getHasLadder())) {
 						//make object stand exactly on top of the platform 
 						MO.setStanding(true);
 		
 						//make object stand exactly on top of the platform, unless climbing on ladder
-						if(!MO.getIsClimbing()){
+						if(!MO.isClimbing()){
 							MO.setYPos(platform.getYPos() - MO.getHeight());
 						}
 	
@@ -1021,6 +1005,31 @@ public class GameModel implements constants {
 		}
 		//add objects to list of moving objects
 		MOList.add(mario);	
+	}
+	
+	private ArrayList<MovingObject> copyMOList() {
+		ArrayList<MovingObject> MOListCopy = new ArrayList<MovingObject>();
+		
+		for(MovingObject MO : this.MOList) {
+			if(MO.getName() == "player") {
+				MOListCopy.add(new Player(MO));
+			} else if(MO.getName() == "barrel") {
+				MOListCopy.add(new Barrel(MO));
+			}
+		}
+		
+		return MOListCopy;
+		
+	}
+	
+	private ArrayList<Powerup> copyPUList() {
+		ArrayList<Powerup> PUListCopy = new ArrayList<Powerup>();
+		
+		for(Powerup PU : this.PUList) {
+			PUListCopy.add(new Powerup(PU));
+		}
+		
+		return PUListCopy;
 	}
 	
 	public void setPlayerAction(int action){

@@ -3,11 +3,11 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import com.google.gson.*;
 
 public class FileHandler {
+	private String filePath;
 	
 	//write action in binary form to file
 	/*public void writeActionToFile(FileWriter fw, int action) throws IOException{
@@ -68,48 +68,60 @@ public class FileHandler {
 		
 		try
 		{
-		    String filePath= "src/" + fileName + ".json";
+		    this.filePath= "src/" + fileName + ".json";
 		    FileWriter fw = new FileWriter(filePath,true);
 		    BufferedWriter out = new BufferedWriter(fw);
 		    Gson gson = new GsonBuilder().create();
 		    
 		    JsonObject trainingData = new JsonObject();
-		    //JsonObject stateList = new JsonObject();
+		    JsonArray stateList = new JsonArray();
 		    JsonObject state;
 		    JsonObject MOJson;
+		    JsonArray barrelList;
 		    JsonObject PUJson;
+		    JsonArray powerupList;
 		    
 		    for (ArrayList<MovingObject> MOList : MOCollection) {
 		    	state = new JsonObject();
-		    	System.out.println(MOList.get(0).getXPos());
+		    	barrelList = new JsonArray();
+		    	powerupList = new JsonArray();
+
+		    	int bc = 0;
 		    	for (MovingObject MO : MOList) {
 		    		MOJson = new JsonObject();
 		    		if (MO.getName() == "player") {	    			    			
 		    			MOJson.addProperty("xPos", MO.getXPos());
 		    			MOJson.addProperty("yPos", MO.getYPos());
 		    			MOJson.addProperty("action", MO.getAction());
-			    		//player.addProperty("isJumping", MO.getIsJumping());
-		    			MOJson.addProperty("isClimbing", MO.getIsClimbing());
+			    		MOJson.addProperty("isJumping", MO.isJumping());
+		    			MOJson.addProperty("isClimbing", MO.isClimbing());
 		    			MOJson.addProperty("isStanding", MO.getStanding());
-		    			MOJson.addProperty("isKilled", MO.getIsKilled());
-			    		//player.addProperty("hasWon", MO.getHasWon);
+		    			MOJson.addProperty("isKilled", MO.isKilled());
+			    		MOJson.addProperty("hasWon", MO.hasWon());
+			    		state.add("player", MOJson);
 		    		} else if (MO.getName() == "barrel") {
 		    			MOJson.addProperty("xPos", MO.getXPos());
 		    			MOJson.addProperty("yPos", MO.getYPos());
+		    			//We use the bc ("barrel counter") to give the barrels a unique name
+		    			barrelList.add(MOJson);
 		    		}
-		    		state.add(MO.getName(), MOJson);
+		    		
 		    	}
+		    	state.add("barrelList", barrelList);
 		    	
 		    	for (Powerup PU : PUCollection.get(MOCollection.indexOf(MOList))) {
 		    		PUJson = new JsonObject();
 		    		PUJson.addProperty("xPos", PU.getXPos());
 		    		PUJson.addProperty("yPos", PU.getYPos());
-		    		state.add("powerup", PUJson);
+		    		powerupList.add(PUJson);
 		    	}
+		    	state.add("powerupList", powerupList);
 		    	
-		    	gson.toJson(state, out);
+		    	stateList.add(state);
 		    	
 		    }
+		    
+		    trainingData.add("stateList", stateList);
 		    
 		    JsonObject staticObjects = new JsonObject();
 		    
@@ -144,7 +156,7 @@ public class FileHandler {
 		    
 		    trainingData.add("staticObjects", staticObjects);
 		    
-		    //gson.toJson(trainingData, out);
+		    gson.toJson(trainingData, out);
 		    
 		    //out.write(MOCollection.get(0).get(0).getXPos() + "");
 		    //write the inputs to the file
@@ -214,6 +226,11 @@ public class FileHandler {
 		}*/
 		return inputs;
 	}
+	
+	public String getFilePath() {
+		return this.filePath;
+	}
+
 }
 
     

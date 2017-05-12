@@ -11,12 +11,18 @@ public abstract class GameObject {
 	protected Color color;
 	protected boolean isSolid;
 	protected String name;
+	
 	public GameObject(int x, int y, int h, int w){
 		xPos = x;
 		yPos = y;
 		height = h;
 		width = w;
 		
+	}
+	
+	public GameObject(GameObject GO) {
+		this.xPos = GO.getXPos();
+		this.yPos = GO.getYPos();
 	}
 	
 	public float getXPos(){
