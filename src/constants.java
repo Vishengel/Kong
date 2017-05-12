@@ -62,8 +62,8 @@ public interface constants {
 	//barrel position and dimensions
 	int BARREL_START_X = 120;
 	int BARREL_START_Y = 250;	
-	int BARREL_HEIGHT = 10;
-	int BARREL_WIDTH = 10;
+	int BARREL_HEIGHT = 13;
+	int BARREL_WIDTH = 13;
 	
 	//powerup dimensions
 	int POWERUP_HEIGHT = 27;

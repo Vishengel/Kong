@@ -9,8 +9,8 @@ public class GameModel implements constants {
 	private int lives = 3;
 	
 	//these values determine how fast barrels are spawned in the game
-	private int spawnTimer = 500; 	
-	private int barrelSpawnTime = 500;  
+	private int spawnTimer = 150; 	
+	private int barrelSpawnTime = 150;    
 	
 	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
@@ -20,10 +20,11 @@ public class GameModel implements constants {
 	private int powerupIndex = -1;
 	
 	//This value determines for how many epochs the game has been running already
-	private int epochs;
+	private int epochs = 0;
+	private double temperature = 1;   
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
-	private int sleepTime = 15;   
+	private int sleepTime = 5;   
 	
 	//These values determine the respective amount of inputs to the Multi-layer Perceptron for learning
 	//to climb ladders or dodging barrels
@@ -31,7 +32,7 @@ public class GameModel implements constants {
 	//private int nInputsDodge = 2;
 	
 	
-	private int NstateInputs = 12;
+	private int NstateInputs = 103;
 
 	private int nOutputs = 7;
 	
@@ -67,6 +68,7 @@ public class GameModel implements constants {
 	
 	private boolean powerupActivated = false;
 	
+	private VisionGrid visionGrid = new VisionGrid(constants.PLAYER_START_X, constants.PLAYER_START_Y, 160, 200, 5);
 	
 	//These values determine the rewards 
 	private boolean gameWon = false;
@@ -123,166 +125,9 @@ public class GameModel implements constants {
 			
 	}
 	
-	//This function returns the Euclidean distance between two game objects
-	public float getEuclideanDistance(GameObject go1, GameObject go2) {
-		float x1 = go1.getXPos() + go1.getWidth() / 2;
-		float x2 = go2.getXPos() + go2.getWidth() / 2;
-		float y1 = go1.getYPos() + go1.getHeight() / 2;
-		float y2 = go2.getYPos() + go2.getHeight() / 2;
-		return (float) Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) );
-	}
+
 	
 	
-	//Find the distance between Mario and another closest object
-	public float findNearestObject(String objectName){
-		float minimumDistance = 300;
-		if(objectName == "ladder"){
-			for(int i = 0; i < ladderList.size(); i++){
-				Ladder l = ladderList.get(i);
-				float distance = getEuclideanDistance(mario,ladderList.get(i));
-				//only do this if the platform is between the top and middle of mario
-				if(distance < minimumDistance && (l.getYPos() + l.getHeight()) > mario.getYPos()
-				&& (l.getYPos() + l.getHeight()) < (mario.getYPos() + mario.getHeight() / 2)){
-					minimumDistance = distance;
-					if(mario.getXPos() <= l.getXPos()){
-						ladderRight = 1;				
-					}
-					else{
-						ladderRight = 0;
-					}
-				}
-				
-			}
-			
-		}
-		//distance between Mario and closest powerup
-		else if(objectName == "powerup"){
-			for(int i = 0; i < PUList.size(); i++){
-				float distance = getEuclideanDistance(mario,PUList.get(i));
-				if(distance < minimumDistance){
-					minimumDistance = distance;
-				}
-			}		
-		}
-		
-		else if(objectName == "barrel"){
-			for(int i = 0; i < MOList.size(); i++){
-				if(MOList.get(i).getName() == "barrel"){
-					Barrel b = (Barrel) MOList.get(i);
-					float distance = getEuclideanDistance(mario,MOList.get(i));
-					
-					//only consider barrels that still wield a point when jumped over; 
-					//don't look at barrels that are no longer a threat
-					if(distance < minimumDistance && !b.pointAwarded()){
-							minimumDistance = distance;
-							//check if barrel is to the left or to the right
-							if(mario.getXPos() <= b.getXPos()){
-								barrelRight = 1;
-							}
-							else{
-								barrelRight = -1;
-							}
-					//if barrel is on the same level
-					if((b.getYPos() + b.getHeight()) >= (mario.getYPos())
-					    && (b.getYPos() + b.getHeight()) <= (mario.getYPos() + mario.getHeight()) ){
-					    	barrelOnSameLevel = 1;							
-					}
-					else{
-						barrelOnSameLevel = -1;
-					}
-					if(b.isClimbing){
-						barrelClimbing = 1;
-					}
-					else{
-						barrelClimbing = -1;
-					}
-				}
-			}
-		}
-	  }
-		return minimumDistance;
-	}
-	
-	public float normalizeForLadders(float distance){
-		if(distance < 15){
-			return 1;
-			
-		}
-		else if(distance >= 15 && distance < 200){
-			return 0;
-		}
-		else{
-			return -1;
-		}
-		//return (distance < 500? (500-distance)/500 : 500);
-	}
-	
-	/*public double[] calculateClimbInputs(){
-		//this array contains the 3 boolean and 5 float inputs for the ladder climbing MLP
-		double[] climbInputs = new double[nInputsClimb + nOutputs];
-		
-		//climb mlp inputs
-		climbInputs[0] = mario.isClimbing() ? 1 : -1;
-		//calculate distance to nearest ladder
-		climbInputs[1] = normalize(findNearestObject("ladder"));	
-		climbInputs[2] = ladderRight;	
-		climbInputs[3] = normalizeForDodging(findNearestObject("barrel"));
-		climbInputs[4] = barrelRight;
-		climbInputs[5] = barrelClimbing;
-		climbInputs[6] = barrelOnSameLevel;
-		//calculate distance to peach 
-		//climbInputs[3] = normalize(getEuclideanDistance(mario, peach));
-		
-		/*System.out.println("1: Mario is climbing: " + mario.isClimbing());
-		System.out.println("2: Nearest Ladder: " + climbInputs[1]);
-		System.out.println("3: Ladder is to the right: " + climbInputs[2]);
-		System.out.println("4: Nearest barrel? " + climbInputs[3]);
-		System.out.println("5: Barrel to right? " + climbInputs[4]);
-		System.out.println("6: Barrel climbing? " + climbInputs[5]);
-		System.out.println("7: Barrel on same level? " + climbInputs[6]);
-		*/
-		//System.out.println("Distance to peach: " + climbInputs[3]);
-		
-		
-		//return climbInputs;
-	//}  
-	
-	public float normalizeForDodging(float distance){
-		if(distance < 130){
-			return 1;
-			
-		}
-		else if(distance >= 15 && distance < 200){
-			return 0;
-		}
-		else{
-			return -1;
-		}
-	}
-	
-	public float normalizepowerup(float distance){
-		if(distance <= 45){
-			return 1;
-		}
-		else if(distance >= 45 && distance < 90){
-			return 0;
-		}
-		else{
-			return -1;
-		}
-	}
-	
-	public float normalizePeach(float distance){
-		if(distance <= 80){
-			return 1;
-		}
-		else if(distance >= 80 && distance < 120){
-			return 0;
-		}
-		else{
-			return -1;
-		}
-	}
 	
 	//This function calculates the inputs necessary for dodging barrels
 	/*public double[] calculateDodgeInputs(){
@@ -298,57 +143,30 @@ public class GameModel implements constants {
 	
 	public double[] calculateState(){
 		double[] state = new double[NstateInputs + nOutputs];
-		//System.out.println(state.length);
+		//Check whether or not barrels / ladders are in the grid's blocks
+		checkDetections();
 		
-		//state variables about ladders, climbing and jumping
-		//System.out.println("-----------------------------------");
-		//1 if mario is jumping, -1 otherwise
-		state[0] = mario.isJumping() ? 1 : -1;
-		//System.out.println("Mario jumping: " + state[0]);
-		//1 if mario is climbing, -1 otherwise
-		state[1] = mario.isClimbing() ? 1 : -1;
-		//System.out.println("Mario climbing: " + state[1]);
-		//categorical distance to nearest ladder
-		state[2] = normalizeForLadders(findNearestObject("ladder"));
-		//System.out.println("Nearest ladder: " + state[2]);
-		//1 if nearest ladder is to the right of mario, -1 otherwise
-		state[3] = ladderRight;	
-		//System.out.println("Ladder right?: " + state[3]);
-		
-		//state variables about barrels and jumping
-		//categorical distance to nearest barrel
-		state[4] = normalizeForDodging(findNearestObject("barrel"));
-		//System.out.println("Nearest barrel: " + state[4]);
-		//1 if closest barrel is to the right of mario, -1 if not
-		state[5] = barrelRight;
-		//System.out.println("Barrel right?: " + state[5]);
-		//1 if the closest barrel is rolling down a ladder, -1 if not
-		state[6] = barrelClimbing;
-		//System.out.println("Barrel on ladder?: " + state[6]);
-		//1 if the nearest barrel is on the same platform level as mario, -1 if not
-		state[7] = barrelOnSameLevel;
-		//System.out.println("Barrel on same level?: " + state[7]);
-		//state variables about powerups
-		//categorical distance to nearest powerup
-		state[8] = normalizepowerup(findNearestObject("powerup"));
-		//System.out.println("Nearest powerup: " + state[8]);
-		//1 if mario is powered up and can destroy barrel, -1 if not
-		state[9] = powerupActivated ? 1 : -1;	
-		//System.out.println("Powered-up?: " + state[9]);
-		//categorical distance to peach
-		state[10] = normalizePeach(getEuclideanDistance(mario, peach));
-		//System.out.println("Distance to peach?: " + state[10]);
-		
-		state[NstateInputs - 1] = -1;
-		//System.out.println("Bias: " + state[NstateInputs - 1]);
-		//System.out.println("-----------------------------------");
-		//add bias
-		
-		/*for(int i = 0; i < NstateInputs; i++){
-			System.out.print(state[i] + " ");
+		//fill the state array with the detections inputs of the vision grid
+		for(int i = 0; i < (NstateInputs - 3) / 4; i++){
+			state[i] = visionGrid.getBarrelInputs()[i];
 		}
-		System.out.println();*/
+		for(int i = 0; i < (NstateInputs - 3) / 4; i++){
+			state[i + (NstateInputs - 3) / 4] = visionGrid.getLadderInputs()[i];
+		}
+		for(int i = 0; i < (NstateInputs - 3) / 4; i++){
+			state[i + (NstateInputs - 3) / 2] = visionGrid.getPowerupInputs()[i];
+		}
+		for(int i = 0; i < (NstateInputs - 3) / 4; i++){
+			state[i + (NstateInputs - 3) / 2 + (NstateInputs - 3) / 4] = visionGrid.getPeachInputs()[i];
+		}
+		
+		state[NstateInputs - 3] = mario.isClimbing() ? 1 : 0;
+		//System.out.println("Climbing: " + state[NstateInputs - 3]);
+		state[NstateInputs - 2] = powerupActivated ? 1 : 0;
+		//System.out.println("Powered-up: " + state[NstateInputs - 2]);
+		state[NstateInputs - 1] = -1;
 		return state;
+		
 	}
 	
 	
@@ -358,33 +176,36 @@ public class GameModel implements constants {
 		int reward = 0;
 
 		if(gameWon){
-			reward += 100;
-			score += 100;
+			reward += 40;
+			score += 40;
 		}
 		if(hitByBarrel){
 			System.out.println("Hit by barrel!");
-			reward -= 20;
-			score -= 20;	
+			reward -= 10;
+			score -= 10;	
 		}
 		
 		else if(jumpedOverBarrel){
 			System.out.println("Jumped over a barrel!");
-			reward += 10;
-			score += 10;
+			reward += 4;
+			score += 4;
 		}
 		else if(destroyedBarrel){
 			System.out.println("Smashed a barrel!");
-			reward += 10;
-			score += 10;
+			reward += 3;
+			score += 3;
 		}
 		
 		if(touchedPowerUp){
 			System.out.println("Picked up powerup!");
-			reward += 5;
-			score += 5;
+			reward += 1;
+			score += 1;
 		}
 		//reward -= 0.1;
 		//score -= 0.1;
+	    /*if(mario.isClimbing()){
+			reward++;
+		}*/
 		//if(steppedOnLadder){
 			//reward += 30;
 			//score += 30;
@@ -399,6 +220,10 @@ public class GameModel implements constants {
 		return reward;
 	}
 	
+	public void reduceTemperature(){
+		temperature = (temperature > 1? temperature * 0.999: 1);
+		
+	}
 	
 	//main game loop
 	public void runGame() throws InterruptedException, IOException{
@@ -411,37 +236,36 @@ public class GameModel implements constants {
 		
 		//don't create the actor and critic if in the demonstration phase
 		if(!constants.DEMO_PHASE){
-			actor = new MLPJelle(NstateInputs, 1, 70, nOutputs, "trainingSet");
-			critic = new Critic(NstateInputs, 1, 50, 1, "");
+			actor = new MLPJelle(NstateInputs, 1, 70, nOutputs, "trainingSet2");
+			critic = new Critic(NstateInputs, 1, 70, 1, "");
 		}
 		if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){
 			actor.trainNetwork();
 		}
-		
-		
-		//Create the MLP's and train them on their respective training datasets
-		/*if(constants.TEST_PHASE_DODGING){
-			dodgeMLP = new MLPJelle(nInputsDodge, 2, 70, nOutputs, "dodgeData");
-			dodgeMLP.trainNetwork();
-		}
-		if(constants.TEST_PHASE_CLIMBING){
-			climbMLP = new MLPJelle(nInputsClimb, 1, 70, nOutputs, "climbData");
-			climbMLP.trainNetwork();
-		}*/
-		
-		
 		
 		double reward = 0;
 		double feedback = 0;
 		int previousAction = 0;
 		double previousEpoch = 0;
 		while(!gameWon){
-			System.out.println("--------------------------");
-			System.out.println("Current epoch: " + epochs);
-			//calculate the inputs to the MLP's 
-			//climbInputs = calculateClimbInputs();
-			//dodgeInputs = calculateDodgeInputs();
+			System.out.println("Temperature: " + temperature);
+			epochs++;
+			//reset the vision grid 
+			visionGrid.resetDetections();
+			//If sufficient epochs have been reached, slow down game model for better inspection of performance
+			if(epochs >= 400000){
+				sleepTime = 4;
+			}
+			//System.out.println("-----------" + temperature + "-----------");
+			//System.out.println("--------------------------");
+			//System.out.println("Current epoch: " + epochs);
 			
+			//Add temperature to the actor
+			if(!constants.DEMO_PHASE){
+				actor.setTemperature(temperature);
+			}
+			//lower the temperature
+			reduceTemperature();
 			
 			if(constants.DEMO_PHASE){
 				MOCollection.add(MOList);
@@ -452,7 +276,7 @@ public class GameModel implements constants {
 			if(mario.standing){
 				mario.setAction(0);
 			}
-			if(constants.TEST_PHASE && !mario.isJumping()){
+			if(constants.TEST_PHASE && !mario.isJumping()){ 
 				testInputs = Arrays.copyOfRange(state, 0, NstateInputs);
 				mario.setAction(actor.presentInput(testInputs));
 			}
@@ -512,13 +336,14 @@ public class GameModel implements constants {
 			//in the current state
 			state = calculateState();		
 			if(!constants.DEMO_PHASE){
-				critic.trainCritic(state, previousState, reward, mario.isKilled());
 				//calculate the critic's feedback
 				feedback = critic.calculateFeedback(state, previousState, reward, mario.isKilled());
 				//System.out.println("Previous epoch: " + previousEpoch);
 				//System.out.println("Feedback: " + feedback);
 				//backpropagate the feedback to the actor in the form of a TD-error (Temporal-Difference)
 				actor.propagateFeedback(previousState, feedback, previousAction);
+				//train the critic
+				critic.trainCritic(state, previousState, reward, mario.isKilled());
 				
 			}
 			
@@ -571,9 +396,13 @@ public class GameModel implements constants {
 					}
 			}
 			
+			//Move vision grid to mario's new position
+			visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
+			//System.out.println("X: " + visionGrid.getBlocks().get(0).getXPos());
+			//System.out.println("Y: " + visionGrid.getBlocks().get(0).getYPos());
 			//calculate the reward for the current state 
 			reward = calculateReward(); 
-			System.out.println("Reward received: " + reward);
+			//System.out.println("Reward received: " + reward);
 			/*if(flame != null) {
 				//The flame's direction depends on the player's direction, so we handle that here
 				flame.setDirection(mario.getXPos(), mario.getYPos());
@@ -607,7 +436,8 @@ public class GameModel implements constants {
 		}
 		
 		if(constants.DEMO_PHASE){
-			fh.writeToFile(trainingSet, "trainingSet");
+			fh.writeToFile(trainingSet, "trainingSet2");
+			System.out.println("Written to file!");
 		}
 
 		//write entire state-action array to training file(s)
@@ -776,7 +606,7 @@ public class GameModel implements constants {
 		ladderList =  new ArrayList<Ladder>();
 		PUList = new ArrayList<Powerup>();
 		
-	
+		
 		
 		if(constants.BARREL_TRAINING){
 			initBarrelTestLevel();
@@ -1059,7 +889,39 @@ public class GameModel implements constants {
 		return score;
 	}
 
+	public VisionGrid getVisionGrid() {
+		return visionGrid;
+	}
 	
+	//Check if any barrels or ladders are detected in the blocks of the vision grid
+	public void checkDetections(){
+		//for every block, check if a barrel or ladder is inside 
+		for(VisionBlock b : visionGrid.getBlocks()){
+			//detect barrels
+			for(int i = 1; i < MOList.size(); i++){
+				if(isColliding(b, MOList.get(i))){
+					b.barrelDetected(1);
+				}
+			}
+			//detect ladders
+			for(int i = 0; i < ladderList.size(); i++){
+				if(isColliding(b, ladderList.get(i))){
+					b.ladderDetected(1);
+				}
+			}
+			
+			//detect powerups
+			for(int i = 0; i < PUList.size(); i++){
+				if(isColliding(b, PUList.get(i))){
+					b.powerupDetected(1);
+				}
+			}
+			//detect peach
+			if(isColliding(b, peach)){
+				b.peachDetected(1);
+			}
+		}
+	}
 	
 	
 }

@@ -60,8 +60,8 @@ public class NeuronJelle {
 		this.output = sigmoid(this.activation);
 	}
 	
-	public void setSoftmaxOutput(ArrayList<NeuronJelle> outputLayer) {
-		this.output = softmax(this.activation, outputLayer);
+	public void setSoftmaxOutput(ArrayList<NeuronJelle> outputLayer, double temperature) {
+		this.output = softmax(this.activation, outputLayer, temperature);
 	}
 	
 	public double getGradient() {
@@ -131,14 +131,14 @@ public class NeuronJelle {
 		return 1 - Math.pow(tanh(activation), 2);
 	}
 	
-	public double softmax(double activation, ArrayList<NeuronJelle> outputLayer) {
+	public double softmax(double activation, ArrayList<NeuronJelle> outputLayer, double temperature) {
 		double activationSum = 0;
 		
 		for(NeuronJelle n : outputLayer) {
-			activationSum += Math.exp(n.getActivation());
+			activationSum += Math.exp(n.getActivation() / temperature);
 		}
 		
-		return Math.exp(activation) / activationSum;
+		return Math.exp(activation / temperature) / activationSum;
 	}
 	
 	public void printWeights() {

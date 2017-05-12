@@ -26,9 +26,11 @@ public class MLPJelle {
 	protected ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
 	protected double learningRate = 0.05; 
-	private double errorThreshold =  0.725;
+	private double errorThreshold =  0.38; 
 	private double maxEpochs = 1000;  
 	private String fileName;
+	
+	private double temperature = 1;
 	
 	public MLPJelle(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName) {
 		this.nInput = nInput;
@@ -183,7 +185,7 @@ public class MLPJelle {
 			}
 			//Use softmax for the Actor 
 			else{
-				n.setSoftmaxOutput(outputLayer);
+				n.setSoftmaxOutput(outputLayer, temperature);
 			}
 			//softmaxSum += n.getOutput();
 		}
@@ -247,7 +249,9 @@ public class MLPJelle {
 	}
 	
 	public void propagateFeedback(double[] state, double feedback, int action){
-		System.out.println("Action used: " + action);
+		//System.out.println("Action used: " + action);
+		//Present the state, then backpropagate for improvement
+		forwardPass(state); 
 		//Create the new targets, using the feedback from the critic: 
 		target = new double[1][nOutput];
 		//new_target = old_target + feedback
@@ -256,11 +260,9 @@ public class MLPJelle {
 		}
 		//Action taken in previous state has to be positively or negatively reinforced
 		target[0][action] = target[0][action] + feedback; 
-		for(int i = 0; i < nOutput; i++){
+		/*for(int i = 0; i < nOutput; i++){
 			System.out.println("New target: " + target[0][i]);
-		} 
-		//Present the state, then backpropagate for improvement
-		forwardPass(state); 
+		} */
 		backwardPass(0);
 	}
 	
@@ -359,8 +361,8 @@ public class MLPJelle {
 		//activation of output nodes
 		
 		for(int i = 0; i < nOutput; i++){
-			System.out.print("Output node " + i + ": " + outputLayer.get(i).getActivation());
-			System.out.println(" " + outputLayer.get(i).getOutput());
+			//System.out.print("Output node " + i + ": " + outputLayer.get(i).getActivation());
+			//System.out.println(" " + outputLayer.get(i).getOutput());
 		}
 		
 		return pickOutputByProbability();	
@@ -397,6 +399,10 @@ public class MLPJelle {
 		for (int i=0; i<target.length; i++) {
 			System.out.println(target[i]);
 		}
+	}
+	
+	public void setTemperature(double temperature){
+		this.temperature = temperature;
 	}
 		
 }

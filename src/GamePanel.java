@@ -41,6 +41,11 @@ public class GamePanel extends JPanel {
 	Image bonus = new ImageIcon(getClass().getResource("images/bonus.png")).getImage();
 	Image bStack = new ImageIcon(getClass().getResource("images/BarrelStack.png")).getImage();
 	
+	Image blue = new ImageIcon(getClass().getResource("images/ladder.png")).getImage();
+	Image orange = new ImageIcon(getClass().getResource("images/b1.png")).getImage();
+	Image red = new ImageIcon(getClass().getResource("images/powerup.png")).getImage();
+	Image pink = new ImageIcon(getClass().getResource("images/peach.png")).getImage();
+	
 	public GamePanel(GameModel model) throws IOException {
 		setOpaque(true);
         setBackground(Color.BLACK);      
@@ -74,6 +79,28 @@ public class GamePanel extends JPanel {
 	
 	 public void paintComponent(Graphics g){
 		super.paintComponent(g); 
+		
+		
+		//Temporary: draw visionGrid
+		/*g.drawRect((int)model.getVisionGrid().getXPos(),(int) model.getVisionGrid().getYPos(),(int) model.getVisionGrid().getWidth(),(int) model.getVisionGrid().getHeight());
+		for(VisionBlock b : model.getVisionGrid().getBlocks()){
+			if(b.detectedBarrel() == 1){
+				g.drawImage(orange, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);
+			}
+			else if(b.detectedLadder() == 1){
+				g.drawImage(blue, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);			
+			}
+			else if(b.detectedPowerup() == 1){
+				g.drawImage(red, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);
+			}
+			else if(b.detectedPeach() == 1){
+				g.drawImage(pink, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);
+			}
+			else{
+				g.drawRect((int)b.getXPos(),(int) b.getYPos(),(int) b.getWidth(),(int) b.getHeight());
+			}
+		}
+		*/ 
 				
 		//Draw game objects	
         for (Platform p : model.getPlatformList()){
