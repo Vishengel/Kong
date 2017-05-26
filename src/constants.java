@@ -6,13 +6,9 @@ public interface constants {
 	//This boolean determines whether the visual representation of the game should be on or off
 	//Turning this value off will cause the game model to speed up significantly
 	boolean GUI_ON = true;
-
-	//These values determine whether the datasets about dodging or climbing should be created, respectively.
-	//boolean DEMO_PHASE_DODGING = false; 
-	//boolean DEMO_PHASE_CLIMBING = false;  
 	
 	boolean DEMO_PHASE = false;
-	
+
 	boolean RANDOM_ACTOR = false;
 		
 	//These values determine whether mario should learn and test dodging or climbing, respectively.
@@ -62,8 +58,8 @@ public interface constants {
 	//barrel position and dimensions
 	int BARREL_START_X = 120;
 	int BARREL_START_Y = 250;	
-	int BARREL_HEIGHT = 13;
-	int BARREL_WIDTH = 13;
+	int BARREL_HEIGHT = 14;
+	int BARREL_WIDTH = 14;
 	
 	//powerup dimensions
 	int POWERUP_HEIGHT = 27;

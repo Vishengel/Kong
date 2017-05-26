@@ -11,7 +11,7 @@ public class MLPJelle {
 	FileHandler FH = new FileHandler();
 	
 	//All four possible input combinations of two input boolean values, plus the threshold multiplier
-	private double[][] input;
+	protected double[][] input;
 	//The target values corresponding with each input				
 	protected double[][] target /*= new double[][] {{0.0,0.0,0.0}, {0.0,0.0,1.0}, {0.0,1.0,0.0}, {0.0,1.0,1.0}}*/;
 	//Define the number of nodes in input, hidden and output layers
@@ -25,10 +25,10 @@ public class MLPJelle {
 	//Define a list of output neurons
 	protected ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
-	protected double learningRate = 0.05; 
-	private double errorThreshold =  0.38; 
-	private double maxEpochs = 1000;  
-	private String fileName;
+	protected double learningRate = 0.1;  
+	protected double errorThreshold =  0.08; 
+	protected double maxEpochs = 1000;  
+	protected String fileName;
 	
 	private double temperature = 1;
 	
@@ -83,11 +83,7 @@ public class MLPJelle {
 			//System.out.println("Pattern: " + i);
 			for(int j = 0; j < nInput; j++){	
 				input[i][j] = initialInput[i][j];
-				//System.out.print(input[i][j] + " ");
 			}
-			//System.out.println();
-			//add the -1 value at the end of the input
-			//input[i][nInput] = -1;		
 		}
 		
 		//fill the target array with the target values 
@@ -104,6 +100,8 @@ public class MLPJelle {
 		initializeLayers();
 	}
 	
+	
+	
 	public void trainNetwork() {
 		double totalError = 0, previousTotalError; 
 		double epoch = 0;
@@ -118,11 +116,11 @@ public class MLPJelle {
 			this.shuffleInput();
 			
 			for (int i=0; i < this.input.length; i++) {
-				this.forwardPass(this.input[i]);
+				this.forwardPass(this.input[i], true);
 				totalError += this.backwardPass(i);
 			}
 			
-			totalError /= -1*this.input.length;
+			totalError /= this.input.length;
 			
 			System.out.println(totalError);
 			
@@ -152,7 +150,7 @@ public class MLPJelle {
 		}
 	}
 	
-	public void forwardPass(double[] input) {
+	public void forwardPass(double[] input, boolean training) {
 		//First, feed the input to the first hidden layer
 		double[] currentInput = input;
 		//Stores the output to be fed to the next hidden layer as input
@@ -179,17 +177,15 @@ public class MLPJelle {
 		}
 		
 		for (NeuronJelle n : outputLayer) {
-			//Use linear activation for the Critic
-			if(this instanceof Critic){
+			//If training on demonstration data, use softmax, otherwise linear activation
+			//The critic always uses linear activation 
+			if(!training){
 				n.setOutput(n.getActivation());
 			}
-			//Use softmax for the Actor 
 			else{
 				n.setSoftmaxOutput(outputLayer, temperature);
 			}
-			//softmaxSum += n.getOutput();
-		}
-		//System.out.println("Sum of softmax output: " + softmaxSum);
+		}	
 	}
 	
 	public double backwardPass(int patternIndex) {
@@ -217,7 +213,7 @@ public class MLPJelle {
 		for(int i = 0; i < nOutput; i++){
 			outputLayer.get(i).updateWeights(target[patternIndex][i], learningRate);
 			//totalError += outputLayer.get(i).getError();
-			totalError += outputLayer.get(i).getCrossEntropy();
+			totalError += outputLayer.get(i).getError();
 			//System.out.println(totalError);
 		}
 		
@@ -234,6 +230,13 @@ public class MLPJelle {
 	}
 	
 	public int pickOutputByProbability() {
+		//convert output layer output to softmax for action selection
+		for(NeuronJelle n: outputLayer){
+			n.setSoftmaxOutput(outputLayer, temperature);
+			System.out.print("Output node " + outputLayer.indexOf(n) + ": " + n.getActivation());
+			System.out.println(" " + n.getOutput());
+			
+		}
 		double p = Math.random();
 		double cumulativeProbability = 0.0;
 		
@@ -241,6 +244,7 @@ public class MLPJelle {
 		    cumulativeProbability += n.getOutput();
 		    
 		    if (p <= cumulativeProbability) {
+		    	System.out.println("Action chosen: " + outputLayer.indexOf(n));
 		        return outputLayer.indexOf(n);
 		    }
 		}
@@ -249,21 +253,29 @@ public class MLPJelle {
 	}
 	
 	public void propagateFeedback(double[] state, double feedback, int action){
-		//System.out.println("Action used: " + action);
 		//Present the state, then backpropagate for improvement
-		forwardPass(state); 
+		forwardPass(state, false); 
 		//Create the new targets, using the feedback from the critic: 
-		target = new double[1][nOutput];
+		//target = new double[1][nOutput];
+		
 		//new_target = old_target + feedback
 		for(int i = 0; i < nOutput; i++){
 			target[0][i] = outputLayer.get(i).getOutput();
 		}
 		//Action taken in previous state has to be positively or negatively reinforced
-		target[0][action] = target[0][action] + feedback; 
+		target[0][action] = outputLayer.get(action).getOutput() + feedback; 
 		/*for(int i = 0; i < nOutput; i++){
-			System.out.println("New target: " + target[0][i]);
-		} */
+			System.out.println(target[0][i]);
+		}*/
+		for(int i = 0; i < nOutput; i++){
+			System.out.println("Target for output node " + i + ": " + target[0][i]);
+		} 
 		backwardPass(0);
+		for(int i = 0; i < nOutput; i++){
+			System.out.println("OUTPUT AFTER BACKPROP; NODE: " + i + ": " + outputLayer.get(i).getOutput());
+		}
+		
+		
 	}
 	
 	public int maxOutput(){
@@ -283,7 +295,7 @@ public class MLPJelle {
 		
 		for (int i=0; i<this.input.length; i++) {
 			
-			this.forwardPass(this.input[i]);
+			this.forwardPass(this.input[i], true);
 			//print pattern number
 			System.out.println("Pattern " + i);
 			
@@ -355,15 +367,10 @@ public class MLPJelle {
 		//System.out.println("Barrel on same level? " + input[3]);
 		
 		//present game state to the network, calculate output
-		forwardPass(input);
+		forwardPass(input, false);
 		//System.out.println(binaryToInt());	
 		
 		//activation of output nodes
-		
-		for(int i = 0; i < nOutput; i++){
-			//System.out.print("Output node " + i + ": " + outputLayer.get(i).getActivation());
-			//System.out.println(" " + outputLayer.get(i).getOutput());
-		}
 		
 		return pickOutputByProbability();	
 		

@@ -82,9 +82,9 @@ public class GamePanel extends JPanel {
 		
 		
 		//Temporary: draw visionGrid
-		/*g.drawRect((int)model.getVisionGrid().getXPos(),(int) model.getVisionGrid().getYPos(),(int) model.getVisionGrid().getWidth(),(int) model.getVisionGrid().getHeight());
+		g.drawRect((int)model.getVisionGrid().getXPos(),(int) model.getVisionGrid().getYPos(),(int) model.getVisionGrid().getWidth(),(int) model.getVisionGrid().getHeight());
 		for(VisionBlock b : model.getVisionGrid().getBlocks()){
-			if(b.detectedBarrel() == 1){
+			/*if(b.detectedBarrel() == 1){
 				g.drawImage(orange, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);
 			}
 			else if(b.detectedLadder() == 1){
@@ -96,11 +96,11 @@ public class GamePanel extends JPanel {
 			else if(b.detectedPeach() == 1){
 				g.drawImage(pink, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);
 			}
-			else{
+			else{*/
 				g.drawRect((int)b.getXPos(),(int) b.getYPos(),(int) b.getWidth(),(int) b.getHeight());
-			}
+			//}
 		}
-		*/ 
+		
 				
 		//Draw game objects	
         for (Platform p : model.getPlatformList()){

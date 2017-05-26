@@ -20,7 +20,7 @@ public class NeuronJelle {
 	
 	public void initWeights() {
 		for(int i=0; i<nInputs; i++) {
-			weights[i] = 0.01*(-1.0 + (Math.random() * 2.0));
+			weights[i] = 0.2*(-1.0 + (Math.random() * 2.0));
 		}
 	}
 	
@@ -73,12 +73,8 @@ public class NeuronJelle {
 		for (NeuronJelle n : nextLayer) {
 			sum += n.getGradient() * n.getWeights()[nodeIndex];
 		}
-		if(hiddenLayer == 0){
-			this.gradient = sigmoidPrime(this.activation) * sum;
-		}
-		else{
-			this.gradient = tanhPrime(this.activation) * sum;
-		}
+		this.gradient = sigmoidPrime(this.activation) * sum;
+		
 	}
 	
 	
@@ -119,7 +115,9 @@ public class NeuronJelle {
 	}
 	
 	public double sigmoidPrime(double activation){
-		return Math.pow(Math.E, activation) / ((1 + Math.pow(Math.E, activation))* (1 + Math.pow(Math.E, activation)));
+		double output = sigmoid(activation);
+		return output * (1-this.output);
+		//return Math.pow(Math.E, activation) / ((1 + Math.pow(Math.E, activation))* (1 + Math.pow(Math.E, activation)));
 		
 	}
 	
