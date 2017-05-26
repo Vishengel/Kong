@@ -21,7 +21,7 @@ public class GameModel implements constants {
 	
 	//This value determines for how many epochs the game has been running already
 	private int epochs = 0;
-	private int maxEpochs = 2;
+	private int maxEpochs = 500;
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
 	private int sleepTime = 15; 
@@ -418,6 +418,11 @@ public class GameModel implements constants {
 		if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){
 			actor.trainNetwork();
 		}
+		
+		if(constants.DEMO_PHASE){
+			MOCollection.add(copyMOList());
+			PUCollection.add(copyPUList());
+		}
 
 		//while(!gameWon){
 		while (epochs < maxEpochs) {
@@ -426,10 +431,7 @@ public class GameModel implements constants {
 			//dodgeInputs = calculateDodgeInputs();
 			
 			
-			if(constants.DEMO_PHASE){
-				MOCollection.add(copyMOList());
-				PUCollection.add(copyPUList());
-			}
+			
 			
 			//reset mario's action when standing
 			if(mario.standing){
@@ -569,6 +571,11 @@ public class GameModel implements constants {
 			if(constants.DEMO_PHASE){
 				state[NstateInputs + mario.getAction()] = 1.0;
 				trainingSet.add(state);
+				
+				MOCollection.add(copyMOList());
+				System.out.println(MOCollection.get(MOCollection.size()-1).get(0).getAction());
+				PUCollection.add(copyPUList());
+				
 			}
 			/*if(constants.DEMO_PHASE_DODGING){
 			dodgeInputs[nInputsDodge + mario.getAction()] = 1.0;

@@ -15,7 +15,7 @@ public class Player extends MovingObject{
 	//private boolean isKilled = false;
 	
     
-	public Player(int x, int y, int h, int w) {
+	public Player(float x, float y, int h, int w) {
 		super(x, y, h, w);
 		xVel = 1.5f;
 		yVel = 1.5f;
@@ -26,9 +26,16 @@ public class Player extends MovingObject{
 		super(MO);
 		xVel = 1.5f;
 		yVel = 1.5f;
-		name = "player";	
+		name = "player";
 	}
 	
+	public Player(float x, float y, int h, int w, int action, boolean isJumping, boolean isClimbing, boolean canClimb,
+			boolean isStanding, boolean isKilled, boolean hasWon) {
+		super(x, y, h, w, action, isJumping, isClimbing, canClimb, isStanding, isKilled, hasWon);
+		xVel = 1.5f;
+		yVel = 1.5f;
+		name = "player";
+	}
 	
 	/*actions: 
 	0 : stand still

@@ -86,7 +86,6 @@ public class FileHandler {
 		    	barrelList = new JsonArray();
 		    	powerupList = new JsonArray();
 
-		    	int bc = 0;
 		    	for (MovingObject MO : MOList) {
 		    		MOJson = new JsonObject();
 		    		if (MO.getName() == "player") {	    			    			
@@ -95,6 +94,7 @@ public class FileHandler {
 		    			MOJson.addProperty("action", MO.getAction());
 			    		MOJson.addProperty("isJumping", MO.isJumping());
 		    			MOJson.addProperty("isClimbing", MO.isClimbing());
+		    			MOJson.addProperty("canClimb", MO.getCanClimb());
 		    			MOJson.addProperty("isStanding", MO.getStanding());
 		    			MOJson.addProperty("isKilled", MO.isKilled());
 			    		MOJson.addProperty("hasWon", MO.hasWon());
@@ -102,7 +102,7 @@ public class FileHandler {
 		    		} else if (MO.getName() == "barrel") {
 		    			MOJson.addProperty("xPos", MO.getXPos());
 		    			MOJson.addProperty("yPos", MO.getYPos());
-		    			//We use the bc ("barrel counter") to give the barrels a unique name
+		    			MOJson.addProperty("action", MO.getAction());
 		    			barrelList.add(MOJson);
 		    		}
 		    		

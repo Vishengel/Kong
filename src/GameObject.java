@@ -12,7 +12,7 @@ public abstract class GameObject {
 	protected boolean isSolid;
 	protected String name;
 	
-	public GameObject(int x, int y, int h, int w){
+	public GameObject(float x, float y, float h, float w){
 		xPos = x;
 		yPos = y;
 		height = h;

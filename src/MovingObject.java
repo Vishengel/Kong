@@ -30,18 +30,33 @@ public abstract class MovingObject extends GameObject{
 	//represents the action that the object can take
 	protected int action;
 	
-	public MovingObject(int x, int y, int h, int w) {
+	public MovingObject(float x, float y, int h, int w) {
 		super(x, y, h, w);	
 		random = new Random();
 	}
 	
 	public MovingObject(MovingObject MO) {
 		super(MO);
+		this.action = MO.getAction();
+		this.jumping = MO.isJumping();
 		this.isClimbing = MO.isClimbing();
 		this.canClimb = MO.getCanClimb();
 		this.standing = MO.getStanding();
 		this.falling = MO.getFalling();
 		this.isKilled = MO.getIsKilled();
+		this.hasWon = MO.hasWon();
+	}
+	
+	public MovingObject(float x, float y, int h, int w, int action, boolean isJumping, boolean isClimbing, boolean canClimb,
+			boolean isStanding, boolean isKilled, boolean hasWon) {
+		super(x, y, h, w);	
+		this.action = action;
+		this.jumping = isJumping;
+		this.isClimbing = isClimbing;
+		this.canClimb = canClimb;
+		this.standing = isStanding;
+		this.isKilled = isKilled;
+		this.hasWon = hasWon;
 	}
 	
 	public void act(){
