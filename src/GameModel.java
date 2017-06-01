@@ -232,7 +232,7 @@ public class GameModel implements constants {
 		if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){ 
 			actor.trainNetwork();
 			critic.trainNetwork();
-			actor.setLearningRate(0.001);
+			actor.setLearningRate(0.0025);
 			//critic.setLearningRate(0.0);
 		}
 		
