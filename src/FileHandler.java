@@ -158,15 +158,6 @@ public class FileHandler {
 		    
 		    gson.toJson(trainingData, out);
 		    
-		    //out.write(MOCollection.get(0).get(0).getXPos() + "");
-		    //write the inputs to the file
-		    /*
-		    for(int i = 0; i < inputs.length; i++){
-			    fw.write(inputs[i] + ",");			    
-		    }
-		   
-		    //write the action taken to a file
-		    writeActionToFile(fw, action);*/
 		    System.out.println("Written to file!");
 		    out.close();
 		}

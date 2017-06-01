@@ -23,6 +23,7 @@ public class InputHandler {
 	}
 
 	public void readFromJson() {
+		//long start = System.currentTimeMillis();
 		try {
             JsonElement root = new JsonParser().parse(new FileReader(filePath));
             
@@ -33,6 +34,7 @@ public class InputHandler {
         } catch (IOException e) {
 	        System.out.println("File Read Error");
 	    }
+		//System.out.println("Time taken to read JSON: " + (System.currentTimeMillis() - start));
 	}
 	
 	public void readMovingObjectsFromJson(JsonArray stateList) {
