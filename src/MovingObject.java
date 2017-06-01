@@ -29,7 +29,7 @@ public abstract class MovingObject extends GameObject{
 	protected int action;
 	
 	
-	public MovingObject(int x, int y, int h, int w) {
+	public MovingObject(float x, float y, int h, int w) {
 		super(x, y, h, w);	
 		random = new Random();
 	}

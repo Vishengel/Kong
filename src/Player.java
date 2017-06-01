@@ -16,7 +16,7 @@ public class Player extends MovingObject{
 	private boolean isKilled = false;
 	
     
-	public Player(int x, int y, int h, int w) {
+	public Player(float x, float y, int h, int w) {
 		super(x, y, h, w);
 		xVel = 1.5f;
 		yVel = 1.8f; 

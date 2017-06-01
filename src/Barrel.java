@@ -5,11 +5,11 @@ public class Barrel extends MovingObject{
 	//keep track of the distance fallen in order to change direction 
 	private int distanceFallen = 0;
 	
-	public Barrel(int x, int y, int h, int w, int action) {
+	public Barrel(float x, float y, int h, int w, int action) {
 		super(x, y, h, w);
 		this.action = action;
-		xVel = 1.5f;
-		yVel = 1.7f;
+		xVel = 1f;
+		yVel = 1f;
 		pointAwarded = false;
 		name = "barrel";
 	}

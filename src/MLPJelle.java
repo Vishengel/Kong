@@ -25,8 +25,8 @@ public class MLPJelle {
 	//Define a list of output neurons
 	protected ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
-	protected double learningRate = 0.1;  
-	protected double errorThreshold =  0.08; 
+	protected double learningRate = 0.05;   
+	protected double errorThreshold =  0.069;     
 	protected double maxEpochs = 1000;  
 	protected String fileName;
 	
@@ -44,7 +44,7 @@ public class MLPJelle {
 	
 	public void initializeLayers(){
 		ArrayList<NeuronJelle> hiddenLayer = new ArrayList<NeuronJelle>();
-		int nWeights = nInput;
+		int nWeights = nInput - 1;
 		
 		//Initialize hidden layers
 		for (int i=0; i<nHiddenLayers; i++) {
@@ -60,9 +60,9 @@ public class MLPJelle {
 			//hiddenLayer.add(new NeuronJelle(0));
 			//Set the amount of weights for each neuron in the next layer
 			//to be the same as the amount of hidden neurons in the current layer, plus one for the bias
-			nWeights = hiddenLayer.size() + 1;
+			nWeights = hiddenLayer.size();
 			//Make sure the output of the bias neuron is -1
-			//hiddenLayer.get(nWeights-1).setOutput(-1);
+			hiddenLayer.get(nWeights-1).setOutput(-1);
 			//Add the hidden layer to the list of hidden layers
 			hiddenList.add(hiddenLayer);
 		}
@@ -73,7 +73,7 @@ public class MLPJelle {
 	}
 	public void initNetwork() {
 		
-	
+		System.out.println("Actor init called!");
 		//read the demonstration data to be learned from 
 		double[][] initialInput = FH.readFile(fileName, nInput, nOutput);
 		
@@ -81,7 +81,7 @@ public class MLPJelle {
 		//filter out the target values from the input array
 		for(int i = 0; i < initialInput.length; i++){
 			//System.out.println("Pattern: " + i);
-			for(int j = 0; j < nInput; j++){	
+			for(int j = 0; j < nInput-1; j++){	
 				input[i][j] = initialInput[i][j];
 			}
 		}
@@ -254,7 +254,8 @@ public class MLPJelle {
 	
 	public void propagateFeedback(double[] state, double feedback, int action){
 		//Present the state, then backpropagate for improvement
-		forwardPass(state, false); 
+		forwardPass(state, false);  
+		System.out.println("ACTION BEFORE FEEDBACK BACKPROP: " + action);
 		//Create the new targets, using the feedback from the critic: 
 		//target = new double[1][nOutput];
 		
@@ -263,19 +264,21 @@ public class MLPJelle {
 			target[0][i] = outputLayer.get(i).getOutput();
 		}
 		//Action taken in previous state has to be positively or negatively reinforced
-		target[0][action] = outputLayer.get(action).getOutput() + feedback; 
+		target[0][action] += feedback; 
 		/*for(int i = 0; i < nOutput; i++){
 			System.out.println(target[0][i]);
 		}*/
 		for(int i = 0; i < nOutput; i++){
 			System.out.println("Target for output node " + i + ": " + target[0][i]);
 		} 
-		backwardPass(0);
 		for(int i = 0; i < nOutput; i++){
-			System.out.println("OUTPUT AFTER BACKPROP; NODE: " + i + ": " + outputLayer.get(i).getOutput());
-		}
-		
-		
+			System.out.println("ACTOR OUTPUT BEFORE BACKPROP; NODE: " + i + ": " + outputLayer.get(i).getOutput());
+		}	
+		backwardPass(0);
+		forwardPass(state, false); 
+		for(int i = 0; i < nOutput; i++){
+			System.out.println("ACTOR OUTPUT AFTER BACKPROP; NODE: " + i + ": " + outputLayer.get(i).getOutput());
+		}	
 	}
 	
 	public int maxOutput(){
@@ -410,6 +413,9 @@ public class MLPJelle {
 	
 	public void setTemperature(double temperature){
 		this.temperature = temperature;
+	}
+	public void setLearningRate(double learningRate){
+		this.learningRate = learningRate; 
 	}
 		
 }

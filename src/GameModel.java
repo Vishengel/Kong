@@ -6,6 +6,8 @@ import java.util.Arrays;
 
 public class GameModel implements constants {
 	
+	String filename = "trainingSet10";
+	
 	//performance variables
 	private double gamesWon = 1;
 	private double gamesLost = 1;
@@ -14,8 +16,8 @@ public class GameModel implements constants {
 	private int lives = 3;
 	
 	//these values determine how fast barrels are spawned in the game
-	private int spawnTimer = 300; 	
-	private int barrelSpawnTime = 300;      
+	private int spawnTimer = 250; 	
+	private int barrelSpawnTime = 250;      
 	
 	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
@@ -26,15 +28,16 @@ public class GameModel implements constants {
 	
 	//This value determines for how many epochs the game has been running already
 	private int epochs = 0;
-	private double temperature = 1;   
+	private int maxEpochs = 500000000;
+	private double temperature = 1;    
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
-	private int sleepTime = 10;    
-	
+	private int sleepTime = 0;        
+	 
 	//N x N vision grid inputs + 2 additional inputs + bias + reward 
-	private int NstateInputs = 104;
+	private int nStateInput = 104;
 	
-	private int nOutputs = 7;
+	private int nOutput = 7;
 	
 	private ArrayList<Platform> platformList;
 	private ArrayList<Ladder> ladderList;
@@ -49,8 +52,8 @@ public class GameModel implements constants {
 	MLPJelle actor;	
 	Critic critic;
 	
-	double[] state;
-	double[] previousState;
+	//double[] state;
+	//double[] previousState;
 	
 	private Player mario;
 	private Peach peach;
@@ -112,85 +115,85 @@ public class GameModel implements constants {
 	}
 
 	public double[] calculateState(double reward){
-		double[] state = new double[NstateInputs + nOutputs];
+		double[] state = new double[nStateInput + nOutput];
 		//Check whether or not barrels / ladders are in the grid's blocks
 		checkDetections();
 		
 		//fill the state array with the detections inputs of the vision grid
-		for(int i = 0; i < (NstateInputs - 4) / 4; i++){
+		for(int i = 0; i < (nStateInput - 4) / 4; i++){
 			state[i] = visionGrid.getBarrelInputs()[i];
 		}
-		for(int i = 0; i < (NstateInputs - 4) / 4; i++){
-			state[i + (NstateInputs - 4) / 4] = visionGrid.getLadderInputs()[i];
+		for(int i = 0; i < (nStateInput - 4) / 4; i++){
+			state[i + (nStateInput - 4) / 4] = visionGrid.getLadderInputs()[i];
 		}
-		for(int i = 0; i < (NstateInputs - 4) / 4; i++){
-			state[i + (NstateInputs - 4) / 2] = visionGrid.getPowerupInputs()[i];
+		for(int i = 0; i < (nStateInput - 4) / 4; i++){
+			state[i + (nStateInput - 4) / 2] = visionGrid.getPowerupInputs()[i];
 		}
-		for(int i = 0; i < (NstateInputs - 4) / 4; i++){
-			state[i + (NstateInputs - 4) / 2 + (NstateInputs - 4) / 4] = visionGrid.getPeachInputs()[i];
+		for(int i = 0; i < (nStateInput - 4) / 4; i++){
+			state[i + (nStateInput - 4) / 2 + (nStateInput - 4) / 4] = visionGrid.getPeachInputs()[i];
 		}
 		
-		state[NstateInputs - 4] = mario.isClimbing() ? 1 : 0;
-		//System.out.println("Climbing: " + state[NstateInputs - 3]);
-		state[NstateInputs - 3] = powerupActivated ? 1 : 0;
-		//System.out.println("Powered-up: " + state[NstateInputs - 2]);
-		state[NstateInputs - 2] = -1;
+		state[nStateInput - 4] = mario.isClimbing() ? 1 : 0;
+		//System.out.println("Climbing: " + state[nStateInput - 3]);
+		state[nStateInput - 3] = powerupActivated ? 1 : 0;
+		//System.out.println("Powered-up: " + state[nStateInput - 2]);
+		state[nStateInput - 2] = -1;
 		//Add the reward received in this state
-		state[NstateInputs - 1] = reward;
+		state[nStateInput - 1] = reward;
 		return state;
 		
 	}
 
 	//calculate rewards and reset the appropriate values
 	public double calculateReward(){
-		int reward = 0;
+		double reward = 0;
 
 		if(gameWon){
-			reward += 20;
-			score += 20;
+			reward += 25;
+			score += 25;
 		}
+		
 		if(hitByBarrel){
 			System.out.println("Hit by barrel!");
-			reward -= 5;
-			score -= 5;	
+			reward -= 10;
+			score -= 10;	
 		}
 		
 		else if(jumpedOverBarrel){
 			System.out.println("Jumped over a barrel!");
-			reward += 2;
-			score += 2;
+			reward += 1;
+			score += 1;
 		}
 		else if(destroyedBarrel){
 			System.out.println("Smashed a barrel!");
-			reward += 2;
-			score += 2;
+			reward += 0.5;
+			score += 0.5;
 		}
 		
 		if(touchedPowerUp){
 			System.out.println("Picked up powerup!");
-			reward += 1;
-			score += 1;
+			reward += 0.5;
+			score += 0.5;
 		}
+		/*
 	    if(mario.isClimbing()){
 			reward += 0.01;
 			score += 0.01; 
 		}
+		*/
+	    //Give positive reward when closer to Peach in the vertical axis
+	    reward += !mario.isJumping() ? 1.0 / (mario.getYPos() - peach.getYPos()) : 0;
 	    
 	    //Give a positive reward that grows smaller the closer Mario is to Peach
 	   // reward += 10/euclideanDistance(mario, peach);
 	    //score += 10/euclideanDistance(mario, peach);
 	    //System.out.println("Distance to peach: " + euclideanDistance(mario, peach));
-	    
+	    //reward -= 0.2;
+	    //score -= 0.2;
 		//if(steppedOnLadder){
 			//reward += 30;
 			//score += 30;
 		//}
-		hitByBarrel = false;
-		gameWon = false;  
-		touchedPowerUp = false;
-		jumpedOverBarrel = false;
-		destroyedBarrel = false;
-		steppedOnLadder = false;
 		
 		return reward;
 	}
@@ -212,33 +215,40 @@ public class GameModel implements constants {
 	public void runGame() throws InterruptedException, IOException{
 	
 		double[] testInputs;
+		double[] state;
+		double[] previousState;
 		
-		state = new double[NstateInputs];
-		previousState = new double[NstateInputs];
+		state = new double[nStateInput-1];
+		previousState = new double[nStateInput-1];
 		
 		visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
 		
 		//don't create the actor and critic if in the demonstration phase
 		if(!constants.DEMO_PHASE){
-			actor = new MLPJelle(NstateInputs, 1, 70, nOutputs, "trainingSet3");
-			critic = new Critic(NstateInputs, 1, 70, 1, "trainingSet3");
+			actor = new MLPJelle(nStateInput, 1, 20, nOutput, filename); 
+			critic = new Critic(nStateInput, 1, 50, 1, filename); 
+			
 		}
 		if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){ 
 			actor.trainNetwork();
-			
+			critic.trainNetwork();
+			actor.setLearningRate(0.001);
+			//critic.setLearningRate(0.0);
 		}
-		critic.trainNetwork();
+		
 		double reward = 0;
 		double feedback = 0;
+		int action = 0;
 		int previousAction = 0;
-		while(!gameWon){
+		while(/*!gameWon*/ epochs < maxEpochs){
 			//System.out.println("Performance: " + gamesWon / gamesLost);
 			System.out.println("------------- Current epoch: " + epochs + " -------------");
+			System.out.println("Temperature: " + temperature);
 			
 			//reset the vision grid 
 			visionGrid.resetDetections();
 			//If sufficient epochs have been reached, slow down game model for better inspection of performance
-			if(epochs >= 100000){
+			if(epochs >= 200000){
 				sleepTime = 5;  
 			}
 			
@@ -255,15 +265,25 @@ public class GameModel implements constants {
 				PUCollection.add(PUList);
 			}
 			
+			
+			//train the critic using the current state, the previous state and the observed reward
+			//in the current state
+			state = calculateState(reward);	
+			
 			//reset mario's action when standing
 			if(mario.standing){
 				mario.setAction(0); 
 			}
-			if(constants.TEST_PHASE && !mario.isJumping()){ 
-				testInputs = Arrays.copyOfRange(state, 0, NstateInputs);
-				mario.setAction(actor.presentInput(testInputs));
+			
+			//Present state to actor for action selection; don't allow action selection while jumping
+			if(constants.TEST_PHASE){ 
+				testInputs = Arrays.copyOfRange(state, 0, nStateInput-1);
+				action = actor.presentInput(testInputs);
+				if(!mario.isJumping()){
+					mario.setAction(action);
+				}
 			}
-						
+					
 			//Spawn a barrel, determine by the spawn timer
 			if(spawnTimer == barrelSpawnTime){
 				spawnTimer = 0;
@@ -299,18 +319,29 @@ public class GameModel implements constants {
 				powerupTimer++;
 			}
 			
-			//train the critic using the current state, the previous state and the observed reward
-			//in the current state
-			state = calculateState(reward);	
+			
 
 			if(!constants.DEMO_PHASE && epochs > 0){
 				//calculate the critic's feedback 
-				feedback = critic.calculateFeedback(state, previousState, reward, mario.isKilled());
+				feedback = critic.calculateFeedback(state, previousState, reward, hitByBarrel, gameWon);
 				//backpropagate the feedback to the actor in the form of a TD-error (Temporal-Difference)
 				actor.propagateFeedback(previousState, feedback, previousAction);
+				
 				//train the critic 
-				critic.trainCritic(state, previousState, reward, mario.isKilled());			
+				critic.trainCritic(state, previousState, reward, hitByBarrel, gameWon);			
 			}	
+			/*if(hitByBarrel || gameWon || touchedPowerUp || jumpedOverBarrel || destroyedBarrel){
+				actor.propagateFeedback(previousState, feedback, previousAction);
+			}*/
+			//Set the reward booleans to false again
+			hitByBarrel = false;
+			gameWon = false;  
+			touchedPowerUp = false;
+			jumpedOverBarrel = false;
+			destroyedBarrel = false;
+			steppedOnLadder = false;
+			
+			
 			//printState(reward, previousAction); 
 			for(int i = 0; i < MOList.size(); i++){
 				//Increment the air time of moving objects, to properly apply gravity 
@@ -349,22 +380,24 @@ public class GameModel implements constants {
 				else if(MOList.get(i).getYPos() >= mario.getYPos()  && MOList.get(i).getYPos() <= mario.getYPos() + 100 && 
 					mario.getXPos() >= MOList.get(i).getXPos()	&&
 					mario.getXPos() <= MOList.get(i).getXPos()+MOList.get(i).getWidth() &&
-					!(MOList.get(i).pointAwarded)){
+					!(MOList.get(i).pointAwarded) && mario.isJumping()){
 					jumpedOverBarrel = true;
-					MOList.get(i).setPointAwarded();					
+					//MOList.get(i).setPointAwarded();					
 				}
 			}
+			
 			//Move vision grid to mario's new position
 			visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
 			//calculate the reward for the current state 
 			reward = calculateReward(); 
 			//this state becomes the previous state in the next iteration
 			//previousState = Arrays.copyOf(state, state.length);
-			for(int i = 0; i < NstateInputs; i++){
+			for(int i = 0; i < nStateInput-1; i++){
 				previousState[i] = state[i];
 			}
+			
 			//The action taken in this state becomes the previous action
-			previousAction = mario.getAction();
+			previousAction = action;
 			//increment epoch
 			epochs++;	
 			
@@ -373,14 +406,14 @@ public class GameModel implements constants {
 				Thread.sleep(sleepTime);
 			}		
 			if(constants.DEMO_PHASE){
-				state[NstateInputs + mario.getAction()] = 1.0;
+				state[nStateInput + mario.getAction()] = 1.0;
 				trainingSet.add(state);
 			}
 	
 		}
 		//Write all the data gathered during the demonstration phase to a txt file for training
 		if(constants.DEMO_PHASE){
-			fh.writeToFile(trainingSet, "trainingSet3");
+			fh.writeToFile(trainingSet, filename);
 			System.out.println("Written to file!");
 		}
 
@@ -584,7 +617,10 @@ public class GameModel implements constants {
 			p = new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
 			platformList.add(p);
 		}
-		
+		p = new Platform(x-10,y-50,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
+		platformList.add(p);
+		p = new Platform(x-10,y-200,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
+		platformList.add(p);
 		//Middle four layers
 		for(int j = 0; j < 4; j++) {
 			y += platformYDiff;
@@ -612,7 +648,10 @@ public class GameModel implements constants {
 				}
 			}
 		}
-		
+		p = new Platform(x-500,y+25,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
+		platformList.add(p);
+		p = new Platform(x-500,y+175,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
+		platformList.add(p);
 		//Top layer
 		y += platformYDiff;
 		y -= 3*constants.PLATFORM_HEIGHT;
@@ -624,7 +663,8 @@ public class GameModel implements constants {
 			p = new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
 			platformList.add(p);
 		}
-		
+		p = new Platform(x+150,y+7,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
+		platformList.add(p);
 		for(int i = x; i >= 0; i -= constants.PLATFORM_WIDTH){
 			x = i;
 			p = new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);

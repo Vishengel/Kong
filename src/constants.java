@@ -7,7 +7,7 @@ public interface constants {
 	//Turning this value off will cause the game model to speed up significantly
 	boolean GUI_ON = true;
 	
-	boolean DEMO_PHASE = false;
+	boolean DEMO_PHASE = false;  
 
 	boolean RANDOM_ACTOR = false;
 		
