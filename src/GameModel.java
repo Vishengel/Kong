@@ -6,36 +6,34 @@ import java.util.Arrays;
 
 public class GameModel implements constants {
 	
-	String filename = "trainingSet10";
+	String filename = "trainingSet3333";
 	
 	//performance variables
-	private double gamesWon = 1;
-	private double gamesLost = 1;
+	double gamesWon = 0;
+	double gamesLost = 1;
 	
 	private double score = 0;
 	private int lives = 3;
 	
 	//these values determine how fast barrels are spawned in the game
-	private int spawnTimer = 250; 	
-	private int barrelSpawnTime = 250;      
+	private int spawnTimer = 200; 	
+	private int barrelSpawnTime = 200;    
 	
 	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
-	private int powerupTimer = 0;	
+	private double powerupTimer = 0;	
 	//This value determines how long the powerup lasts when Mario picks it up
-	private int powerupDuration = 300;
+	private double powerupDuration = 300;
 	private int powerupIndex = -1;
 	
 	//This value determines for how many epochs the game has been running already
 	private int epochs = 0;
-	private int maxEpochs = 500000000;
 	private double temperature = 1;    
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
 	private int sleepTime = 0;        
 	 
-	//N x N vision grid inputs + 2 additional inputs + bias + reward 
-	private int nStateInput = 104;
+	
 	
 	private int nOutput = 7;
 	
@@ -60,14 +58,24 @@ public class GameModel implements constants {
 
 	private boolean powerupActivated = false;
 	
-	private VisionGrid visionGrid = new VisionGrid(constants.PLAYER_START_X, constants.PLAYER_START_Y, 160, 200, 5);
+	private VisionGrid visionGrid = new VisionGrid(constants.PLAYER_START_X, constants.PLAYER_START_Y, 160, 200, 7);
+	private VisionGrid marioTracker = new VisionGrid(0, 0,constants.SCREEN_Y, constants.SCREEN_X, 10 );
+	
+	//N x N vision grid inputs 
+	private int visionGridInputs = visionGrid.getSize() * visionGrid.getSize() * 4;
+	//N x N mario tracker inputs 
+	private int marioTrackInputs = marioTracker.getSize() * marioTracker.getSize();
+	//3 additional inputs + bias + reward
+	private int otherInputs = 5;
+	
+			
 	//These values determine the rewards 
 	private boolean gameWon = false;
 	private boolean hitByBarrel = false;
 	private boolean touchedPowerUp = false;
 	private boolean jumpedOverBarrel = false;
 	private boolean destroyedBarrel = false;
-	private boolean steppedOnLadder = false;
+	
 	
 	//allow for alternating left and right barrel spawing during training
 	private boolean leftSpawned = true;
@@ -115,31 +123,41 @@ public class GameModel implements constants {
 	}
 
 	public double[] calculateState(double reward){
-		double[] state = new double[nStateInput + nOutput];
+		double[] state = new double[visionGridInputs + marioTrackInputs + otherInputs + nOutput];
 		//Check whether or not barrels / ladders are in the grid's blocks
-		checkDetections();
+		visionGrid.checkDetections(MOList,ladderList, PUList, mario, peach);
+		marioTracker.checkDetections(MOList,ladderList, PUList, mario, peach);
 		
 		//fill the state array with the detections inputs of the vision grid
-		for(int i = 0; i < (nStateInput - 4) / 4; i++){
+		for(int i = 0; i < visionGridInputs / 4; i++){
 			state[i] = visionGrid.getBarrelInputs()[i];
 		}
-		for(int i = 0; i < (nStateInput - 4) / 4; i++){
-			state[i + (nStateInput - 4) / 4] = visionGrid.getLadderInputs()[i];
+		for(int i = 0; i < visionGridInputs / 4; i++){
+			state[i + visionGridInputs / 4] = visionGrid.getLadderInputs()[i];
 		}
-		for(int i = 0; i < (nStateInput - 4) / 4; i++){
-			state[i + (nStateInput - 4) / 2] = visionGrid.getPowerupInputs()[i];
+		for(int i = 0; i < visionGridInputs / 4; i++){
+			state[i + visionGridInputs / 2] = visionGrid.getPowerupInputs()[i];
 		}
-		for(int i = 0; i < (nStateInput - 4) / 4; i++){
-			state[i + (nStateInput - 4) / 2 + (nStateInput - 4) / 4] = visionGrid.getPeachInputs()[i];
+		for(int i = 0; i < visionGridInputs / 4; i++){
+			state[i + visionGridInputs / 2 + visionGridInputs / 4] = visionGrid.getPeachInputs()[i];
 		}
 		
-		state[nStateInput - 4] = mario.isClimbing() ? 1 : 0;
+		for(int i = 0; i < marioTrackInputs; i++){
+			state[visionGridInputs + i] = marioTracker.getMarioInputs()[i];
+		}
+			
+		state[visionGridInputs + marioTrackInputs] = mario.isClimbing() ? 1 : 0;
 		//System.out.println("Climbing: " + state[nStateInput - 3]);
-		state[nStateInput - 3] = powerupActivated ? 1 : 0;
+		state[visionGridInputs + marioTrackInputs + 1] = powerupActivated ? 1 : 0;
 		//System.out.println("Powered-up: " + state[nStateInput - 2]);
-		state[nStateInput - 2] = -1;
+		//Give mario the time passed since he picked up a powerup
+		state[visionGridInputs + marioTrackInputs + 2] = powerupTimer/powerupDuration;
+		
+		state[visionGridInputs + marioTrackInputs + 3] = -1.0;
 		//Add the reward received in this state
-		state[nStateInput - 1] = reward;
+		state[visionGridInputs + marioTrackInputs + 4] = reward;
+		
+		//System.out.println("Total state size should be: " + (visionGridInputs + marioTrackInputs + otherInputs+ nOutput));
 		return state;
 		
 	}
@@ -182,10 +200,10 @@ public class GameModel implements constants {
 		}
 		*/
 	    //Give positive reward when closer to Peach in the vertical axis
-	    reward += !mario.isJumping() ? 1.0 / (mario.getYPos() - peach.getYPos()) : 0;
+	    //reward += !mario.isJumping() ? 1.0 / (mario.getYPos() - peach.getYPos()) : 0;
 	    
 	    //Give a positive reward that grows smaller the closer Mario is to Peach
-	   // reward += 10/euclideanDistance(mario, peach);
+	   //reward += 10/euclideanDistance(mario, peach);
 	    //score += 10/euclideanDistance(mario, peach);
 	    //System.out.println("Distance to peach: " + euclideanDistance(mario, peach));
 	    //reward -= 0.2;
@@ -218,38 +236,38 @@ public class GameModel implements constants {
 		double[] state;
 		double[] previousState;
 		
-		state = new double[nStateInput-1];
-		previousState = new double[nStateInput-1];
+		state = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
+		previousState = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
 		
 		visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
 		
 		//don't create the actor and critic if in the demonstration phase
 		if(!constants.DEMO_PHASE){
-			actor = new MLPJelle(nStateInput, 1, 20, nOutput, filename); 
-			critic = new Critic(nStateInput, 1, 50, 1, filename); 
+			actor = new MLPJelle(visionGridInputs + marioTrackInputs + otherInputs, 1, (visionGridInputs + marioTrackInputs + otherInputs + nOutput) / 2 + 1, nOutput, filename); 
+			critic = new Critic(visionGridInputs + marioTrackInputs + otherInputs, 1, (visionGridInputs + marioTrackInputs + otherInputs + 1)/2 + 1, 1, filename); 
 			
 		}
 		if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){ 
 			actor.trainNetwork();
 			critic.trainNetwork();
-			actor.setLearningRate(0.0025);
-			//critic.setLearningRate(0.0);
+			actor.setLearningRate(0.00005); 
 		}
 		
 		double reward = 0;
 		double feedback = 0;
 		int action = 0;
 		int previousAction = 0;
-		while(/*!gameWon*/ epochs < maxEpochs){
+		while(/*!gameWon*/ epochs < constants.MAX_EPOCHS){
 			//System.out.println("Performance: " + gamesWon / gamesLost);
 			System.out.println("------------- Current epoch: " + epochs + " -------------");
 			System.out.println("Temperature: " + temperature);
 			
 			//reset the vision grid 
 			visionGrid.resetDetections();
+			marioTracker.resetDetections();
 			//If sufficient epochs have been reached, slow down game model for better inspection of performance
-			if(epochs >= 200000){
-				sleepTime = 5;  
+			if(epochs >= 1000000){
+				sleepTime = 10;  
 			}
 			
 			
@@ -277,7 +295,7 @@ public class GameModel implements constants {
 			
 			//Present state to actor for action selection; don't allow action selection while jumping
 			if(constants.TEST_PHASE){ 
-				testInputs = Arrays.copyOfRange(state, 0, nStateInput-1);
+				testInputs = Arrays.copyOfRange(state, 0, visionGridInputs + marioTrackInputs + otherInputs-1);
 				action = actor.presentInput(testInputs);
 				if(!mario.isJumping()){
 					mario.setAction(action);
@@ -314,9 +332,12 @@ public class GameModel implements constants {
 				if(powerupTimer == powerupDuration){
 					powerupTimer = 0;
 					powerupActivated = false;
+					mario.setPoweredUp(false);
 					System.out.println("Powerup deactivated");
-				}	
-				powerupTimer++;
+				}
+				else{
+					powerupTimer++;
+				}
 			}
 			
 			
@@ -339,7 +360,7 @@ public class GameModel implements constants {
 			touchedPowerUp = false;
 			jumpedOverBarrel = false;
 			destroyedBarrel = false;
-			steppedOnLadder = false;
+			
 			
 			
 			//printState(reward, previousAction); 
@@ -392,7 +413,7 @@ public class GameModel implements constants {
 			reward = calculateReward(); 
 			//this state becomes the previous state in the next iteration
 			//previousState = Arrays.copyOf(state, state.length);
-			for(int i = 0; i < nStateInput-1; i++){
+			for(int i = 0; i < visionGridInputs + marioTrackInputs + otherInputs-1; i++){
 				previousState[i] = state[i];
 			}
 			
@@ -406,7 +427,7 @@ public class GameModel implements constants {
 				Thread.sleep(sleepTime);
 			}		
 			if(constants.DEMO_PHASE){
-				state[nStateInput + mario.getAction()] = 1.0;
+				state[visionGridInputs + marioTrackInputs + otherInputs + mario.getAction()] = 1.0;
 				trainingSet.add(state);
 			}
 	
@@ -435,9 +456,10 @@ public class GameModel implements constants {
 		initMovingObjects();
 		//firstBarrel = true;
 		powerupActivated = false;
+		mario.setPoweredUp(false);
 	}
 	
-	public boolean isColliding(GameObject o1, GameObject o2){
+	public static boolean isColliding(GameObject o1, GameObject o2){
 		float l1 = o1.getXPos(), r1 = l1+o1.getWidth(), t1 = o1.getYPos(), b1 = t1+o1.getHeight();
 		float l2 = o2.getXPos(), r2 = o2.getXPos()+o2.getWidth(), t2 = o2.getYPos(), b2 = o2.getYPos()+o2.getHeight();
 		//For Jelle: remember that y = 0 is at THE TOP of the screen
@@ -550,6 +572,7 @@ public class GameModel implements constants {
 			if(isColliding(MO,PU)) {
 				touchedPowerUp = true;
 				powerupActivated = true;
+				mario.setPoweredUp(true);
 				//Store the index of the activated powerup so it can be deleted from the list
 				powerupIndex = PUList.indexOf(PU);
 				//This makes sure the timer is reset when a powerup is picked up while a powerup is already active
@@ -857,39 +880,11 @@ public class GameModel implements constants {
 		return score;
 	}
 
+	//Allow the game panel to get the vision grid for drawing them on the screen 
 	public VisionGrid getVisionGrid() {
 		return visionGrid;
 	}
-	
-	//Check if any barrels or ladders are detected in the blocks of the vision grid
-	public void checkDetections(){
-		//for every block, check if a barrel or ladder is inside 
-		for(VisionBlock b : visionGrid.getBlocks()){
-			//detect barrels
-			for(int i = 1; i < MOList.size(); i++){
-				if(isColliding(b, MOList.get(i))){
-					b.barrelDetected(1);
-				}
-			}
-			//detect ladders
-			for(int i = 0; i < ladderList.size(); i++){
-				if(isColliding(b, ladderList.get(i))){
-					b.ladderDetected(1);
-				}
-			}
-			
-			//detect powerups
-			for(int i = 0; i < PUList.size(); i++){
-				if(isColliding(b, PUList.get(i))){
-					b.powerupDetected(1);
-				}
-			}
-			//detect peach
-			if(isColliding(b, peach)){
-				b.peachDetected(1);
-			}
-		}
-	}
-	
-	
+	public VisionGrid getMarioTracker(){
+		return marioTracker;
+	}	
 }

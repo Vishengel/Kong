@@ -40,8 +40,6 @@ public class NeuronJelle {
 		this.activation = 0;
 
 		for(int i=0; i<this.nInputs; i++) {
-			//System.out.println(i + "; " + this.input[i]);
-			//System.out.println(this.weights[i]);
 			this.activation += this.input[i] * this.weights[i];
 		}
 		//System.out.println(this.activation);
@@ -60,23 +58,32 @@ public class NeuronJelle {
 		this.output = sigmoid(this.activation);
 	}
 	
-	public void setSoftmaxOutput(ArrayList<NeuronJelle> outputLayer, double temperature) {
-		this.output = softmax(this.activation, outputLayer, temperature);
+	public void setReluOutput(){
+		this.output = (this.activation > 0 ? this.activation : 0);
 	}
+	
+	/*public void setSoftmaxOutput(ArrayList<NeuronJelle> outputLayer, double temperature) {
+		this.output = softmax(this.activation, outputLayer, temperature);
+	}*/
 	
 	public double getGradient() {
 		return this.gradient;
 	}
 	
-	public void setHiddenGradient(int nodeIndex, ArrayList<NeuronJelle> nextLayer, int hiddenLayer) {
+	public void setHiddenGradient(int nodeIndex, ArrayList<NeuronJelle> nextLayer, int hiddenLayer, boolean isCritic) {
 		double sum = 0;
 		for (NeuronJelle n : nextLayer) {
 			sum += n.getGradient() * n.getWeights()[nodeIndex];
 		}
-		this.gradient = sigmoidPrime(this.activation) * sum;
-		
+		if(!isCritic){
+			this.gradient = reluPrime(this.activation) * sum;		
+		}
+		else{
+			this.gradient = sigmoidPrime(this.activation) * sum;	
+		}
 	}
 	
+
 	
 	
 	
@@ -117,8 +124,11 @@ public class NeuronJelle {
 	public double sigmoidPrime(double activation){
 		double output = sigmoid(activation);
 		return output * (1-this.output);
-		//return Math.pow(Math.E, activation) / ((1 + Math.pow(Math.E, activation))* (1 + Math.pow(Math.E, activation)));
-		
+		//return Math.pow(Math.E, activation) / ((1 + Math.pow(Math.E, activation))* (1 + Math.pow(Math.E, activation)));		
+	}
+	
+	public double reluPrime(double activation){
+		return (activation > 0 ? 1 : 0);
 	}
 	
 	public double tanh(double activation){
@@ -129,7 +139,7 @@ public class NeuronJelle {
 		return 1 - Math.pow(tanh(activation), 2);
 	}
 	
-	public double softmax(double activation, ArrayList<NeuronJelle> outputLayer, double temperature) {
+	/*public double softmax(double activation, ArrayList<NeuronJelle> outputLayer, double temperature) {
 		double activationSum = 0;
 		
 		for(NeuronJelle n : outputLayer) {
@@ -137,7 +147,8 @@ public class NeuronJelle {
 		}
 		
 		return Math.exp(activation / temperature) / activationSum;
-	}
+	}*/
+	
 	
 	public void printWeights() {
 		int i=0;

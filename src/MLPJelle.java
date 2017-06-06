@@ -26,7 +26,10 @@ public class MLPJelle {
 	protected ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
 	protected double learningRate = 0.05;   
-	protected double errorThreshold =  0.069;     
+	protected double errorThreshold =  0.06;     
+	//Define a minimum change that makes the training phase stop when this minimum difference between training epochs
+	//is reached
+	protected double minimumChange = 0.0001; 
 	protected double maxEpochs = 1000;  
 	protected String fileName;
 	
@@ -103,14 +106,13 @@ public class MLPJelle {
 	
 	
 	public void trainNetwork() {
-		double totalError = 0, previousTotalError; 
+		double previousError = 0;
+		double totalError = 0; 
 		double epoch = 0;
 		do {
+			previousError = totalError;
 			//print training progress
-			System.out.println("Learning.. " + Math.round((epoch / maxEpochs) * 100) + "%");
-			//System.out.println("Current epoch: " + epoch);
-			//System.out.println("Training completed in " + epoch + " epochs");
-			previousTotalError = totalError;
+			System.out.println("Learning.. " + Math.round((epoch / maxEpochs) * 100) + "%");		
 			totalError = 0;
 			
 			this.shuffleInput();
@@ -121,13 +123,12 @@ public class MLPJelle {
 			}
 			
 			totalError /= this.input.length;
-			
 			System.out.println(totalError);
 			
 			epoch++;
 		//Continue until either the maximum number of epochs is reached 
 		//or the decrease in the error is smaller than the threshold
-		} while (epoch < maxEpochs && totalError >= errorThreshold);
+		} while (epoch < maxEpochs && totalError >= errorThreshold &&  Math.abs(totalError - previousError) > minimumChange);
 		System.out.println("Training completed in " + epoch + " epochs");
 	}
 	
@@ -151,6 +152,7 @@ public class MLPJelle {
 	}
 	
 	public void forwardPass(double[] input, boolean training) {
+		double activationSum = 0;
 		//First, feed the input to the first hidden layer
 		double[] currentInput = input;
 		//Stores the output to be fed to the next hidden layer as input
@@ -161,7 +163,12 @@ public class MLPJelle {
 			for (int j=0; j<nHidden; j++) {
 				hiddenList.get(i).get(j).setInput(currentInput);
 				hiddenList.get(i).get(j).setActivation();
-				hiddenList.get(i).get(j).setSigmoidOutput();
+				if(this instanceof Critic){
+					hiddenList.get(i).get(j).setSigmoidOutput();
+				}
+				else{
+					hiddenList.get(i).get(j).setReluOutput();
+				}
 				//System.out.println("Act.: " + hiddenList.get(i).get(j).getActivation());
 				outputArray[j] = hiddenList.get(i).get(j).getOutput();
 			}
@@ -178,14 +185,20 @@ public class MLPJelle {
 		
 		for (NeuronJelle n : outputLayer) {
 			//If training on demonstration data, use softmax, otherwise linear activation
-			//The critic always uses linear activation 
 			if(!training){
 				n.setOutput(n.getActivation());
 			}
 			else{
-				n.setSoftmaxOutput(outputLayer, temperature);
+				//calculate total activation sum of each neuron for softmax
+				activationSum += Math.exp(n.getActivation() / temperature);
 			}
 		}	
+		//set corresponding softmax output for each neuron
+		if(training)
+			{for (NeuronJelle n : outputLayer) {
+				n.setOutput(Math.exp(n.getActivation() / temperature) / activationSum);
+			}
+		}
 	}
 	
 	public double backwardPass(int patternIndex) {
@@ -204,7 +217,7 @@ public class MLPJelle {
 			//Train each node in the hidden layer
 			for (int j=0; j<nHidden; j++) {
 				//Calculate gradients for nodes in each hidden layer
-				hiddenList.get(i).get(j).setHiddenGradient(j, nextLayer, i);
+				hiddenList.get(i).get(j).setHiddenGradient(j, nextLayer, i, this instanceof Critic);
 			}
 			nextLayer = hiddenList.get(i);
 		}
@@ -230,12 +243,16 @@ public class MLPJelle {
 	}
 	
 	public int pickOutputByProbability() {
+		double activationSum = 0.0;
 		//convert output layer output to softmax for action selection
 		for(NeuronJelle n: outputLayer){
-			n.setSoftmaxOutput(outputLayer, temperature);
+			//calculate total activation sum of each neuron for softmax
+			activationSum += Math.exp(n.getActivation() / temperature);		
+		}
+		for(NeuronJelle n: outputLayer){
+			n.setOutput(Math.exp(n.getActivation() / temperature) / activationSum);
 			System.out.print("Output node " + outputLayer.indexOf(n) + ": " + n.getActivation());
-			System.out.println(" " + n.getOutput());
-			
+			System.out.println(" " + n.getOutput());		
 		}
 		double p = Math.random();
 		double cumulativeProbability = 0.0;

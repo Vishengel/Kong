@@ -79,28 +79,50 @@ public class GamePanel extends JPanel {
 	
 	 public void paintComponent(Graphics g){
 		super.paintComponent(g); 
-		
+		g.setColor(Color.WHITE);
+		g.drawString("Performance: " + Math.round((model.gamesWon / model.gamesLost) * 100) + "%", 10, 10);
 		
 		//Temporary: draw visionGrid
-		g.drawRect((int)model.getVisionGrid().getXPos(),(int) model.getVisionGrid().getYPos(),(int) model.getVisionGrid().getWidth(),(int) model.getVisionGrid().getHeight());
-		for(VisionBlock b : model.getVisionGrid().getBlocks()){
-			/*if(b.detectedBarrel() == 1){
-				g.drawImage(orange, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);
+		//g.drawRect((int)model.getVisionGrid().getXPos(),(int) model.getVisionGrid().getYPos(),(int) model.getVisionGrid().getWidth(),(int) model.getVisionGrid().getHeight());
+		/*for(VisionBlock b : model.getVisionGrid().getBlocks()){
+			if(b.detectedBarrel() > 0){
+				//g.drawImage(orange, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);
+				g.drawString("" + b.detectedBarrel(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
 			}
-			else if(b.detectedLadder() == 1){
-				g.drawImage(blue, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);			
+			else if(b.detectedLadder() > 0){
+				//g.drawImage(blue, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);	
+				g.drawString("" + b.detectedLadder(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
 			}
-			else if(b.detectedPowerup() == 1){
-				g.drawImage(red, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);
+			else if(b.detectedPowerup() > 0 ){
+				//g.drawImage(red, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);
+				g.drawString("" + b.detectedPowerup(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
 			}
-			else if(b.detectedPeach() == 1){
-				g.drawImage(pink, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);
+			else if(b.detectedPeach() > 0){
+				//g.drawImage(pink, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);
+				g.drawString("" + b.detectedPeach(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
 			}
-			else{*/
+			
+			else{
 				g.drawRect((int)b.getXPos(),(int) b.getYPos(),(int) b.getWidth(),(int) b.getHeight());
-			//}
+				//g.drawString("" + b.detectedBarrel(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
+			}
 		}
-		
+		*/
+		//draw mario tracker
+		/*for(VisionBlock b : model.getMarioTracker().getBlocks()){
+			
+			if(b.detectedMario() > 0){	
+				g.setColor(Color.WHITE);
+				//g.fillRect((int)b.getXPos(),(int) b.getYPos(),(int) b.getWidth(),(int) b.getHeight());
+				g.drawString("" + b.detectedMario(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
+				//System.out.println("MARIO IS CURRENTLY AT BLOCK# " + model.getMarioTracker().getBlocks().indexOf(b));
+			}
+			
+			else{
+				g.setColor(Color.GRAY);
+				g.drawRect((int)b.getXPos(),(int) b.getYPos(),(int) b.getWidth(),(int) b.getHeight());
+			}
+		}*/
 				
 		//Draw game objects	
         for (Platform p : model.getPlatformList()){
@@ -198,63 +220,70 @@ public class GamePanel extends JPanel {
 	}
 	public void animateMario(Graphics g, MovingObject object){
 		int action = object.getAction();
+		float marioWidth = object.getWidth();
+		float marioHeight = object.getHeight();
+		//Draw mario bigger if he has a powerup
+		if(((Player) object).isPoweredUp()){
+			marioWidth += 5;
+			marioHeight += 5;
+		}
 		switch(action){
 		case 0:
-			g.drawImage(marioLeft1, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+			g.drawImage(marioLeft1, (int)object.getXPos(),(int)object.getYPos(),(int)marioWidth,(int)marioHeight, null);
 			break;
 		case 1:
 			if(animationTimer < 4){
-				g.drawImage(marioLeft1, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+				g.drawImage(marioLeft1, (int)object.getXPos(),(int)object.getYPos(),(int)marioWidth,(int)marioHeight, null);
 			}
 			else if(animationTimer >= 4 && animationTimer < 7){
-				g.drawImage(marioLeft2, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+				g.drawImage(marioLeft2, (int)object.getXPos(),(int)object.getYPos(),(int)marioWidth,(int)marioHeight, null);
 			}
 			else{
-				g.drawImage(marioLeft3, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+				g.drawImage(marioLeft3, (int)object.getXPos(),(int)object.getYPos(),(int)marioWidth,(int)marioHeight, null);
 			}
 			break;
 		case 2:
 			if(animationTimer < 4){
-				g.drawImage(marioRight1, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+				g.drawImage(marioRight1, (int)object.getXPos(),(int)object.getYPos(),(int)marioWidth,(int)marioHeight, null);
 			}
 			else if(animationTimer >= 4 && animationTimer < 7){
-				g.drawImage(marioRight2, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+				g.drawImage(marioRight2, (int)object.getXPos(),(int)object.getYPos(),(int)marioWidth,(int)marioHeight, null);
 			}
 			else{
-				g.drawImage(marioRight3, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+				g.drawImage(marioRight3, (int)object.getXPos(),(int)object.getYPos(),(int)marioWidth,(int)marioHeight, null);
 			}	
 			break;
 		case 3:
 			if(object.isClimbing){
 				if(animationTimer <= 5){
-					g.drawImage(marioClimbLeft, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);			
+					g.drawImage(marioClimbLeft, (int)object.getXPos(),(int)object.getYPos(),(int)marioWidth,(int)marioHeight, null);			
 				}
 				else{
-					g.drawImage(marioClimbRight, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);						
+					g.drawImage(marioClimbRight, (int)object.getXPos(),(int)object.getYPos(),(int)marioWidth,(int)marioHeight, null);						
 				}
 			}
 			else{
-				g.drawImage(marioLeft1, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+				g.drawImage(marioLeft1, (int)object.getXPos(),(int)object.getYPos(),(int)marioWidth,(int)marioHeight, null);
 			}
 			break;
 		case 4:
 			if(object.isClimbing){
 				if(animationTimer <= 5){
-					g.drawImage(marioClimbLeft, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);			
+					g.drawImage(marioClimbLeft, (int)object.getXPos(),(int)object.getYPos(),(int)marioWidth,(int)marioHeight, null);			
 				}
 				else{
-					g.drawImage(marioClimbRight, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);						
+					g.drawImage(marioClimbRight, (int)object.getXPos(),(int)object.getYPos(),(int)marioWidth,(int)marioHeight, null);						
 				}
 			}
 			else{
-				g.drawImage(marioLeft1, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+				g.drawImage(marioLeft1, (int)object.getXPos(),(int)object.getYPos(),(int)marioWidth,(int)marioHeight, null);
 			}
 			break;
 		case 5:
-			g.drawImage(marioJumpLeft, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);	
+			g.drawImage(marioJumpLeft, (int)object.getXPos(),(int)object.getYPos(),(int)marioWidth,(int)marioHeight, null);	
 			break;
 		case 6:
-			g.drawImage(marioJumpRight, (int)object.getXPos(),(int)object.getYPos(),(int)object.getWidth(),(int)object.getHeight(), null);
+			g.drawImage(marioJumpRight, (int)object.getXPos(),(int)object.getYPos(),(int)marioWidth,(int)marioHeight, null);
 			break;
 		}
 			

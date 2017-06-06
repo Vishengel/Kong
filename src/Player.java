@@ -14,6 +14,7 @@ public class Player extends MovingObject{
 	private float jumpHeight = 2.6f;
 	private boolean hasWon = false;
 	private boolean isKilled = false;
+	private boolean isPoweredUp = false;
 	
     
 	public Player(float x, float y, int h, int w) {
@@ -199,6 +200,13 @@ public void move(){
 
 	public boolean isJumping() {
 		return jumping;
+	}
+	
+	public void setPoweredUp(boolean isPoweredUp){
+		this.isPoweredUp = isPoweredUp;
+	}
+	public boolean isPoweredUp(){
+		return isPoweredUp;
 	}
 	
 }
