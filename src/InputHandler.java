@@ -1,26 +1,20 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Map;
 
 import com.google.gson.*;
-import com.google.gson.stream.JsonReader;
+
 
 public class InputHandler {
 	private String filePath;
 	
 	private ArrayList<ArrayList<MovingObject>> MOCollection = new ArrayList<ArrayList<MovingObject>>();
 	private ArrayList<ArrayList<Powerup>> PUCollection = new ArrayList<ArrayList<Powerup>>();
-	private ArrayList<Platform> platformList;
-	private ArrayList<Ladder> ladderList;
-	private ArrayList<MovingObject> MOList;
-	private ArrayList<Powerup> PUList; 
+	private ArrayList<Platform> platformList = new ArrayList<Platform>();
+	private ArrayList<Ladder> ladderList = new ArrayList<Ladder>();
+	private Peach peach;
+	private Oil oil = new Oil(0,0,0,0);
+	private Flame flame = new Flame(0,0,0,0);
 	
 	public InputHandler(String filePath) {
 		//The path to the json file where the input is stored
@@ -29,22 +23,94 @@ public class InputHandler {
 	}
 
 	public void readFromJson() {
-		BufferedReader in;
+		//long start = System.currentTimeMillis();
 		try {
-            Gson gson = new GsonBuilder().create();
-            in = new BufferedReader(new FileReader(filePath));
-            JsonParser parser = new JsonParser();
-            //JsonObject obj = parser.parse(filePath).getAsJsonObject();
-            JsonReader reader = new JsonReader(new StringReader(filePath));
-            reader.setLenient(true);
-            System.out.println(reader.nextString());
-            System.out.println(reader.nextString());
+            JsonElement root = new JsonParser().parse(new FileReader(filePath));
             
-            //Map jsonJavaRootObject = gson.fromJson(filePath, Map.class);
-            //System.out.println(jsonJavaRootObject.get("player"));
+            readMovingObjectsFromJson(root.getAsJsonObject().get("stateList").getAsJsonArray());
+            readStaticObjectsFromJson(root.getAsJsonObject().get("staticObjects").getAsJsonObject());
+
+            
         } catch (IOException e) {
 	        System.out.println("File Read Error");
 	    }
+		//System.out.println("Time taken to read JSON: " + (System.currentTimeMillis() - start));
+	}
+	
+	public void readMovingObjectsFromJson(JsonArray stateList) {
+		ArrayList<MovingObject> MOList;
+		ArrayList<Powerup> PUList;
+		JsonObject playerAsJson, barrelAsJson, powerupAsJson;
+		JsonArray barrelList, powerupList;
+		Player player;
+		MovingObject barrel;
+		Powerup powerup;
+		
+        for(int i=0; i<stateList.size(); i++) {
+        	MOList = new ArrayList<MovingObject>();
+        	playerAsJson = stateList.get(i).getAsJsonObject().get("player").getAsJsonObject();
+        	player = new Player(playerAsJson.get("xPos").getAsFloat(), playerAsJson.get("yPos").getAsFloat(),
+        			constants.PLAYER_HEIGHT, constants.PLAYER_WIDTH, playerAsJson.get("action").getAsInt(),
+        			playerAsJson.get("isJumping").getAsBoolean(), playerAsJson.get("isClimbing").getAsBoolean(),
+        			playerAsJson.get("canClimb").getAsBoolean(), playerAsJson.get("isStanding").getAsBoolean(),
+        			playerAsJson.get("isKilled").getAsBoolean(), playerAsJson.get("hasWon").getAsBoolean());
+        	MOList.add(player);
+        	
+        	barrelList = stateList.get(i).getAsJsonObject().get("barrelList").getAsJsonArray();
+        	
+        	for(int j=0; j<barrelList.size(); j++) {
+        		barrelAsJson = barrelList.get(j).getAsJsonObject();
+        		barrel = new Barrel(barrelAsJson.get("xPos").getAsFloat(), barrelAsJson.get("yPos").getAsFloat(),
+        				constants.BARREL_HEIGHT, constants.BARREL_WIDTH, barrelAsJson.get("action").getAsInt());
+        		MOList.add(barrel);
+        	}
+        	
+        	PUList = new ArrayList<Powerup>();
+        	powerupList = stateList.get(i).getAsJsonObject().get("powerupList").getAsJsonArray();
+        	
+        	for(int j=0; j<powerupList.size(); j++) {
+        		powerupAsJson = powerupList.get(j).getAsJsonObject();
+        		powerup = new Powerup(powerupAsJson.get("xPos").getAsFloat(), powerupAsJson.get("yPos").getAsFloat(),
+        				constants.POWERUP_HEIGHT, constants.POWERUP_WIDTH);
+        		PUList.add(powerup);
+        	}
+        	
+        	MOCollection.add(MOList);
+        	PUCollection.add(PUList);
+        } 
+        
+	}
+	
+	public void readStaticObjectsFromJson(JsonObject staticObjects) {
+		JsonArray platformListAsJson = staticObjects.get("platformList").getAsJsonArray(), 
+				ladderListAsJson = staticObjects.get("ladderList").getAsJsonArray();
+		JsonObject platformAsJson, ladderAsJson;
+		Platform platform;
+		Ladder ladder;
+		
+		for(int i=0; i<platformListAsJson.size(); i++) {
+			platformAsJson = platformListAsJson.get(i).getAsJsonObject();
+			platform = new Platform(platformAsJson.get("xPos").getAsFloat(), platformAsJson.get("yPos").getAsFloat(),
+					constants.PLATFORM_HEIGHT, constants.PLATFORM_WIDTH);
+			platform.setHasLadder(platformAsJson.get("hasLadder").getAsBoolean());
+			this.platformList.add(platform);
+		}
+		
+		for(int i=0; i<ladderListAsJson.size(); i++) {
+			ladderAsJson = ladderListAsJson.get(i).getAsJsonObject();
+			ladder = new Ladder(ladderAsJson.get("xPos").getAsFloat(), ladderAsJson.get("yPos").getAsFloat(),
+					constants.LADDER_HEIGHT, constants.LADDER_WIDTH);		
+			this.ladderList.add(ladder);
+		}
+		
+        peach = new Peach(staticObjects.get("peach").getAsJsonArray().get(0).getAsFloat(),
+        		staticObjects.get("peach").getAsJsonArray().get(1).getAsFloat(),
+        		constants.PEACH_HEIGHT, constants.PEACH_WIDTH);
+	}
+	
+	public void test() throws IOException {
+		FileHandler fh = new FileHandler();
+		fh.writeGameStateToFile(MOCollection, PUCollection, platformList, ladderList, peach, oil, flame, "./TrainingData/gameStateDataTest");
 	}
 	
 }

@@ -175,6 +175,7 @@ public class MLPJelle {
 		for (NeuronJelle n : outputLayer) {
 			n.setInput(currentInput);
 			n.setActivation();
+			
 			n.setSoftmaxOutput(outputLayer);
 			softmaxSum += n.getOutput();
 			//n.printWeights();

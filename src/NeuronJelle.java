@@ -20,7 +20,7 @@ public class NeuronJelle {
 	
 	public void initWeights() {
 		for(int i=0; i<nInputs; i++) {
-			weights[i] = 0.01*(-1.0 + (Math.random() * 2.0));
+			weights[i] = 0.2*(-1.0 + (Math.random() * 2.0));
 		}
 	}
 	

@@ -36,6 +36,7 @@ public class Main {
 		*/
 		
 		InputHandler IH = new InputHandler("src/TrainingData/gameStateData.json");
+		IH.test();
 
 	}
 }

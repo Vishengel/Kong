@@ -86,7 +86,6 @@ public class FileHandler {
 		    	barrelList = new JsonArray();
 		    	powerupList = new JsonArray();
 
-		    	int bc = 0;
 		    	for (MovingObject MO : MOList) {
 		    		MOJson = new JsonObject();
 		    		if (MO.getName() == "player") {	    			    			
@@ -103,7 +102,7 @@ public class FileHandler {
 		    		} else if (MO.getName() == "barrel") {
 		    			MOJson.addProperty("xPos", MO.getXPos());
 		    			MOJson.addProperty("yPos", MO.getYPos());
-		    			//We use the bc ("barrel counter") to give the barrels a unique name
+		    			MOJson.addProperty("action", MO.getAction());
 		    			barrelList.add(MOJson);
 		    		}
 		    		
@@ -159,15 +158,6 @@ public class FileHandler {
 		    
 		    gson.toJson(trainingData, out);
 		    
-		    //out.write(MOCollection.get(0).get(0).getXPos() + "");
-		    //write the inputs to the file
-		    /*
-		    for(int i = 0; i < inputs.length; i++){
-			    fw.write(inputs[i] + ",");			    
-		    }
-		   
-		    //write the action taken to a file
-		    writeActionToFile(fw, action);*/
 		    System.out.println("Written to file!");
 		    out.close();
 		}
