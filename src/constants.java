@@ -8,7 +8,7 @@ public interface constants {
 	boolean GUI_ON = true;
 	
 	boolean DEMO_PHASE = false;  
-	boolean TEST_PHASE = true;  
+	boolean TEST_PHASE = true;   
 	
 	
 	boolean RANDOM_ACTOR = false;

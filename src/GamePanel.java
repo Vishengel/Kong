@@ -80,7 +80,7 @@ public class GamePanel extends JPanel {
 	 public void paintComponent(Graphics g){
 		super.paintComponent(g); 
 		g.setColor(Color.WHITE);
-		g.drawString("Performance: " + Math.round((model.gamesWon / model.gamesLost) * 100) + "%", 10, 10);
+		g.drawString("Performance: " + model.performance + "%", 10, 10);
 		
 		//Temporary: draw visionGrid
 		//g.drawRect((int)model.getVisionGrid().getXPos(),(int) model.getVisionGrid().getYPos(),(int) model.getVisionGrid().getWidth(),(int) model.getVisionGrid().getHeight());
@@ -109,21 +109,21 @@ public class GamePanel extends JPanel {
 		}
 		*/
 		//draw mario tracker
-		/*for(VisionBlock b : model.getMarioTracker().getBlocks()){
+		//for(VisionBlock b : model.getMarioTracker().getBlocks()){
 			
-			if(b.detectedMario() > 0){	
+			/*if(b.detectedMario() > 0){	
 				g.setColor(Color.WHITE);
-				//g.fillRect((int)b.getXPos(),(int) b.getYPos(),(int) b.getWidth(),(int) b.getHeight());
-				g.drawString("" + b.detectedMario(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
+				g.fillRect((int)b.getXPos(),(int) b.getYPos(),(int) b.getWidth(),(int) b.getHeight());
+				//g.drawString("" + b.detectedMario(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
 				//System.out.println("MARIO IS CURRENTLY AT BLOCK# " + model.getMarioTracker().getBlocks().indexOf(b));
-			}
+			}*/
 			
-			else{
-				g.setColor(Color.GRAY);
-				g.drawRect((int)b.getXPos(),(int) b.getYPos(),(int) b.getWidth(),(int) b.getHeight());
-			}
-		}*/
-				
+			//else{
+				//g.setColor(Color.GRAY);
+				//g.drawRect((int)b.getXPos(),(int) b.getYPos(),(int) b.getWidth(),(int) b.getHeight());
+			//}
+		//}
+			
 		//Draw game objects	
         for (Platform p : model.getPlatformList()){
         	//if(p.getHasLadder()) {

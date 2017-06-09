@@ -7,12 +7,11 @@ public class Critic extends MLPJelle {
 	double discount = 0.99;  
 	double[] rewards;
 	
-	
 	public Critic(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName) {
 		super(nInput, nHiddenLayers, nHidden, nOutput, fileName);
 		target = new double[input.length][1];
 		//System.out.println("n in: " + target.length);
-		errorThreshold = 0.045; 
+		errorThreshold = 0.3; 
 	}
 	
 	
@@ -93,7 +92,7 @@ public class Critic extends MLPJelle {
 			//present previous state to the Critic and apply the target in backpropagation.
 			forwardPass(previousState, false); 
 			System.out.println("Value of previous state before backprop: " + outputLayer.get(0).getOutput());
-			backwardPass(0);
+			//backwardPass(0);
 			forwardPass(previousState, false); 
 			System.out.println("Value of previous state after backprop: " + outputLayer.get(0).getOutput());
 			

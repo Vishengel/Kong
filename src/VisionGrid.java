@@ -45,8 +45,8 @@ public class VisionGrid extends GameObject{
 	//Move the entire grid to the specified (x,y) coordinates
 	public void moveGrid(float x, float y){
 		//calculate difference in x and y position compared to current position
-		float marioCenterX = (size / 2) * blocks.get(0).getWidth()+10;
-		float marioCenterY  = (size / 2) * blocks.get(0).getHeight() + 10;
+		float marioCenterX = (size / 2) * blocks.get(0).getWidth()+5;
+		float marioCenterY  = (size / 2) * blocks.get(0).getHeight() + 45;
 		x -= marioCenterX;
 		y -= marioCenterY;
 		float xdiff;
@@ -122,18 +122,18 @@ public class VisionGrid extends GameObject{
 	
   //Check if any barrels or ladders are detected in the blocks of the vision grid
   	public void checkDetections(ArrayList<MovingObject> MOList, ArrayList<Ladder> ladderList, ArrayList<Powerup> PUList, Player mario, Peach peach){
-  		float barrelDetections = 0;
-  		float ladderDetections = 0;
-  		float powerupDetections = 0;
-  		float peachDetections = 0;
-  		float marioDetections = 0;
+  		//float barrelDetections = 0;
+  		//float ladderDetections = 0;
+  		//float powerupDetections = 0;
+  		//float peachDetections = 0;
+  		//float marioDetections = 0;
   		//for every block, check if a barrel or ladder is inside 
   		for(VisionBlock b : blocks){
   			//detect barrels
   			for(int i = 1; i < MOList.size(); i++){
   				if(GameModel.isColliding(b, MOList.get(i))){
   					b.barrelDetected(1);
-  					barrelDetections++;
+  					//barrelDetections++;
   					
   				}
   			}
@@ -141,7 +141,7 @@ public class VisionGrid extends GameObject{
   			for(int i = 0; i < ladderList.size(); i++){
   				if(GameModel.isColliding(b, ladderList.get(i))){
   					b.ladderDetected(1);
-  					ladderDetections++;
+  					//ladderDetections++;
   				}
   			}
   			
@@ -149,25 +149,25 @@ public class VisionGrid extends GameObject{
   			for(int i = 0; i < PUList.size(); i++){
   				if(GameModel.isColliding(b, PUList.get(i))){
   					b.powerupDetected(1);
-  					powerupDetections++;
+  					//powerupDetections++;
   				}
   			}
   			//detect peach
   			if(GameModel.isColliding(b, peach)){
   				b.peachDetected(1);
-  				peachDetections++;
+  				//peachDetections++;
   			}
   		//detect mario
 			if(GameModel.isColliding(b, mario)){
 				b.marioDetected(1);
-				marioDetections++;
+				//marioDetections++;
 			}
   			
   		}
   		
   		//Divide the detection values by the number of detections;
   		//Divide the value in each block by the total number of blocks that the object occupies
-  		for(VisionBlock b : blocks){
+  		/*for(VisionBlock b : blocks){
   			if(barrelDetections > 0){
   				b.barrelDetected(b.detectedBarrel()/barrelDetections);
   			}
@@ -184,6 +184,7 @@ public class VisionGrid extends GameObject{
   				b.marioDetected(b.detectedMario()/marioDetections); 
   			}
   		}
+  		*/
   	}
     
     

@@ -6,18 +6,19 @@ import java.util.Arrays;
 
 public class GameModel implements constants {
 	
-	String filename = "trainingSet3333";
+	String filename = "trainingSetFinalOne";
 	
 	//performance variables
 	double gamesWon = 0;
-	double gamesLost = 1;
+	double gamesPlayed = 0;
+	double performance = 0;
 	
 	private double score = 0;
 	private int lives = 3;
 	
 	//these values determine how fast barrels are spawned in the game
 	private int spawnTimer = 200; 	
-	private int barrelSpawnTime = 200;    
+	private int barrelSpawnTime = 200;      
 	
 	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
@@ -58,15 +59,15 @@ public class GameModel implements constants {
 
 	private boolean powerupActivated = false;
 	
-	private VisionGrid visionGrid = new VisionGrid(constants.PLAYER_START_X, constants.PLAYER_START_Y, 160, 200, 7);
-	private VisionGrid marioTracker = new VisionGrid(0, 0,constants.SCREEN_Y, constants.SCREEN_X, 10 );
+	private VisionGrid visionGrid = new VisionGrid(constants.PLAYER_START_X, constants.PLAYER_START_Y, 180, 230, 7);
+	private VisionGrid marioTracker = new VisionGrid(0, 0,constants.SCREEN_Y, constants.SCREEN_X, 6 );
 	
 	//N x N vision grid inputs 
 	private int visionGridInputs = visionGrid.getSize() * visionGrid.getSize() * 4;
 	//N x N mario tracker inputs 
 	private int marioTrackInputs = marioTracker.getSize() * marioTracker.getSize();
-	//3 additional inputs + bias + reward
-	private int otherInputs = 5;
+	//4 additional inputs + bias + reward
+	private int otherInputs = 6;
 	
 			
 	//These values determine the rewards 
@@ -145,54 +146,61 @@ public class GameModel implements constants {
 		for(int i = 0; i < marioTrackInputs; i++){
 			state[visionGridInputs + i] = marioTracker.getMarioInputs()[i];
 		}
-			
+	
 		state[visionGridInputs + marioTrackInputs] = mario.isClimbing() ? 1 : 0;
-		//System.out.println("Climbing: " + state[nStateInput - 3]);
-		state[visionGridInputs + marioTrackInputs + 1] = powerupActivated ? 1 : 0;
-		//System.out.println("Powered-up: " + state[nStateInput - 2]);
+		state[visionGridInputs + marioTrackInputs + 1] = mario.canClimb ? 1 : 0;
+		state[visionGridInputs + marioTrackInputs + 2] = powerupActivated ? 1 : 0;
 		//Give mario the time passed since he picked up a powerup
-		state[visionGridInputs + marioTrackInputs + 2] = powerupTimer/powerupDuration;
-		
-		state[visionGridInputs + marioTrackInputs + 3] = -1.0;
+		state[visionGridInputs + marioTrackInputs + 3] = powerupTimer/powerupDuration;
+		state[visionGridInputs + marioTrackInputs + 4] = -1.0;
 		//Add the reward received in this state
-		state[visionGridInputs + marioTrackInputs + 4] = reward;
+		state[visionGridInputs + marioTrackInputs + 5] = reward;
 		
-		//System.out.println("Total state size should be: " + (visionGridInputs + marioTrackInputs + otherInputs+ nOutput));
+		System.out.println("Total state size should be: " + (visionGridInputs + marioTrackInputs + otherInputs+ nOutput));
 		return state;
 		
 	}
 
 	//calculate rewards and reset the appropriate values
-	public double calculateReward(){
+	public double calculateReward(int action, int previousAction){
 		double reward = 0;
 
 		if(gameWon){
-			reward += 25;
-			score += 25;
+			reward += 500;
+			score += 500; 
 		}
 		
 		if(hitByBarrel){
 			System.out.println("Hit by barrel!");
-			reward -= 10;
-			score -= 10;	
+			reward -= 200;
+			score -= 200;	
 		}
 		
 		else if(jumpedOverBarrel){
 			System.out.println("Jumped over a barrel!");
-			reward += 1;
-			score += 1;
+			reward += 10;
+			
 		}
 		else if(destroyedBarrel){
 			System.out.println("Smashed a barrel!");
-			reward += 0.5;
-			score += 0.5;
+			reward += 8;
+			score += 8;
 		}
 		
 		if(touchedPowerUp){
 			System.out.println("Picked up powerup!");
-			reward += 0.5;
-			score += 0.5;
+			reward += 2;
+			score += 2;
 		}
+		//Give Mario a penalty if he changes directions from left to right or from right to left
+		//This is an incentive for Mario to get stuck less
+		/*if( (action == 1 && previousAction == 2) || (action == 2 && previousAction == 1)){
+			reward -= 5;
+			score -= 5;
+			System.out.println("Changed direction!");
+		}
+		System.out.println("Action: " + action);
+		System.out.println("Previous action: " + previousAction);*/
 		/*
 	    if(mario.isClimbing()){
 			reward += 0.01;
@@ -249,8 +257,8 @@ public class GameModel implements constants {
 		}
 		if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){ 
 			actor.trainNetwork();
-			critic.trainNetwork();
-			actor.setLearningRate(0.00005); 
+			//critic.trainNetwork();
+			actor.setLearningRate(0.00002);  
 		}
 		
 		double reward = 0;
@@ -375,14 +383,15 @@ public class GameModel implements constants {
 				
 				//if mario is hit, subtract a life
 				if(MOList.get(0).isKilled){	
-					gamesLost++;
+					gamesPlayed++;
 					hitByBarrel = true;
 					lives--;
 					resetGame();
 				} 
 				else if(gameWon){
 						//if mario saved the princess, reset game
-						System.out.println("Princess saved!");					
+						System.out.println("Princess saved!");	
+						gamesPlayed++;
 						gamesWon++;
 						resetGame();					
 				}					
@@ -410,7 +419,7 @@ public class GameModel implements constants {
 			//Move vision grid to mario's new position
 			visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
 			//calculate the reward for the current state 
-			reward = calculateReward(); 
+			reward = calculateReward(action, previousAction); 
 			//this state becomes the previous state in the next iteration
 			//previousState = Arrays.copyOf(state, state.length);
 			for(int i = 0; i < visionGridInputs + marioTrackInputs + otherInputs-1; i++){
@@ -457,6 +466,7 @@ public class GameModel implements constants {
 		//firstBarrel = true;
 		powerupActivated = false;
 		mario.setPoweredUp(false);
+		performance = 100 * gamesWon / gamesPlayed;
 	}
 	
 	public static boolean isColliding(GameObject o1, GameObject o2){
