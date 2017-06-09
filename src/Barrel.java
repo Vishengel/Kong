@@ -8,8 +8,8 @@ public class Barrel extends MovingObject{
 	public Barrel(float x, float y, int h, int w, int action) {
 		super(x, y, h, w);
 		this.action = action;
-		xVel = 1.5f;
-		yVel = 1.7f;
+		xVel = 1f;
+		yVel = 1f;
 		pointAwarded = false;
 		name = "barrel";
 	}

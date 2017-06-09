@@ -11,14 +11,16 @@ public class Player extends MovingObject{
 	private boolean goLeft, goRight, goUp, goDown, jump;
 	private boolean keysDown[] = new boolean[255];	 
 	private float jumpHeight = 2.6f;
-	
-	//private boolean isKilled = false;
+
+	private boolean hasWon = false;
+	private boolean isKilled = false;
+	private boolean isPoweredUp = false;
 	
     
 	public Player(float x, float y, int h, int w) {
 		super(x, y, h, w);
 		xVel = 1.5f;
-		yVel = 1.5f;
+		yVel = 1.8f; 
 		name = "player";	
 	}
 	
@@ -196,4 +198,16 @@ public void move(){
 	public boolean isClimbing() {	
 		return isClimbing;
 	}
+
+	public boolean isJumping() {
+		return jumping;
+	}
+	
+	public void setPoweredUp(boolean isPoweredUp){
+		this.isPoweredUp = isPoweredUp;
+	}
+	public boolean isPoweredUp(){
+		return isPoweredUp;
+	}
+	
 }

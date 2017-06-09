@@ -11,7 +11,7 @@ public abstract class GameObject {
 	protected Color color;
 	protected boolean isSolid;
 	protected String name;
-	
+
 	public GameObject(float x, float y, float h, float w){
 		xPos = x;
 		yPos = y;

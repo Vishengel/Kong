@@ -5,88 +5,82 @@ import java.util.Arrays;
 
 
 public class GameModel implements constants {
-	private int score = 0;
+	
+	String filename = "trainingSet3333";
+	
+	//performance variables
+	double gamesWon = 0;
+	double gamesLost = 1;
+	
+	private double score = 0;
 	private int lives = 3;
 	
 	//these values determine how fast barrels are spawned in the game
-	private int spawnTimer = 100;	
-	private int barrelSpawnTime = 100;  
+
+	private int spawnTimer = 200; 	
+	private int barrelSpawnTime = 200;    
 	
 	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
-	private int powerupTimer = 0;	
+	private double powerupTimer = 0;	
 	//This value determines how long the powerup lasts when Mario picks it up
-	private int powerupDuration = 300;
+	private double powerupDuration = 300;
 	private int powerupIndex = -1;
 	
 	//This value determines for how many epochs the game has been running already
 	private int epochs = 0;
-	private int maxEpochs = 500;
+
+	private double temperature = 1;    
+
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
-	private int sleepTime = 15; 
-	
-	//These values determine the respective amount of inputs to the Multi-layer Perceptron for learning
-	//to climb ladders or dodging barrels
-	//private int nInputsClimb = 7;
-	//private int nInputsDodge = 2;
-	
-	
-	private int NstateInputs = 12;
 
-	private int nOutputs = 7;
+	private int sleepTime = 0;        
+	 		
+	private int nOutput = 7;
 	
 	private ArrayList<Platform> platformList;
 	private ArrayList<Ladder> ladderList;
 	private ArrayList<MovingObject> MOList;
 	private ArrayList<Powerup> PUList;
-
-	//These lists contain the entire respective inputs + targets training setfor each epoch. These arrays 
-	//are later written to a file
-	//private ArrayList<double[]> dodgeTrainingSet = new ArrayList<double[]>();
-	//private ArrayList<double[]> climbTrainingSet = new ArrayList<double[]>();
 	
 	private ArrayList<double[]> trainingSet = new ArrayList<double[]>();
 	private ArrayList<ArrayList<MovingObject>> MOCollection = new ArrayList<ArrayList<MovingObject>>();
 	private ArrayList<ArrayList<Powerup>> PUCollection = new ArrayList<ArrayList<Powerup>>();
 	
-	//These variables are the two multi-layer perceptrons that are used for learning 
 
-	//MLPJelle dodgeMLP;
-	//MLPJelle climbMLP;
-	MLPJelle actor;
-	
+	MLPJelle actor;	
 	Critic critic;
-	double discount = 0.6;
-	double[] state;
-	double[] previousState;
+	
+	//double[] state;
+	//double[] previousState;
 	
 	private Player mario;
 	private Peach peach;
 
-	private Oil oil;
-	private Flame flame;
-	
 	private boolean powerupActivated = false;
 	
+	private VisionGrid visionGrid = new VisionGrid(constants.PLAYER_START_X, constants.PLAYER_START_Y, 160, 200, 7);
+	private VisionGrid marioTracker = new VisionGrid(0, 0,constants.SCREEN_Y, constants.SCREEN_X, 10 );
 	
+	//N x N vision grid inputs 
+	private int visionGridInputs = visionGrid.getSize() * visionGrid.getSize() * 4;
+	//N x N mario tracker inputs 
+	private int marioTrackInputs = marioTracker.getSize() * marioTracker.getSize();
+	//3 additional inputs + bias + reward
+	private int otherInputs = 5;
+	
+			
 	//These values determine the rewards 
 	private boolean gameWon = false;
 	private boolean hitByBarrel = false;
 	private boolean touchedPowerUp = false;
 	private boolean jumpedOverBarrel = false;
 	private boolean destroyedBarrel = false;
-	private boolean steppedOnLadder = false;
+	
 	
 	//allow for alternating left and right barrel spawing during training
 	private boolean leftSpawned = true;
-	
-	//These values relate to specific inputs necessary for learning to jump over barrels
-	private int ladderRight;
-	private int barrelRight;
-	private int barrelOnSameLevel;
-	private int barrelClimbing;
-	
 	
 	//The file handler is used to write to and read from the text files
 	FileHandler fh = new FileHandler();
@@ -107,7 +101,7 @@ public class GameModel implements constants {
 	}
 	
 	public void spawnRightBarrel(){
-		MOList.add(new Barrel(constants.SCREEN_X, constants.SCREEN_Y-220,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, 1));
+		MOList.add(new Barrel(constants.SCREEN_X, constants.SCREEN_Y-220,constants.BARREL_HEIGHT,constants.BARREL_WIDTH, 0));
 	}
 	
 	
@@ -125,339 +119,190 @@ public class GameModel implements constants {
 			
 	}
 	
-	//This function returns the Euclidean distance between two game objects
-	public float getEuclideanDistance(GameObject go1, GameObject go2) {
-		float x1 = go1.getXPos() + go1.getWidth() / 2;
-		float x2 = go2.getXPos() + go2.getWidth() / 2;
-		float y1 = go1.getYPos() + go1.getHeight() / 2;
-		float y2 = go2.getYPos() + go2.getHeight() / 2;
-		return (float) Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) );
+	public double euclideanDistance(GameObject o1, GameObject o2){
+		return Math.sqrt( ((o1.getXPos() - o2.getXPos()) * (o1.getXPos() - o2.getXPos()))
+				+ ((o1.getYPos() - o2.getYPos()) * (o1.getYPos() - o2.getYPos())) );
 	}
-	
-	
-	//Find the distance between Mario and another closest object
-	public float findNearestObject(String objectName){
-		float minimumDistance = 300;
-		if(objectName == "ladder"){
-			for(int i = 0; i < ladderList.size(); i++){
-				Ladder l = ladderList.get(i);
-				float distance = getEuclideanDistance(mario,ladderList.get(i));
-				//only do this if the platform is between the top and middle of mario
-				if(distance < minimumDistance && (l.getYPos() + l.getHeight()) > mario.getYPos()
-				&& (l.getYPos() + l.getHeight()) < (mario.getYPos() + mario.getHeight() / 2)){
-					minimumDistance = distance;
-					if(mario.getXPos() <= l.getXPos()){
-						ladderRight = 1;				
-					}
-					else{
-						ladderRight = 0;
-					}
-				}
-				
-			}
-			
-		}
-		//distance between Mario and closest powerup
-		else if(objectName == "powerup"){
-			for(int i = 0; i < PUList.size(); i++){
-				float distance = getEuclideanDistance(mario,PUList.get(i));
-				if(distance < minimumDistance){
-					minimumDistance = distance;
-				}
-			}		
-		}
-		
-		else if(objectName == "barrel"){
-			for(int i = 0; i < MOList.size(); i++){
-				if(MOList.get(i).getName() == "barrel"){
-					Barrel b = (Barrel) MOList.get(i);
-					float distance = getEuclideanDistance(mario,MOList.get(i));
-					
-					//only consider barrels that still wield a point when jumped over; 
-					//don't look at barrels that are no longer a threat
-					if(distance < minimumDistance && !b.pointAwarded()){
-							minimumDistance = distance;
-							//check if barrel is to the left or to the right
-							if(mario.getXPos() <= b.getXPos()){
-								barrelRight = 1;
-							}
-							else{
-								barrelRight = -1;
-							}
-					//if barrel is on the same level
-					if((b.getYPos() + b.getHeight()) >= (mario.getYPos())
-					    && (b.getYPos() + b.getHeight()) <= (mario.getYPos() + mario.getHeight()) ){
-					    	barrelOnSameLevel = 1;							
-					}
-					else{
-						barrelOnSameLevel = -1;
-					}
-					if(b.isClimbing){
-						barrelClimbing = 1;
-					}
-					else{
-						barrelClimbing = -1;
-					}
-				}
-			}
-		}
-	  }
-		return minimumDistance;
-	}
-	
-	public float normalizeForLadders(float distance){
-		if(distance < 15){
-			return 1;
-			
-		}
-		else if(distance >= 15 && distance < 200){
-			return 0;
-		}
-		else{
-			return -1;
-		}
-		//return (distance < 500? (500-distance)/500 : 500);
-	}
-	
-	/*public double[] calculateClimbInputs(){
-		//this array contains the 3 boolean and 5 float inputs for the ladder climbing MLP
-		double[] climbInputs = new double[nInputsClimb + nOutputs];
-		
-		//climb mlp inputs
-		climbInputs[0] = mario.isClimbing() ? 1 : -1;
-		//calculate distance to nearest ladder
-		climbInputs[1] = normalize(findNearestObject("ladder"));	
-		climbInputs[2] = ladderRight;	
-		climbInputs[3] = normalizeForDodging(findNearestObject("barrel"));
-		climbInputs[4] = barrelRight;
-		climbInputs[5] = barrelClimbing;
-		climbInputs[6] = barrelOnSameLevel;
-		//calculate distance to peach 
-		//climbInputs[3] = normalize(getEuclideanDistance(mario, peach));
-		
-		/*System.out.println("1: Mario is climbing: " + mario.isClimbing());
-		System.out.println("2: Nearest Ladder: " + climbInputs[1]);
-		System.out.println("3: Ladder is to the right: " + climbInputs[2]);
-		System.out.println("4: Nearest barrel? " + climbInputs[3]);
-		System.out.println("5: Barrel to right? " + climbInputs[4]);
-		System.out.println("6: Barrel climbing? " + climbInputs[5]);
-		System.out.println("7: Barrel on same level? " + climbInputs[6]);
-		*/
-		//System.out.println("Distance to peach: " + climbInputs[3]);
-		
-		
-		//return climbInputs;
-	//}  
-	
-	public float normalizeForDodging(float distance){
-		if(distance < 130){
-			return 1;
-			
-		}
-		else if(distance >= 15 && distance < 200){
-			return 0;
-		}
-		else{
-			return -1;
-		}
-	}
-	
-	public float normalizepowerup(float distance){
-		if(distance <= 45){
-			return 1;
-		}
-		else if(distance >= 45 && distance < 90){
-			return 0;
-		}
-		else{
-			return -1;
-		}
-	}
-	
-	public float normalizePeach(float distance){
-		if(distance <= 80){
-			return 1;
-		}
-		else if(distance >= 80 && distance < 120){
-			return 0;
-		}
-		else{
-			return -1;
-		}
-	}
-	
-	//This function calculates the inputs necessary for dodging barrels
-	/*public double[] calculateDodgeInputs(){
-		double[] dodgeInputs = new double[nInputsDodge + nOutputs];
-		//calculate distance to the nearest barrel
 
-		dodgeInputs[0] = normalizeForDodging(findNearestObject("barrel"));
-		//determine whether or not a barrel is to the left or to the right of Mario
-		dodgeInputs[1] = barrelRight;	
+	public double[] calculateState(double reward){
+		double[] state = new double[visionGridInputs + marioTrackInputs + otherInputs + nOutput];
+		//Check whether or not barrels / ladders are in the grid's blocks
+		visionGrid.checkDetections(MOList,ladderList, PUList, mario, peach);
+		marioTracker.checkDetections(MOList,ladderList, PUList, mario, peach);
 		
-		return dodgeInputs;
-	}*/
-	
-	public double[] calculateState(){
-		double[] state = new double[NstateInputs + nOutputs];
-		//System.out.println(state.length);
-		
-		//state variables about ladders, climbing and jumping
-		//System.out.println("-----------------------------------");
-		//1 if mario is jumping, -1 otherwise
-		state[0] = mario.isJumping() ? 1 : -1;
-		//System.out.println("Mario jumping: " + state[0]);
-		//1 if mario is climbing, -1 otherwise
-		state[1] = mario.isClimbing() ? 1 : -1;
-		//System.out.println("Mario climbing: " + state[1]);
-		//categorical distance to nearest ladder
-		state[2] = normalizeForLadders(findNearestObject("ladder"));
-		//System.out.println("Nearest ladder: " + state[2]);
-		//1 if nearest ladder is to the right of mario, -1 otherwise
-		state[3] = ladderRight;	
-		//System.out.println("Ladder right?: " + state[3]);
-		
-		//state variables about barrels and jumping
-		//categorical distance to nearest barrel
-		state[4] = normalizeForDodging(findNearestObject("barrel"));
-		//System.out.println("Nearest barrel: " + state[4]);
-		//1 if closest barrel is to the right of mario, -1 if not
-		state[5] = barrelRight;
-		//System.out.println("Barrel right?: " + state[5]);
-		//1 if the closest barrel is rolling down a ladder, -1 if not
-		state[6] = barrelClimbing;
-		//System.out.println("Barrel on ladder?: " + state[6]);
-		//1 if the nearest barrel is on the same platform level as mario, -1 if not
-		state[7] = barrelOnSameLevel;
-		//System.out.println("Barrel on same level?: " + state[7]);
-		//state variables about powerups
-		//categorical distance to nearest powerup
-		state[8] = normalizepowerup(findNearestObject("powerup"));
-		//System.out.println("Nearest powerup: " + state[8]);
-		//1 if mario is powered up and can destroy barrel, -1 if not
-		state[9] = powerupActivated ? 1 : -1;	
-		//System.out.println("Powered-up?: " + state[9]);
-		//categorical distance to peach
-		state[10] = normalizePeach(getEuclideanDistance(mario, peach));
-		//System.out.println("Distance to peach?: " + state[10]);
-		
-		state[NstateInputs - 1] = -1;
-		//System.out.println("Bias: " + state[NstateInputs - 1]);
-		//System.out.println("-----------------------------------");
-		//add bias
-		
-		/*for(int i = 0; i < NstateInputs + 1; i++){
-			System.out.print(state[i] + " ");
+		//fill the state array with the detections inputs of the vision grid
+		for(int i = 0; i < visionGridInputs / 4; i++){
+			state[i] = visionGrid.getBarrelInputs()[i];
 		}
-		System.out.println();*/
+		for(int i = 0; i < visionGridInputs / 4; i++){
+			state[i + visionGridInputs / 4] = visionGrid.getLadderInputs()[i];
+		}
+		for(int i = 0; i < visionGridInputs / 4; i++){
+			state[i + visionGridInputs / 2] = visionGrid.getPowerupInputs()[i];
+		}
+		for(int i = 0; i < visionGridInputs / 4; i++){
+			state[i + visionGridInputs / 2 + visionGridInputs / 4] = visionGrid.getPeachInputs()[i];
+		}
+		
+		for(int i = 0; i < marioTrackInputs; i++){
+			state[visionGridInputs + i] = marioTracker.getMarioInputs()[i];
+		}
+			
+		state[visionGridInputs + marioTrackInputs] = mario.isClimbing() ? 1 : 0;
+		//System.out.println("Climbing: " + state[nStateInput - 3]);
+		state[visionGridInputs + marioTrackInputs + 1] = powerupActivated ? 1 : 0;
+		//System.out.println("Powered-up: " + state[nStateInput - 2]);
+		//Give mario the time passed since he picked up a powerup
+		state[visionGridInputs + marioTrackInputs + 2] = powerupTimer/powerupDuration;
+		
+		state[visionGridInputs + marioTrackInputs + 3] = -1.0;
+		//Add the reward received in this state
+		state[visionGridInputs + marioTrackInputs + 4] = reward;
+		
+		//System.out.println("Total state size should be: " + (visionGridInputs + marioTrackInputs + otherInputs+ nOutput));
 		return state;
+		
 	}
-	
-	
-	
+
 	//calculate rewards and reset the appropriate values
 	public double calculateReward(){
-		int reward = 0;
+		double reward = 0;
 
 		if(gameWon){
-			reward += 1000;
-			score += 1000;
+			reward += 25;
+			score += 25;
 		}
+		
 		if(hitByBarrel){
 			System.out.println("Hit by barrel!");
-			reward -= 700;
-			score -= 700;	
+			reward -= 10;
+			score -= 10;	
 		}
 		
 		else if(jumpedOverBarrel){
 			System.out.println("Jumped over a barrel!");
-			reward += 150;
-			score += 150;
+			reward += 1;
+			score += 1;
 		}
 		else if(destroyedBarrel){
 			System.out.println("Smashed a barrel!");
-			reward += 100;
-			score += 100;
+			reward += 0.5;
+			score += 0.5;
 		}
 		
 		if(touchedPowerUp){
 			System.out.println("Picked up powerup!");
-			reward += 10;
-			score += 10;
+			reward += 0.5;
+			score += 0.5;
 		}
-		
-		if(steppedOnLadder){
-			reward += 30;
-			score += 30;
+		/*
+	    if(mario.isClimbing()){
+			reward += 0.01;
+			score += 0.01; 
 		}
-		hitByBarrel = false;
-		gameWon = false;
-		touchedPowerUp = false;
-		jumpedOverBarrel = false;
-		destroyedBarrel = false;
-		steppedOnLadder = false;
+		*/
+	    //Give positive reward when closer to Peach in the vertical axis
+	    //reward += !mario.isJumping() ? 1.0 / (mario.getYPos() - peach.getYPos()) : 0;
+	    
+	    //Give a positive reward that grows smaller the closer Mario is to Peach
+	   //reward += 10/euclideanDistance(mario, peach);
+	    //score += 10/euclideanDistance(mario, peach);
+	    //System.out.println("Distance to peach: " + euclideanDistance(mario, peach));
+	    //reward -= 0.2;
+	    //score -= 0.2;
+		//if(steppedOnLadder){
+			//reward += 30;
+			//score += 30;
+		//}
 		
 		return reward;
 	}
 	
+	//Prints all the vital information pertaining to the current state
+	public void printState(double reward, int previousAction){
+		System.out.println("--------------Current epoch: " + epochs + "----------------------");
+		System.out.println("Temperature: " + temperature);
+		System.out.println("Current action: " + mario.getAction());
+		System.out.println("Previous action: " + previousAction); 
+		System.out.println("Previous reward: " + reward);
+	}
+	
+	public void reduceTemperature(){
+		temperature = (temperature > 1? temperature * 0.999: 1);		
+	}
 	
 	//main game loop
 	public void runGame() throws InterruptedException, IOException{
 		double[] testInputs;
-		double reward = 0;
-		double feedback = 0;
+		double[] state;
+		double[] previousState;
 		
-		state = new double[NstateInputs];
-		previousState = new double[NstateInputs];
+		state = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
+		previousState = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
+		
+		visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
 		
 		//don't create the actor and critic if in the demonstration phase
 		if(!constants.DEMO_PHASE){
-			actor = new MLPJelle(NstateInputs, 1, 70, nOutputs, "trainingSet");
-			//critic = new Critic(NstateInputs, 1, 5, 1, "");
+			actor = new MLPJelle(visionGridInputs + marioTrackInputs + otherInputs, 1, (visionGridInputs + marioTrackInputs + otherInputs + nOutput) / 2 + 1, nOutput, filename); 
+			critic = new Critic(visionGridInputs + marioTrackInputs + otherInputs, 1, (visionGridInputs + marioTrackInputs + otherInputs + 1)/2 + 1, 1, filename); 
 		}
-		if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){
+		if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){ 
 			actor.trainNetwork();
+			critic.trainNetwork();
+			actor.setLearningRate(0.00005); 
 		}
 		
 		if(constants.DEMO_PHASE){
 			MOCollection.add(copyMOList());
 			PUCollection.add(copyPUList());
 		}
-
-		//while(!gameWon){
-		while (epochs < maxEpochs) {
-			//calculate the inputs to the MLP's 
-			//climbInputs = calculateClimbInputs();
-			//dodgeInputs = calculateDodgeInputs();
+		double reward = 0;
+		double feedback = 0;
+		int action = 0;
+		int previousAction = 0;
+		while(/*!gameWon*/ epochs < constants.MAX_EPOCHS){
+			//System.out.println("Performance: " + gamesWon / gamesLost);
+			System.out.println("------------- Current epoch: " + epochs + " -------------");
+			System.out.println("Temperature: " + temperature);
+			
+			//reset the vision grid 
+			visionGrid.resetDetections();
+			marioTracker.resetDetections();
+			//If sufficient epochs have been reached, slow down game model for better inspection of performance
+			if(epochs >= 1000000){
+				sleepTime = 10;  
+			}
+			
+			
+			//Add temperature to the actor
+			if(!constants.DEMO_PHASE){
+				actor.setTemperature(temperature);
+			}
+			//lower the temperature
+			reduceTemperature();
 			
 			
 			
+			
+			//train the critic using the current state, the previous state and the observed reward
+			//in the current state
+			state = calculateState(reward);	
 			
 			//reset mario's action when standing
 			if(mario.standing){
-				mario.setAction(0);
-			}
-			if(constants.TEST_PHASE && !mario.isJumping()){
-				testInputs = Arrays.copyOfRange(state, 0, NstateInputs);
-				mario.setAction(actor.determineAction(testInputs));
+				mario.setAction(0); 
 			}
 			
-			
-			//present input to networks
-			/*if(constants.TEST_PHASE_CLIMBING){
-				testInputs = Arrays.copyOfRange(climbInputs, 0, nInputsClimb);
-				mario.setAction(climbMLP.testNetwork(testInputs));
+			//Present state to actor for action selection; don't allow action selection while jumping
+			if(constants.TEST_PHASE){ 
+				testInputs = Arrays.copyOfRange(state, 0, visionGridInputs + marioTrackInputs + otherInputs-1);
+				action = actor.presentInput(testInputs);
+				if(!mario.isJumping()){
+					mario.setAction(action);
+				}
 			}
-			
-			//if only training on dodging barrels, only present input to dodging MLP
-			else if(constants.BARREL_TRAINING && constants.TEST_PHASE_DODGING){
-				testInputs = Arrays.copyOfRange(dodgeInputs, 0, nInputsDodge);
-				mario.setAction(dodgeMLP.testNetwork(testInputs));
-			}*/
-			
-			
-
-				
+					
 			//Spawn a barrel, determine by the spawn timer
 			if(spawnTimer == barrelSpawnTime){
 				spawnTimer = 0;
@@ -488,27 +333,36 @@ public class GameModel implements constants {
 				if(powerupTimer == powerupDuration){
 					powerupTimer = 0;
 					powerupActivated = false;
+					mario.setPoweredUp(false);
 					System.out.println("Powerup deactivated");
-				}	
-				powerupTimer++;
+				}
+				else{
+					powerupTimer++;
+				}
 			}
 			
-			//train the critic using the current state, the previous state and the observed reward
-			//in the current state
-			state = calculateState();		
-			if(!constants.DEMO_PHASE){
-				//critic.trainCritic(state, previousState, reward);
-				//calculate the critic's feedback
-				//feedback = critic.calculateFeedback(state, previousState, reward);
+			if(!constants.DEMO_PHASE && epochs > 0){
+				//calculate the critic's feedback 
+				feedback = critic.calculateFeedback(state, previousState, reward, hitByBarrel, gameWon);
 				//backpropagate the feedback to the actor in the form of a TD-error (Temporal-Difference)
+				actor.propagateFeedback(previousState, feedback, previousAction);
 				
-			}
+				//train the critic 
+				critic.trainCritic(state, previousState, reward, hitByBarrel, gameWon);			
+			}	
+			/*if(hitByBarrel || gameWon || touchedPowerUp || jumpedOverBarrel || destroyedBarrel){
+				actor.propagateFeedback(previousState, feedback, previousAction);
+			}*/
+			//Set the reward booleans to false again
+			hitByBarrel = false;
+			gameWon = false;  
+			touchedPowerUp = false;
+			jumpedOverBarrel = false;
+			destroyedBarrel = false;
 			
-			//System.out.print("Epoch: " + epochs);
-			//System.out.print(" Reward: " + reward);
-			//System.out.println(" Value: " + critic.outputLayer.get(0).getOutput());
-				
 			
+			
+			//printState(reward, previousAction); 
 			for(int i = 0; i < MOList.size(); i++){
 				//Increment the air time of moving objects, to properly apply gravity 
 				incrementTime(MOList.get(i));
@@ -520,48 +374,52 @@ public class GameModel implements constants {
 				
 				//if mario is hit, subtract a life
 				if(MOList.get(0).isKilled){	
+					gamesLost++;
 					hitByBarrel = true;
 					lives--;
 					resetGame();
 				} 
 				else if(gameWon){
-						//if mario saved the princess, add 1000 points instead
-						System.out.println("Princess saved!");
-						//score += 1000;
-						resetGame();
-						
+						//if mario saved the princess, reset game
+						System.out.println("Princess saved!");					
+						gamesWon++;
+						resetGame();					
+				}					
+				//If object falls or rolls out of the game screen, delete it
+				else if(MOList.get(i).getXPos() < 0){
+					MOList.remove(i);						
+				}				
+		       //If a barrel has been smashed, the value of smashedBarrelIndex >= 0
+			   //We remove the barrel using this index
+				else if (smashedBarrelIndex >= 0) {
+					MOList.remove(smashedBarrelIndex);
+					smashedBarrelIndex = -1;
 				}
-										
-					//If object falls or rolls out of the game screen, delete it
-					else if(MOList.get(i).getXPos() < 0){
-						MOList.remove(i);
-						
-					}
-					
-					//If a barrel has been smashed, the value of smashedBarrelIndex >= 0
-					//We remove the barrel using this index
-					else if (smashedBarrelIndex >= 0) {
-						MOList.remove(smashedBarrelIndex);
-						smashedBarrelIndex = -1;
-					}
 
-					//If mario jumps over a barrel, increment score by 100
-					else if(MOList.get(i).getYPos() >= mario.getYPos()  && MOList.get(i).getYPos() <= mario.getYPos() + 100 && 
-						mario.getXPos() >= MOList.get(i).getXPos()	&&
-						mario.getXPos() <= MOList.get(i).getXPos()+MOList.get(i).getWidth() &&
-						!(MOList.get(i).pointAwarded)){
-						jumpedOverBarrel = true;
-						MOList.get(i).setPointAwarded();
-						//score += 100;
-					}
+				//If mario jumps over a barrel, increment score 
+				else if(MOList.get(i).getYPos() >= mario.getYPos()  && MOList.get(i).getYPos() <= mario.getYPos() + 100 && 
+					mario.getXPos() >= MOList.get(i).getXPos()	&&
+					mario.getXPos() <= MOList.get(i).getXPos()+MOList.get(i).getWidth() &&
+					!(MOList.get(i).pointAwarded) && mario.isJumping()){
+					jumpedOverBarrel = true;
+					//MOList.get(i).setPointAwarded();					
+				}
 			}
 			
+			//Move vision grid to mario's new position
+			visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
+			//calculate the reward for the current state 
 			reward = calculateReward(); 
+			//this state becomes the previous state in the next iteration
+			//previousState = Arrays.copyOf(state, state.length);
+			for(int i = 0; i < visionGridInputs + marioTrackInputs + otherInputs-1; i++){
+				previousState[i] = state[i];
+			}
 			
-			/*if(flame != null) {
-				//The flame's direction depends on the player's direction, so we handle that here
-				flame.setDirection(mario.getXPos(), mario.getYPos());
-			}*/
+			//The action taken in this state becomes the previous action
+			previousAction = action;
+			//increment epoch
+			epochs++;	
 			
 			//slow game model down, so that game can be played by human
 			if(GUI_ON){
@@ -569,7 +427,7 @@ public class GameModel implements constants {
 			}
 			
 			if(constants.DEMO_PHASE){
-				state[NstateInputs + mario.getAction()] = 1.0;
+				state[visionGridInputs + marioTrackInputs + otherInputs + mario.getAction()] = 1.0;
 				trainingSet.add(state);
 				
 				MOCollection.add(copyMOList());
@@ -577,43 +435,15 @@ public class GameModel implements constants {
 				PUCollection.add(copyPUList());
 				
 			}
-			/*if(constants.DEMO_PHASE_DODGING){
-			dodgeInputs[nInputsDodge + mario.getAction()] = 1.0;
-			dodgeTrainingSet.add(dodgeInputs);
-			}
-			if(constants.DEMO_PHASE_CLIMBING){
-				climbInputs[nInputsClimb + mario.getAction()] = 1.0;
-				climbTrainingSet.add(climbInputs);
-			}
-			*/
-			//this state becomes the previous state in the next iteration
-			previousState = Arrays.copyOf(state, state.length);
-			
-			epochs++;
+	
 		}
-		
+		//Write all the data gathered during the demonstration phase to a txt file for training
 		if(constants.DEMO_PHASE){
 			//fh.writeToFile(trainingSet, "trainingSet");
-			fh.writeGameStateToFile(MOCollection, PUCollection, platformList, ladderList, peach, oil, flame, "./TrainingData/gameStateData");
+			fh.writeGameStateToFile(MOCollection, PUCollection, platformList, ladderList, peach, "./TrainingData/gameStateData");
 			System.out.println("Game states written to file");
 		}
 
-		//write entire state-action array to training file(s)
-		/*if(constants.DEMO_PHASE_DODGING  ){
-			fh.writeToFile(dodgeTrainingSet, "dodgeData");
-			
-		}
-		if(constants.DEMO_PHASE_CLIMBING){
-			//fh.writeToFile(climbTrainingSet, "climbData");
-<<<<<<< HEAD
-			fh.writeGameStateToFile(MOCollection, PUCollection, platformList, ladderList, peach, oil, flame, "./TrainingData/gameStateData");
-			System.out.println("Game states written to file");
-=======
-			fh.writeGameStateToFile(MOCollection, PUCollection, platformList, ladderList, peach, oil, flame);
-			System.out.println("Game states written to file");
->>>>>>> refs/heads/Paul
-		}
-		*/
 	}	
 	
 	//This function is called at the start of the game and runs the entire model
@@ -632,9 +462,10 @@ public class GameModel implements constants {
 		initMovingObjects();
 		//firstBarrel = true;
 		powerupActivated = false;
+		mario.setPoweredUp(false);
 	}
 	
-	public boolean isColliding(GameObject o1, GameObject o2){
+	public static boolean isColliding(GameObject o1, GameObject o2){
 		float l1 = o1.getXPos(), r1 = l1+o1.getWidth(), t1 = o1.getYPos(), b1 = t1+o1.getHeight();
 		float l2 = o2.getXPos(), r2 = o2.getXPos()+o2.getWidth(), t2 = o2.getYPos(), b2 = o2.getYPos()+o2.getHeight();
 		//For Jelle: remember that y = 0 is at THE TOP of the screen
@@ -747,6 +578,7 @@ public class GameModel implements constants {
 			if(isColliding(MO,PU)) {
 				touchedPowerUp = true;
 				powerupActivated = true;
+				mario.setPoweredUp(true);
 				//Store the index of the activated powerup so it can be deleted from the list
 				powerupIndex = PUList.indexOf(PU);
 				//This makes sure the timer is reset when a powerup is picked up while a powerup is already active
@@ -764,7 +596,7 @@ public class GameModel implements constants {
 		ladderList =  new ArrayList<Ladder>();
 		PUList = new ArrayList<Powerup>();
 		
-	
+		
 		
 		if(constants.BARREL_TRAINING){
 			initBarrelTestLevel();
@@ -814,7 +646,10 @@ public class GameModel implements constants {
 			p = new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
 			platformList.add(p);
 		}
-		
+		p = new Platform(x-10,y-50,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
+		platformList.add(p);
+		p = new Platform(x-10,y-200,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
+		platformList.add(p);
 		//Middle four layers
 		for(int j = 0; j < 4; j++) {
 			y += platformYDiff;
@@ -842,7 +677,10 @@ public class GameModel implements constants {
 				}
 			}
 		}
-		
+		p = new Platform(x-500,y+25,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
+		platformList.add(p);
+		p = new Platform(x-500,y+175,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
+		platformList.add(p);
 		//Top layer
 		y += platformYDiff;
 		y -= 3*constants.PLATFORM_HEIGHT;
@@ -854,7 +692,8 @@ public class GameModel implements constants {
 			p = new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
 			platformList.add(p);
 		}
-		
+		p = new Platform(x+150,y+7,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
+		platformList.add(p);
 		for(int i = x; i >= 0; i -= constants.PLATFORM_WIDTH){
 			x = i;
 			p = new Platform(x,y,constants.PLATFORM_HEIGHT,constants.PLATFORM_WIDTH);
@@ -1068,11 +907,15 @@ public class GameModel implements constants {
 	public int getLives(){
 		return lives;
 	}
-	public int getScore(){
+	public double getScore(){
 		return score;
 	}
 
-	
-	
-	
+	//Allow the game panel to get the vision grid for drawing them on the screen 
+	public VisionGrid getVisionGrid() {
+		return visionGrid;
+	}
+	public VisionGrid getMarioTracker(){
+		return marioTracker;
+	}	
 }

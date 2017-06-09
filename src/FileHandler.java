@@ -64,7 +64,7 @@ public class FileHandler {
 	}
 	
 	public void writeGameStateToFile(ArrayList<ArrayList<MovingObject>> MOCollection, ArrayList<ArrayList<Powerup>> PUCollection,
-			ArrayList<Platform> platformList, ArrayList<Ladder> ladderList, Peach peach, Oil oil, Flame flame, String fileName) throws IOException{
+			ArrayList<Platform> platformList, ArrayList<Ladder> ladderList, Peach peach, String fileName) throws IOException{
 		
 		try
 		{
@@ -197,7 +197,7 @@ public class FileHandler {
 	        int line = 0;
 	        while ((str = in.readLine()) != null) {
 	            String[] ar =str.split(",");
-	            for(int i = 0; i < ar.length; i++){
+	            for(int i = 0; i < nInput + nOutput; i++){
 	            	inputs[line][i] = Double.parseDouble(ar[i]);
 	            	//System.out.print(inputs[line][i] + ",");
 	            }
@@ -215,6 +215,7 @@ public class FileHandler {
 			}
 			System.out.println();
 		}*/
+		
 		return inputs;
 	}
 	

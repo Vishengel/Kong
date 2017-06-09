@@ -110,7 +110,7 @@ public class InputHandler {
 	
 	public void test() throws IOException {
 		FileHandler fh = new FileHandler();
-		fh.writeGameStateToFile(MOCollection, PUCollection, platformList, ladderList, peach, oil, flame, "./TrainingData/gameStateDataTest");
+		fh.writeGameStateToFile(MOCollection, PUCollection, platformList, ladderList, peach, "./TrainingData/gameStateDataTest");
 	}
 	
 }
