@@ -3,14 +3,11 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-//import org.json.*;
-
-
-
+import com.google.gson.*;
 
 public class FileHandler {
+	private String filePath;
 	
 	//write action in binary form to file
 	/*public void writeActionToFile(FileWriter fw, int action) throws IOException{
@@ -69,14 +66,100 @@ public class FileHandler {
 	public void writeGameStateToFile(ArrayList<ArrayList<MovingObject>> MOCollection, ArrayList<ArrayList<Powerup>> PUCollection,
 			ArrayList<Platform> platformList, ArrayList<Ladder> ladderList, Peach peach, Oil oil, Flame flame, String fileName) throws IOException{
 		
-		//JSONObject peach = new JSONObject();
-		
 		try
 		{
-		    String filePath= "src/" + fileName + ".csv";
+		    this.filePath= "src/" + fileName + ".json";
 		    FileWriter fw = new FileWriter(filePath,true);
 		    BufferedWriter out = new BufferedWriter(fw);
-		    out.write(MOCollection.get(0).get(0).getXPos() + "");
+		    Gson gson = new GsonBuilder().create();
+		    
+		    JsonObject trainingData = new JsonObject();
+		    JsonArray stateList = new JsonArray();
+		    JsonObject state;
+		    JsonObject MOJson;
+		    JsonArray barrelList;
+		    JsonObject PUJson;
+		    JsonArray powerupList;
+		    
+		    for (ArrayList<MovingObject> MOList : MOCollection) {
+		    	state = new JsonObject();
+		    	barrelList = new JsonArray();
+		    	powerupList = new JsonArray();
+
+		    	int bc = 0;
+		    	for (MovingObject MO : MOList) {
+		    		MOJson = new JsonObject();
+		    		if (MO.getName() == "player") {	    			    			
+		    			MOJson.addProperty("xPos", MO.getXPos());
+		    			MOJson.addProperty("yPos", MO.getYPos());
+		    			MOJson.addProperty("action", MO.getAction());
+			    		MOJson.addProperty("isJumping", MO.isJumping());
+		    			MOJson.addProperty("isClimbing", MO.isClimbing());
+		    			MOJson.addProperty("canClimb", MO.getCanClimb());
+		    			MOJson.addProperty("isStanding", MO.getStanding());
+		    			MOJson.addProperty("isKilled", MO.isKilled());
+			    		MOJson.addProperty("hasWon", MO.hasWon());
+			    		state.add("player", MOJson);
+		    		} else if (MO.getName() == "barrel") {
+		    			MOJson.addProperty("xPos", MO.getXPos());
+		    			MOJson.addProperty("yPos", MO.getYPos());
+		    			//We use the bc ("barrel counter") to give the barrels a unique name
+		    			barrelList.add(MOJson);
+		    		}
+		    		
+		    	}
+		    	state.add("barrelList", barrelList);
+		    	
+		    	for (Powerup PU : PUCollection.get(MOCollection.indexOf(MOList))) {
+		    		PUJson = new JsonObject();
+		    		PUJson.addProperty("xPos", PU.getXPos());
+		    		PUJson.addProperty("yPos", PU.getYPos());
+		    		powerupList.add(PUJson);
+		    	}
+		    	state.add("powerupList", powerupList);
+		    	
+		    	stateList.add(state);
+		    	
+		    }
+		    
+		    trainingData.add("stateList", stateList);
+		    
+		    JsonObject staticObjects = new JsonObject();
+		    
+		    //Write platform data to file
+		    JsonArray platformArray = new JsonArray();
+		    JsonObject platform;
+		    for (Platform p : platformList) {
+		    	platform  = new JsonObject();
+		    	platform.addProperty("xPos", p.getXPos());
+		    	platform.addProperty("yPos", p.getYPos());
+		    	platform.addProperty("hasLadder", p.getHasLadder());
+		    	platformArray.add(platform);
+		    }
+		    staticObjects.add("platformList", platformArray);
+		    
+		    //Write ladder data to file
+		    JsonArray ladderArray = new JsonArray();
+		    JsonObject ladder;
+		    for (Ladder l : ladderList) {
+		    	ladder  = new JsonObject();
+		    	ladder.addProperty("xPos", l.getXPos());
+		    	ladder.addProperty("yPos", l.getYPos());
+		    	ladderArray.add(ladder);
+		    }
+		    staticObjects.add("ladderList", ladderArray);
+		    
+		    //Write coordinates of Peach to file
+		    JsonArray peachPos = new JsonArray();
+		    peachPos.add(peach.getXPos());
+		    peachPos.add(peach.getYPos());
+		    staticObjects.add("peach", peachPos);
+		    
+		    trainingData.add("staticObjects", staticObjects);
+		    
+		    gson.toJson(trainingData, out);
+		    
+		    //out.write(MOCollection.get(0).get(0).getXPos() + "");
 		    //write the inputs to the file
 		    /*
 		    for(int i = 0; i < inputs.length; i++){
@@ -144,6 +227,11 @@ public class FileHandler {
 		}*/
 		return inputs;
 	}
+	
+	public String getFilePath() {
+		return this.filePath;
+	}
+
 }
 
     

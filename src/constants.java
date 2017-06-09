@@ -8,13 +8,18 @@ public interface constants {
 	boolean GUI_ON = true;
 
 	//These values determine whether the datasets about dodging or climbing should be created, respectively.
-	boolean DEMO_PHASE_DODGING = false; 
-	boolean DEMO_PHASE_CLIMBING = false;  
+	//boolean DEMO_PHASE_DODGING = false; 
+	//boolean DEMO_PHASE_CLIMBING = false;  
 	
+	boolean DEMO_PHASE = true;
 	
+	boolean RANDOM_ACTOR = false;
+		
 	//These values determine whether mario should learn and test dodging or climbing, respectively.
-	boolean TEST_PHASE_DODGING = false; 
-	boolean TEST_PHASE_CLIMBING = true;
+	//boolean TEST_PHASE_DODGING = false; 
+	//boolean TEST_PHASE_CLIMBING = false;
+	
+	boolean TEST_PHASE = false;
 	
 	//This value determines whether the game should create the standard level, or the alternative level 
 	//created for training to jump over barrels.
@@ -22,9 +27,9 @@ public interface constants {
 	
 	//This value determines whether Mario can die in the game when touching a barrel
 	boolean DEATH = true;
-	
+
 	//This value determines for how many epochs the game should run
-	int MAX_EPOCHS = 30000; 
+	int MAX_EPOCHS = 200000000; 
 	
 	//The following values determine positions and dimensions for game objects
 	
@@ -48,7 +53,7 @@ public interface constants {
 	int LADDER_HEIGHT = 10;
 	
 	//Position and dimension of princess Peach
-	int PEACH_START_X = SCREEN_X / 2 - PLATFORM_WIDTH;
+	int PEACH_START_X = SCREEN_X / 2 - PLATFORM_WIDTH + 100;
 	int PEACH_START_Y = 155;
 	int PEACH_HEIGHT = 35;
 	int PEACH_WIDTH = 20;
@@ -56,8 +61,8 @@ public interface constants {
 	//barrel position and dimensions
 	int BARREL_START_X = 120;
 	int BARREL_START_Y = 250;	
-	int BARREL_HEIGHT = 20;
-	int BARREL_WIDTH = 22;
+	int BARREL_HEIGHT = 10;
+	int BARREL_WIDTH = 10;
 	
 	//powerup dimensions
 	int POWERUP_HEIGHT = 27;

@@ -3,9 +3,9 @@ import java.io.IOException;
 //runs the entire game 
 public class Main {
 	public static void main(String[] args) throws IOException{
-		GameController gc = new GameController();
-		gc.start();
-		
+		//GameController gc = new GameController();
+		//gc.start();
+
 		//NeuralNetworkJelle n = new NeuralNetworkJelle();
 		//n.trainNetwork();
 		//MLP mlp = new MLP();
@@ -17,7 +17,8 @@ public class Main {
 		//fh.readFile(floats,booleans,5);
 		//n.printResults();
 		
-		//MLPJelle mlp = new MLPJelle(2, 2, 2, 3, "XORData");
+
+		//MLPJelle mlp = new MLPJelle(2, 1, 2, 3, "XORData");
 		//mlp.trainNetwork();
 	    //mlp.testNetwork();
 		//mlp.printNetwork();
@@ -33,6 +34,8 @@ public class Main {
 		MLP mlp = new MLP();
 		mlp.trainNetwork();
 		*/
+		
+		InputHandler IH = new InputHandler("src/TrainingData/gameStateData.json");
 
 	}
 }

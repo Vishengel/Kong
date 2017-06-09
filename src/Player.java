@@ -10,14 +10,20 @@ public class Player extends MovingObject{
 
 	private boolean goLeft, goRight, goUp, goDown, jump;
 	private boolean keysDown[] = new boolean[255];	 
-	private boolean jumping = false;
 	private float jumpHeight = 2.6f;
-	private boolean hasWon = false;
-	private boolean isKilled = false;
+	
+	//private boolean isKilled = false;
 	
     
 	public Player(int x, int y, int h, int w) {
 		super(x, y, h, w);
+		xVel = 1.5f;
+		yVel = 1.5f;
+		name = "player";	
+	}
+	
+	public Player(MovingObject MO) {
+		super(MO);
 		xVel = 1.5f;
 		yVel = 1.5f;
 		name = "player";	
@@ -108,7 +114,7 @@ public void move(){
 		dy = 0;
 		
 		//reset action for smoother player control when not controlled by AI
-		if(!jumping && !constants.TEST_PHASE_DODGING && !constants.TEST_PHASE_CLIMBING){
+		if(!jumping && !constants.TEST_PHASE){
 			action = 0;
 		}
 		
@@ -179,26 +185,8 @@ public void move(){
 	public boolean jump() {
 		return jump;
 	}
-	public void setJump(boolean b){
-		jumping = b;
-	}
-	
-	public boolean hasWon(){
-		return hasWon;
-	}
-	
-	public boolean isKilled(){
-		return isKilled;
-	}
-
 
 	public boolean isClimbing() {	
 		return isClimbing;
 	}
-
-
-	public boolean isJumping() {
-		return jumping;
-	}
-	
 }

@@ -5,4 +5,8 @@ public class Powerup extends GameObject {
 		isSolid = false;
 		name = "powerup";
 	}
+	
+	public Powerup(Powerup PU) {
+		super(PU);
+	}
 }
