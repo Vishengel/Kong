@@ -13,8 +13,6 @@ public class VisionGrid extends GameObject{
 	private double ladderDetections[];
 	//Contains the powerup detections for every block
     private double powerupDetections[];
-	//Contains the peach detections for every block
-	private double peachDetections[];
 	//contains the mario detections for every block
 	private double marioDetections[];
 	
@@ -25,7 +23,6 @@ public class VisionGrid extends GameObject{
 		barrelDetections = new double[(int) (size * size)];
 		ladderDetections = new double[(int) (size * size)];
 		powerupDetections = new double[(int) (size * size)];
-		peachDetections = new double[(int) (size * size)];
 		marioDetections = new double[(int) (size * size)];
 		createBlocks();
 	}
@@ -74,8 +71,7 @@ public class VisionGrid extends GameObject{
 		for(VisionBlock b : blocks){
 			b.barrelDetected(0);
 			b.ladderDetected(0);
-			b.powerupDetected(0);
-			b.peachDetected(0);		
+			b.powerupDetected(0);	
 			b.marioDetected(0);
 		}		
 	}
@@ -106,12 +102,6 @@ public class VisionGrid extends GameObject{
 		return powerupDetections;
 	}
 	
-    public double[] getPeachInputs(){
-    	for(int i = 0; i < blocks.size(); i++){
-    		peachDetections[i] = blocks.get(i).detectedPeach();
-		}
-		return peachDetections;
-	}
     
     public double[] getMarioInputs(){
     	for(int i = 0; i < blocks.size(); i++){

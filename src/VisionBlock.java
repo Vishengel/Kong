@@ -4,7 +4,6 @@ public class VisionBlock extends GameObject{
 	private double barrelDetected = 0;
 	private double ladderDetected = 0;
 	private double powerupDetected = 0;
-	private double peachDetected = 0;
 	private double marioDetected = 0;
 			
 	
@@ -24,10 +23,6 @@ public class VisionBlock extends GameObject{
 		this.powerupDetected = powerupDetected;
 	}
 	
-	public void peachDetected(double peachDetected){
-		this.peachDetected = peachDetected;
-	}
-	
 	public void marioDetected(double marioDetected){
 		this.marioDetected = marioDetected;
 	}
@@ -42,10 +37,6 @@ public class VisionBlock extends GameObject{
 	
 	public double detectedPowerup(){
 		return powerupDetected;
-	}
-	
-	public double detectedPeach(){
-		return peachDetected;
 	}
 	
 	public double detectedMario(){

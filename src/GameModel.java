@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 public class GameModel implements constants {
 	
-	String filename = "FinalSet2New"; 
+	String filename = "demodata"; 
 	
 	//performance variables
 	double gamesWon = 0;
@@ -61,10 +61,10 @@ public class GameModel implements constants {
 	private boolean powerupActivated = false;
 	
 	private VisionGrid visionGrid = new VisionGrid(constants.PLAYER_START_X, constants.PLAYER_START_Y, 180, 230, 7);
-	private VisionGrid marioTracker = new VisionGrid(0, 0,constants.SCREEN_Y, constants.SCREEN_X, 10 );
+	private VisionGrid marioTracker = new VisionGrid(0, 0,constants.SCREEN_Y, constants.SCREEN_X, 20 );
 	
 	//N x N vision grid inputs 
-	private int visionGridInputs = visionGrid.getSize() * visionGrid.getSize() * 4;
+	private int visionGridInputs = visionGrid.getSize() * visionGrid.getSize() * 3;
 	//N x N mario tracker inputs 
 	private int marioTrackInputs = marioTracker.getSize() * marioTracker.getSize();
 	//4 additional inputs + bias + reward
@@ -135,21 +135,17 @@ public class GameModel implements constants {
 		marioTracker.checkMarioDetections(mario);
 		
 		//fill the state array with the detections inputs of the vision grid
-		for(int i = 0; i < visionGridInputs / 4; i++){
+		for(int i = 0; i < visionGridInputs / 3; i++){
 			state[i] = visionGrid.getBarrelInputs()[i];
 		}
-		for(int i = 0; i < visionGridInputs / 4; i++){
-			state[i + visionGridInputs / 4] = visionGrid.getLadderInputs()[i];
+		for(int i = 0; i < visionGridInputs / 3; i++){
+			state[i + visionGridInputs / 3] = visionGrid.getLadderInputs()[i];
 		}
-		for(int i = 0; i < visionGridInputs / 4; i++){
-			state[i + visionGridInputs / 2] = visionGrid.getPowerupInputs()[i];
+		for(int i = 0; i < visionGridInputs / 3; i++){
+			state[i + visionGridInputs / 3 + visionGridInputs / 3] = visionGrid.getPowerupInputs()[i];
 		}
-		for(int i = 0; i < visionGridInputs / 4; i++){
-			state[i + visionGridInputs / 2 + visionGridInputs / 4] = visionGrid.getPeachInputs()[i];
-		}
-		
 		for(int i = 0; i < marioTrackInputs; i++){
-			state[visionGridInputs + i] = marioTracker.getMarioInputs()[i];
+			state[i + visionGridInputs] = marioTracker.getMarioInputs()[i];
 		}
 		
 		state[visionGridInputs + marioTrackInputs] = mario.isClimbing() ? 1 : 0;
@@ -183,7 +179,8 @@ public class GameModel implements constants {
 		
 		else if(jumpedOverBarrel){
 			System.out.println("Jumped over a barrel!");
-			reward += 0.5; 		
+			reward += 0.5; 
+			score += 0.5;
 		}
 		else if(destroyedBarrel){
 			System.out.println("Smashed a barrel!");
@@ -277,7 +274,7 @@ public class GameModel implements constants {
 				condition = epochs < constants.MAX_EPOCHS;
 			}
 			else{
-				condition = gamesWon <= 10;
+				condition = gamesWon < 1;
 			}
 			//System.out.println("Performance: " + gamesWon / gamesLost);
 			System.out.println("------------- Current epoch: " + epochs + " -------------");
@@ -482,7 +479,7 @@ public class GameModel implements constants {
 			}	
 			//Test
 			System.out.println("Current and previous state are equal: " + Arrays.equals(currentState, previousState));
-			if(constants.DEMO_PHASE && (!mario.isJumping() || epochs == epochBeforeJump) ){
+			if(constants.DEMO_PHASE/* && (!mario.isJumping() || epochs == epochBeforeJump)*/ ){
 				gameState[visionGridInputs + marioTrackInputs + otherInputs + mario.getAction()] = 1.0;
 				trainingSet.add(gameState); 
 				/*System.out.println("Mario action: " + mario.getAction());

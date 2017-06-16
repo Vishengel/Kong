@@ -7,11 +7,11 @@ public interface constants {
 	//Turning this value off will cause the game model to speed up significantly
 	boolean GUI_ON = true;
 	
-	boolean DEMO_PHASE = true;  
-	boolean TEST_PHASE = false;  
+	boolean DEMO_PHASE = false;  
+	boolean TEST_PHASE = true;  
 	boolean CRITIC_ON = true; 
 	
-	int GAME_SPEED = 15;
+	int GAME_SPEED = 10;
 	
 	boolean RANDOM_ACTOR = false;
 	
@@ -36,7 +36,7 @@ public interface constants {
 	int N_HIDDEN_LAYERS_ACTOR = 2;     
 	int N_HIDDEN_LAYERS_CRITIC = 2;  
 	
-	boolean TEST_CRITIC = true;
+	boolean TEST_CRITIC = false;
 	
 	double ACTOR_CRITIC_LEARNING_RATE = 0.0004; 
 	int LEARNING_RATE_REDUCTION_EPOCHS = 50000;
