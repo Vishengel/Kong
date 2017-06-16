@@ -4,8 +4,10 @@ import java.io.IOException;
 public class Main {
 	public static void main(String[] args) throws IOException{
 		GameController gc = new GameController();
-		gc.start();
-
+	    gc.start();
+		//NeuralNet network = new NeuralNet(3, 70, 1, 1);
+		//network.trainNetwork();
+		//network.forwardPass(0);
 		//NeuralNetworkJelle n = new NeuralNetworkJelle();
 		//n.trainNetwork();
 		//MLP mlp = new MLP();

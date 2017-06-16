@@ -4,14 +4,16 @@ import java.util.ArrayList;
 //This MLP represents the value function:  state ---> stateValue
 public class Critic extends MLPJelle {
 	
-	double discount = 0.99;  
+	double discount = 0.999;  
 	double[] rewards;
 	
 	public Critic(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName) {
 		super(nInput, nHiddenLayers, nHidden, nOutput, fileName);
 		target = new double[input.length][1];
 		//System.out.println("n in: " + target.length);
-		errorThreshold = 0.3; 
+		errorThreshold = 0.18;  
+		learningRate = 0.001;
+		//minimumChange = 0;
 	}
 	
 	
@@ -28,13 +30,17 @@ public class Critic extends MLPJelle {
 			totalError = 0;
 			
 			//this.shuffleInput();
-			
+			double nextStateValue = 0;
 			for (int i=0; i < this.input.length; i++) {
 				forwardPass(this.input[i], false);
 				//calculate the target for the critic: target = reward + (discount * nextValue) - previousValue
 				reward = rewards[i];
-				
-				double nextStateValue = outputLayer.get(0).getOutput();
+				if(reward <= -20 || reward >= 100){
+					nextStateValue = 0;
+				}
+				else{
+					nextStateValue = outputLayer.get(0).getOutput();
+				}
 				if(i > 0){
 					forwardPass(this.input[i-1], false);
 					t = reward + (discount * nextStateValue);
@@ -59,7 +65,7 @@ public class Critic extends MLPJelle {
 			System.out.println("Critic init called!");
 			//read the demonstration data to be learned from 
 			double[][] initialInput = FH.readFile(fileName, nInput, nOutput);
-			input = new double[initialInput.length][nInput];
+			input = new double[initialInput.length][nInput - 1];
 			rewards = new double[initialInput.length];
 			//filter out the target values from the input array
 			for(int i = 0; i < initialInput.length; i++){
@@ -68,6 +74,7 @@ public class Critic extends MLPJelle {
 					input[i][j] = initialInput[i][j];
 				}
 				rewards[i] = initialInput[i][nInput - 1];
+				//System.out.println("Reward at pattern " + i + ": " + rewards[i]);
 			}					
 			initializeLayers();	
 	}
@@ -82,17 +89,17 @@ public class Critic extends MLPJelle {
 			if(!marioKilled && !gameWon){
 				valueNextState = outputLayer.get(0).getOutput();
 			}
+			//present previous state to the Critic and apply the target in backpropagation.
+			forwardPass(previousState, false);
 			System.out.println("Reward received: " + reward);
 			
 			System.out.println("Value of current state: " + valueNextState);
 			double target = reward + (discount * valueNextState);		
 			System.out.println("Target for previous state: " + target);
 			//System.out.println("Target:" + target);
-			setTarget(target);
-			//present previous state to the Critic and apply the target in backpropagation.
-			forwardPass(previousState, false); 
+			setTarget(target); 
 			System.out.println("Value of previous state before backprop: " + outputLayer.get(0).getOutput());
-			//backwardPass(0);
+			backwardPass(0);
 			forwardPass(previousState, false); 
 			System.out.println("Value of previous state after backprop: " + outputLayer.get(0).getOutput());
 			

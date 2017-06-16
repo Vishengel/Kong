@@ -153,16 +153,10 @@ public class VisionGrid extends GameObject{
   				}
   			}
   			//detect peach
-  			if(GameModel.isColliding(b, peach)){
+  			/*if(GameModel.isColliding(b, peach)){
   				b.peachDetected(1);
   				//peachDetections++;
-  			}
-  		//detect mario
-			if(GameModel.isColliding(b, mario)){
-				b.marioDetected(1);
-				//marioDetections++;
-			}
-  			
+  			}*/
   		}
   		
   		//Divide the detection values by the number of detections;
@@ -187,6 +181,17 @@ public class VisionGrid extends GameObject{
   		*/
   	}
     
+  	public void checkMarioDetections(Player mario){
+  		for(VisionBlock b : blocks){
+  		//detect mario
+			if(GameModel.isColliding(b, mario)){
+				b.marioDetected(1);
+				//marioDetections++;
+				//break;
+			}
+  			
+  		}
+  	}
     
 	
 	public int getSize(){

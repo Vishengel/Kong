@@ -7,17 +7,16 @@ public interface constants {
 	//Turning this value off will cause the game model to speed up significantly
 	boolean GUI_ON = true;
 	
-	boolean DEMO_PHASE = false;  
-	boolean TEST_PHASE = true;   
+	boolean DEMO_PHASE = true;  
+	boolean TEST_PHASE = false;  
+	boolean CRITIC_ON = true; 
 	
+	int GAME_SPEED = 15;
 	
 	boolean RANDOM_ACTOR = false;
 	
-	//These values determine whether mario should learn and test dodging or climbing, respectively.
-	//boolean TEST_PHASE_DODGING = false; 
-	//boolean TEST_PHASE_CLIMBING = false;
 	
-	  
+
 	
 	//This value determines whether the game should create the standard level, or the alternative level 
 	//created for training to jump over barrels.
@@ -27,9 +26,23 @@ public interface constants {
 	boolean DEATH = true;
 
 	//This value determines for how many epochs the game should run
-	int MAX_EPOCHS = 300000000; 
+	int MAX_EPOCHS = 1000000; 
 
 	
+	int ACTOR_HIDDEN_NODES = 120;  
+	int CRITIC_HIDDEN_NODES = 50;
+	
+	//These values determine the amount of hidden layers of both the actor and critic network 
+	int N_HIDDEN_LAYERS_ACTOR = 2;     
+	int N_HIDDEN_LAYERS_CRITIC = 2;  
+	
+	boolean TEST_CRITIC = true;
+	
+	double ACTOR_CRITIC_LEARNING_RATE = 0.0004; 
+	int LEARNING_RATE_REDUCTION_EPOCHS = 50000;
+			
+			
+			
 	//The following values determine positions and dimensions for game objects
 	
 	//Width and Height of the game frame
@@ -37,7 +50,7 @@ public interface constants {
 	int SCREEN_Y = 680;
 	
 	//player position and dimensions
-	int PLAYER_START_X = 30;
+	int PLAYER_START_X = 50;
 	int PLAYER_START_Y = 600;
 
 	int PLAYER_HEIGHT = 32;
@@ -60,8 +73,8 @@ public interface constants {
 	//barrel position and dimensions
 	int BARREL_START_X = 120;
 	int BARREL_START_Y = 250;	
-	int BARREL_HEIGHT = 14;
-	int BARREL_WIDTH = 14;
+	int BARREL_HEIGHT = 15;
+	int BARREL_WIDTH = 15;
 	
 	//powerup dimensions
 	int POWERUP_HEIGHT = 27;

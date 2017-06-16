@@ -145,6 +145,42 @@ public class FileHandler {
 		
 		return inputs;
 	}
+	//Store the weights of the network in a text file 
+	public void storeNetwork(MLPJelle mlp, ArrayList<ArrayList<NeuronJelle>> hiddenList, int hiddenLayers) throws IOException{
+		String filename= "src/" + "storedNet" + ".csv";
+		FileWriter fw = new FileWriter(filename,true);
+		int nWeights = hiddenList.get(0).get(0).getWeights().length;
+		//Write amount of hidden layers and hidden nodes of first layer to file 
+		fw.write(hiddenLayers + ",");
+		for(int i = 0; i < hiddenLayers; i++){
+			fw.write(hiddenList.get(i).get(0).getWeights().length + ",");
+		}
+		fw.write("\n");
+		
+		
+		//Write all hidden weights to file, for every hidden layer
+		for(int i = 0; i < hiddenLayers; i++){
+			//Write weights for every hidden node
+			for(NeuronJelle n: hiddenList.get(i)){
+				for(int w = 0; w < n.getWeights().length; w++){
+					fw.write(n.getWeights()[w] + ",");
+				}
+				fw.write("\n");
+				//Next hidden layer has half the weights compared to the previous layer
+				nWeights = nWeights / 2;
+			}
+		}
+		fw.write("" + mlp.getOutputLayer().get(0).getWeights().length);
+		fw.write("\n");
+		//Store weights of output layer
+		for(NeuronJelle n: mlp.getOutputLayer()){
+			for(int w = 0; w < n.getWeights().length; w++){
+				fw.write(n.getWeights()[w] + ",");
+			}
+			fw.write("\n");
+		}
+		fw.close();
+	}
 }
 
     
