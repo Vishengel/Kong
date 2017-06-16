@@ -1,11 +1,12 @@
 import java.io.IOException;
+import java.util.ArrayList;
 
 //runs the entire game 
 public class Main {
 	public static void main(String[] args) throws IOException{
 		GameController gc = new GameController();
 		gc.start();
-
+		
 		//NeuralNetworkJelle n = new NeuralNetworkJelle();
 		//n.trainNetwork();
 		//MLP mlp = new MLP();
@@ -35,8 +36,8 @@ public class Main {
 		mlp.trainNetwork();
 		*/
 		
-		InputHandler IH = new InputHandler("src/TrainingData/gameStateData.json");
-		IH.test();
+		
+		//IH.test();
 
 	}
 }

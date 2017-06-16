@@ -84,6 +84,8 @@ public class GameModel implements constants {
 	
 	//The file handler is used to write to and read from the text files
 	FileHandler fh = new FileHandler();
+	//The input handler reads the game states from a json file 
+	InputHandler ih = new InputHandler("src/TrainingData/gameStateData.json");
 		
 	public GameModel(){
 		initGame();
