@@ -9,9 +9,11 @@ public interface constants {
 	
 	boolean DEMO_PHASE = true;  
 	boolean TEST_PHASE = false;  
-	boolean CRITIC_ON = true; 
+	boolean CRITIC_ON = false; 
 	
 	int GAME_SPEED = 15;
+	
+	String TRAINING_DATA_FILEPATH = "src/trainingSet.csv";
 	
 	boolean RANDOM_ACTOR = false;
 	
@@ -24,7 +26,7 @@ public interface constants {
 
 	//This value determines for how many epochs the game should run
 	int MAX_EPOCHS = 1000000; 
-
+	int MAX_DEMOS = 10;
 	
 	int ACTOR_HIDDEN_NODES = 120;  
 	int CRITIC_HIDDEN_NODES = 50;
@@ -33,7 +35,7 @@ public interface constants {
 	int N_HIDDEN_LAYERS_ACTOR = 2;     
 	int N_HIDDEN_LAYERS_CRITIC = 2;  
 	
-	boolean TEST_CRITIC = true;
+	boolean TEST_CRITIC = false;
 	
 	double ACTOR_CRITIC_LEARNING_RATE = 0.0004; 
 	int LEARNING_RATE_REDUCTION_EPOCHS = 50000;

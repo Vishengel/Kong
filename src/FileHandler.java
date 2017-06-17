@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import com.google.gson.*;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 public class FileHandler {
 	private String filePath;
@@ -42,8 +44,8 @@ public class FileHandler {
 	public void writeToFile(ArrayList<double[]> inputs, String fileName) throws IOException{
 		try
 		{
-			
-		    String filename= "src/" + fileName + ".csv";
+			String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+		    String filename= "src/" + fileName + "_" + timeStamp + ".csv";
 		    FileWriter fw = new FileWriter(filename,true);
 		    //write the inputs to the file
 		    for(int i = 0; i < inputs.size(); i++){
@@ -68,7 +70,8 @@ public class FileHandler {
 		
 		try
 		{
-		    this.filePath= "src/" + fileName + ".json";
+			String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
+		    this.filePath= "src/" + fileName + "_" + timeStamp + ".json";
 		    FileWriter fw = new FileWriter(filePath,true);
 		    BufferedWriter out = new BufferedWriter(fw);
 		    Gson gson = new GsonBuilder().create();

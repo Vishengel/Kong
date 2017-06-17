@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 public class GameModel implements constants {
 	
-	String filename = "FinalSet2New"; 
+	String filename = constants.TRAINING_DATA_FILEPATH; 
 	
 	//performance variables
 	double gamesWon = 0;
@@ -61,7 +61,7 @@ public class GameModel implements constants {
 	private boolean powerupActivated = false;
 	
 	private VisionGrid visionGrid = new VisionGrid(constants.PLAYER_START_X, constants.PLAYER_START_Y, 180, 230, 7);
-	private VisionGrid marioTracker = new VisionGrid(0, 0,constants.SCREEN_Y, constants.SCREEN_X, 10 );
+	private VisionGrid marioTracker = new VisionGrid(0, 0,constants.SCREEN_Y, constants.SCREEN_X, 20 );
 	
 	//N x N vision grid inputs 
 	private int visionGridInputs = visionGrid.getSize() * visionGrid.getSize() * 4;
@@ -284,7 +284,9 @@ public class GameModel implements constants {
 				condition = epochs < constants.MAX_EPOCHS;
 			}
 			else{
-				condition = gamesWon <= 10;
+				//condition = gamesWon <= 10;
+				//We demonstrate 10 games at a time
+				condition = gamesPlayed < constants.MAX_DEMOS;
 			}
 			//System.out.println("Performance: " + gamesWon / gamesLost);
 			System.out.println("------------- Current epoch: " + epochs + " -------------");
@@ -518,14 +520,16 @@ public class GameModel implements constants {
 		}
 		//Write all the data gathered during the demonstration phase to a txt file for training
 		if(constants.DEMO_PHASE){
-			//fh.writeToFile(trainingSet, "trainingSet");
-			fh.writeGameStateToFile(MOCollection, PUCollection, platformList, ladderList, peach, "./TrainingData/gameStateData");
+			fh.writeToFile(trainingSet, "trainingSet");
+			//fh.writeGameStateToFile(MOCollection, PUCollection, platformList, ladderList, peach, "./TrainingData/gameStateData");
 			System.out.println("Game states written to file");
+		} else {
+			//Store the network
+			fh.storeNetwork(actor, actor.getHiddenLayers(),constants.N_HIDDEN_LAYERS_ACTOR);
 		}
 		//Print final performance
 		System.out.println("Final performance: " + performance);
-		//Store the network
-		fh.storeNetwork(actor, actor.getHiddenLayers(),constants.N_HIDDEN_LAYERS_ACTOR);
+		
 		//Quit the program 
 		System.exit(0);
 
