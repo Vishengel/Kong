@@ -7,9 +7,9 @@ public interface constants {
 	//Turning this value off will cause the game model to speed up significantly
 	boolean GUI_ON = true;
 	
-	boolean DEMO_PHASE = false;  
-	boolean TEST_PHASE = true;  
-	boolean CRITIC_ON = true; 
+	boolean DEMO_PHASE = true;  
+	boolean TEST_PHASE = false;  
+	boolean CRITIC_ON = false; 
 	
 	int GAME_SPEED = 10;
 	
@@ -29,7 +29,7 @@ public interface constants {
 	int MAX_EPOCHS = 1000000; 
 
 	
-	int ACTOR_HIDDEN_NODES = 120;  
+	int ACTOR_HIDDEN_NODES = 100;  
 	int CRITIC_HIDDEN_NODES = 50;
 	
 	//These values determine the amount of hidden layers of both the actor and critic network 
@@ -38,7 +38,7 @@ public interface constants {
 	
 	boolean TEST_CRITIC = false;
 	
-	double ACTOR_CRITIC_LEARNING_RATE = 0.0004; 
+	double ACTOR_CRITIC_LEARNING_RATE = 0.0001; 
 	int LEARNING_RATE_REDUCTION_EPOCHS = 50000;
 			
 			

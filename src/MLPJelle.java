@@ -27,11 +27,11 @@ public class MLPJelle {
 	protected ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
 	protected double learningRate = 0.05;   
-	protected double errorThreshold = 0.03;     
+	protected double errorThreshold = 0;     
 	//Define a minimum change that makes the training phase stop when this minimum difference between training epochs
 	//is reached
 	protected double minimumChange = 0.00005; 
-	protected double maxEpochs = 100;  
+	protected double maxEpochs = 500;  
 	protected String fileName;
 	
 	private double temperature = 1;

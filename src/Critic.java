@@ -11,7 +11,7 @@ public class Critic extends MLPJelle {
 		super(nInput, nHiddenLayers, nHidden, nOutput, fileName);
 		target = new double[input.length][1];
 		//System.out.println("n in: " + target.length);
-		errorThreshold = 0.18;  
+		errorThreshold = 0.6;  
 		learningRate = 0.001;
 		//minimumChange = 0;
 	}

@@ -17,8 +17,8 @@ public class GameModel implements constants {
 	private int lives = 3;
 	
 	//these values determine how fast barrels are spawned in the game
-	private int spawnTimer = 250; 	
-	private int barrelSpawnTime = 250;     
+	private int spawnTimer = 150; 	
+	private int barrelSpawnTime = 150;     
 	
 	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
@@ -274,7 +274,7 @@ public class GameModel implements constants {
 				condition = epochs < constants.MAX_EPOCHS;
 			}
 			else{
-				condition = gamesWon < 1;
+				condition = gamesWon < 5;
 			}
 			//System.out.println("Performance: " + gamesWon / gamesLost);
 			System.out.println("------------- Current epoch: " + epochs + " -------------");
@@ -296,13 +296,26 @@ public class GameModel implements constants {
 			//lower the temperature
 			reduceTemperature();
 			
+			
+			//this state becomes the previous state in the next iteration, but only if Mario is not jumping.
+			if(!saveStateBeforeJump && !justLanded){
+				for(int i = 0; i < previousState.length; i++){
+					previousState[i] = currentState[i];
+				}
+			}
 			//Calculate the total state for this epoch: inputs + bias + reward + outputs
 			gameState = calculateState(reward);	
 			//Assign the inputs to the current state
 			for(int i = 0; i < currentState.length; i++){
 				currentState[i] = gameState[i];
 			}
-			
+			//The action taken in this state becomes the previous action
+			//Don't overwrite the action when Mario has jumped
+			if(!saveStateBeforeJump && !justLanded){
+				previousAction = action;
+			}
+			System.out.println("Previous action: " + previousAction);
+						
 			//reset mario's action when standing
 			if(mario.standing){
 				mario.setAction(0); 
@@ -329,12 +342,7 @@ public class GameModel implements constants {
 			}
 			System.out.println("Previous state is temporarily the state before jumping: " + saveStateBeforeJump);
 			System.out.println("Epoch right before jumping: " + epochBeforeJump);
-			//this state becomes the previous state in the next iteration, but only if Mario is not jumping.
-			if(!saveStateBeforeJump && !justLanded){
-				for(int i = 0; i < previousState.length; i++){
-					previousState[i] = currentState[i];
-				}
-			}
+			
 			
 					
 			//Spawn a barrel, determine by the spawn timer
@@ -382,7 +390,7 @@ public class GameModel implements constants {
 			if(!saveStateBeforeJump){
 				System.out.println("Critic is ready to give feedback again!");
 			}
-			if(constants.TEST_PHASE && constants.CRITIC_ON && !saveStateBeforeJump){
+			if(constants.TEST_PHASE && constants.CRITIC_ON && !saveStateBeforeJump && !Arrays.equals(currentState, previousState)){
 				justLanded = false;
 				//calculate the critic's feedback 
 				feedback = critic.calculateFeedback(currentState, previousState, reward, hitByBarrel, gameWon);
@@ -446,6 +454,10 @@ public class GameModel implements constants {
 					System.out.println("JUMPED OVER A BARREL!");
 				}
 			}
+			if(mario.isClimbing()){
+				saveStateBeforeJump = false;
+				justLanded = false;;				
+			}
 			System.out.println("Standing: " + mario.standing);
 			System.out.println("Jumping: " + mario.isJumping());
 			
@@ -460,16 +472,8 @@ public class GameModel implements constants {
 			//calculate the reward for the current state 
 			reward = calculateReward(action, previousAction); 
 			
-			
-			System.out.println("Reward: " + reward);
-			
 			System.out.println("Just landed: " + justLanded);
-			//The action taken in this state becomes the previous action
-			//Don't overwrite the action when Mario has jumped
-			if(!saveStateBeforeJump && !justLanded){
-				previousAction = action;
-			}
-			System.out.println("Previous action: " + previousAction);
+			
 			//increment epoch
 			epochs++;	
 			
@@ -479,7 +483,7 @@ public class GameModel implements constants {
 			}	
 			//Test
 			System.out.println("Current and previous state are equal: " + Arrays.equals(currentState, previousState));
-			if(constants.DEMO_PHASE/* && (!mario.isJumping() || epochs == epochBeforeJump)*/ ){
+			if(constants.DEMO_PHASE /*(!mario.isJumping() || epochs == epochBeforeJump)*/ ){
 				gameState[visionGridInputs + marioTrackInputs + otherInputs + mario.getAction()] = 1.0;
 				trainingSet.add(gameState); 
 				/*System.out.println("Mario action: " + mario.getAction());
