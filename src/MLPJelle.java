@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -27,11 +28,11 @@ public class MLPJelle {
 
 	//Define the learning rate, error threshold and the maximum number of epochs
 	protected double learningRate = 0.05;   
-	protected double errorThreshold =  0.06;     
+	protected double errorThreshold = 0.08;     
 	//Define a minimum change that makes the training phase stop when this minimum difference between training epochs
 	//is reached
-	protected double minimumChange = 0.0001; 
-	protected double maxEpochs = 1000;  
+	protected double minimumChange = 0.00005; 
+	protected double maxEpochs = 100;  
 	protected String fileName;
 	
 	private double temperature = 1;
@@ -49,31 +50,38 @@ public class MLPJelle {
 	public void initializeLayers(){
 		ArrayList<NeuronJelle> hiddenLayer = new ArrayList<NeuronJelle>();
 		int nWeights = nInput - 1;
-		
+		int hiddenLayerSize = nHidden;
 		//Initialize hidden layers
 		for (int i=0; i<nHiddenLayers; i++) {
 			//Clear the hiddenlayer after each iteration
 			hiddenLayer = new ArrayList<NeuronJelle>();
-			for (int j=0; j<nHidden; j++) {
+			for (int j=0; j<hiddenLayerSize; j++) {
 				//Add nWeights amount of nodes to the hidden layer
 				//For the first iteration, this amount is equal to the number of inputs
 				//Afterwards, this amount is equal to the number of nodes in the previous layer
 				hiddenLayer.add(new NeuronJelle(nWeights));
 			}
+			System.out.println("Hidden layer: " + i);
+			System.out.println("Size: " + hiddenLayerSize);
 			//Add a node for the bias
 			//hiddenLayer.add(new NeuronJelle(0));
 			//Set the amount of weights for each neuron in the next layer
 			//to be the same as the amount of hidden neurons in the current layer, plus one for the bias
-			nWeights = hiddenLayer.size();
-			//Make sure the output of the bias neuron is -1
-			hiddenLayer.get(nWeights-1).setOutput(-1);
+			nWeights = hiddenLayer.size() + 1;
+			//Make sure the output of the bias neuron is 1
+			//hiddenLayer.get(nWeights - 1).setOutput(1);
 			//Add the hidden layer to the list of hidden layers
 			hiddenList.add(hiddenLayer);
+			//Divide the hiddenlayerSize, so that each hidden layer (except the first one)
+			//has half the nodes of the previous hidden layer
+			hiddenLayerSize = hiddenLayerSize / 2;
 		}
 		//Initialize output layer
 		for(int i=0; i<nOutput; i++) {
 			outputLayer.add(new NeuronJelle(nWeights));
 		}
+		//System.out.println("NWEIGHTS: " + nWeights);
+		//System.out.println("OUTPUT LAYER WEIGHT LENGTH: " + getOutputLayer().get(0).getWeights().length);
 	}
 	public void initNetwork() {
 		
@@ -81,7 +89,7 @@ public class MLPJelle {
 		//read the demonstration data to be learned from 
 		double[][] initialInput = FH.readFile(fileName, nInput, nOutput);
 		
-		input = new double[initialInput.length][nInput];
+		input = new double[initialInput.length][nInput-1];
 		//filter out the target values from the input array
 		for(int i = 0; i < initialInput.length; i++){
 			//System.out.println("Pattern: " + i);
@@ -153,35 +161,51 @@ public class MLPJelle {
 		}
 	}
 	
-	public void forwardPass(double[] input, boolean training) {
+	public void forwardPass(double[] currentInput, boolean training) {
 		double activationSum = 0;
 		//First, feed the input to the first hidden layer
-		double[] currentInput = input;
+		//double[] currentInput = input;
+		//System.out.println("Starting input length: " + currentInput.length);
 		//Stores the output to be fed to the next hidden layer as input
-		double[] outputArray = new double[nHidden + 1];
+		double[] outputArray = new double[nHidden + 1]; 
 		//Loop through hidden layers
 		for (int i=0; i<nHiddenLayers; i++) {
 			//Calculate the output for each node in the hidden layer
-			for (int j=0; j<nHidden; j++) {
+			for (int j=0; j<hiddenList.get(i).size(); j++) {
 				hiddenList.get(i).get(j).setInput(currentInput);
 				hiddenList.get(i).get(j).setActivation();
 
 				if(this instanceof Critic){
-					hiddenList.get(i).get(j).setSigmoidOutput();
-				}
-				else{
-					hiddenList.get(i).get(j).setReluOutput();
+					//Don't compute sigmoid when then input/activation is 0
+					if(hiddenList.get(i).get(j).getActivation() != 0  && i != 10){
+						hiddenList.get(i).get(j).setSigmoidOutput();
+					}
+					else if(i == 10){
+						hiddenList.get(i).get(j).setReluOutput();
+					}
+					
+				} 
+				else{ 
+					if(i != 10){   
+						hiddenList.get(i).get(j).setSigmoidOutput();	
+					}
+					else{
+						hiddenList.get(i).get(j).setReluOutput();
+					}
+					
 				}
 				//System.out.println("Act.: " + hiddenList.get(i).get(j).getActivation());
 				outputArray[j] = hiddenList.get(i).get(j).getOutput();
 			}
 			//Set the final output to be the bias
-			outputArray[nHidden] = -1.0;
+			outputArray[nHidden] = 1.0;
+			//System.out.println("Input for next layer length: " + outputArray.length);
 			//Store the output of the hidden layer as input for the next layer
-			currentInput = outputArray;
+			currentInput = Arrays.copyOf(outputArray,outputArray.length);
 		}
 		//double softmaxSum = 0;
 		for (NeuronJelle n : outputLayer) {
+			//System.out.println("Input length for output layer: " + currentInput.length);
 			n.setInput(currentInput);
 			n.setActivation();
 			//n.setSoftmaxOutput(outputLayer);
@@ -201,8 +225,8 @@ public class MLPJelle {
 			}
 		}	
 		//set corresponding softmax output for each neuron
-		if(training)
-			{for (NeuronJelle n : outputLayer) {
+		if(training){
+			for (NeuronJelle n : outputLayer) {
 				n.setOutput(Math.exp(n.getActivation() / temperature) / activationSum);
 			}
 		}
@@ -210,23 +234,23 @@ public class MLPJelle {
 	
 	public double backwardPass(int patternIndex) {
 		double totalError=0;
-		ArrayList<NeuronJelle> nextLayer = new ArrayList<NeuronJelle>();
+		ArrayList<NeuronJelle> nextLayer;
 		
 		//Calculate gradients for nodes in the output layer
 		for(int i = 0; i < nOutput; i++){
 			outputLayer.get(i).setOutputGradient(target[patternIndex][i]);		
 		}
 		
-		nextLayer = outputLayer;
+		nextLayer = new ArrayList<NeuronJelle>(outputLayer);
 		
 		//Loop through all hidden layers in reverse order
 		for (int i=nHiddenLayers-1; i>=0; i--) {
 			//Train each node in the hidden layer
-			for (int j=0; j<nHidden; j++) {
+			for (int j=0; j<hiddenList.get(i).size(); j++) {
 				//Calculate gradients for nodes in each hidden layer
 				hiddenList.get(i).get(j).setHiddenGradient(j, nextLayer, i, this instanceof Critic);
 			}
-			nextLayer = hiddenList.get(i);
+			nextLayer = new ArrayList<NeuronJelle>(hiddenList.get(i));
 		}
 		
 		//Update the weights for nodes in the output layer
@@ -239,9 +263,9 @@ public class MLPJelle {
 		
 		for (int i=nHiddenLayers-1; i>=0; i--) {
 			//Train each node in the hidden layer
-			for (int j=0; j<nHidden; j++) {
+			for (int j=0; j<hiddenList.get(i).size(); j++) {
 				//Update the weights for each node in the hidden layer
-				hiddenList.get(i).get(j).updateWeights(target[patternIndex][i], learningRate);
+				hiddenList.get(i).get(j).updateWeights(0, learningRate);
 			}
 		}
 		//System.out.println(totalError);
@@ -376,8 +400,19 @@ public class MLPJelle {
 	public void setTemperature(double temperature){
 		this.temperature = temperature;
 	}
+	
+	public double getLearningRate(){
+		return learningRate;
+	}
 	public void setLearningRate(double learningRate){
 		this.learningRate = learningRate; 
 	}
+	public ArrayList<ArrayList<NeuronJelle>> getHiddenLayers(){
+		return hiddenList;
+	}
+	public ArrayList<NeuronJelle> getOutputLayer(){
+		return outputLayer;
+	}
+	
 		
 }

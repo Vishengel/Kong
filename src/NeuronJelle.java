@@ -15,12 +15,13 @@ public class NeuronJelle {
 		this.nInputs = nInputs;
 		input = new double[nInputs];
 		weights = new double[nInputs];
+		//System.out.println("Weights: " + weights.length); 
 		this.initWeights();
 	}
 	
 	public void initWeights() {
 		for(int i=0; i<nInputs; i++) {
-			weights[i] = 0.2*(-1.0 + (Math.random() * 2.0));
+			weights[i] = 0.2 *(-1.0 + (Math.random() * 2.0));
 		}
 	}
 	
@@ -76,10 +77,20 @@ public class NeuronJelle {
 			sum += n.getGradient() * n.getWeights()[nodeIndex];
 		}
 		if(!isCritic){
-			this.gradient = reluPrime(this.activation) * sum;		
+			if(hiddenLayer != 10){ 
+				this.gradient = sigmoidPrime(this.activation) * sum;	
+			}
+			else{
+				this.gradient = reluPrime(this.activation) * sum;
+			}
 		}
 		else{
-			this.gradient = sigmoidPrime(this.activation) * sum;	
+			if(hiddenLayer == 10){
+				this.gradient = reluPrime(this.activation) * sum;
+			}
+			else{
+				this.gradient = sigmoidPrime(this.activation) * sum;	
+			}
 		}
 	}
 	
