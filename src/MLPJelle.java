@@ -28,11 +28,11 @@ public class MLPJelle {
 
 	//Define the learning rate, error threshold and the maximum number of epochs
 	protected double learningRate = 0.05;   
-	protected double errorThreshold = 0.08;     
+	protected double errorThreshold = 0.05;     
 	//Define a minimum change that makes the training phase stop when this minimum difference between training epochs
 	//is reached
 	protected double minimumChange = 0.00005; 
-	protected double maxEpochs = 100;  
+	protected double maxEpochs = 100000;  
 	protected String fileName;
 	
 	private double temperature = 1;

@@ -7,13 +7,13 @@ public interface constants {
 	//Turning this value off will cause the game model to speed up significantly
 	boolean GUI_ON = true;
 	
-	boolean DEMO_PHASE = true;  
-	boolean TEST_PHASE = false;  
+	boolean DEMO_PHASE = false;  
+	boolean TEST_PHASE = true;  
 	boolean CRITIC_ON = false; 
 	
 	int GAME_SPEED = 15;
 	
-	String TRAINING_DATA_FILEPATH = "src/trainingSet.csv";
+	String TRAINING_DATA_FILEPATH = "TrainingData/FinalData/FullDataSetPaul";
 	
 	boolean RANDOM_ACTOR = false;
 	
@@ -28,11 +28,11 @@ public interface constants {
 	int MAX_EPOCHS = 1000000; 
 	int MAX_DEMOS = 10;
 	
-	int ACTOR_HIDDEN_NODES = 120;  
+	int ACTOR_HIDDEN_NODES = 60;  
 	int CRITIC_HIDDEN_NODES = 50;
 	
 	//These values determine the amount of hidden layers of both the actor and critic network 
-	int N_HIDDEN_LAYERS_ACTOR = 2;     
+	int N_HIDDEN_LAYERS_ACTOR = 1;     
 	int N_HIDDEN_LAYERS_CRITIC = 2;  
 	
 	boolean TEST_CRITIC = false;
