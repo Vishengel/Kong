@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 public class GameModel implements constants {
 	
-	String filename = "demodata"; 
+	String filename = "TrainingData/FinalData/FullDataSetPaul"; 
 	
 	//performance variables
 	double gamesWon = 0;
@@ -222,308 +222,303 @@ public class GameModel implements constants {
 	
 	//main game loop
 	public void runGame() throws InterruptedException, IOException{
+		for (int run=0; run<10; run++) {
+			double[] testInputs;
+			//This array contains all the game inputs + the bias value
+			double[] currentState;
+			//After each epoch, assign the current state to the previous state
+			double[] previousState;
+			//After the game state contains everything from the current state plus the obtained reward plus the 
+			//targets for the actions. This information is written to a trainingSet.
+			double[] gameState;
+			
+			gameState = new double[visionGridInputs + marioTrackInputs + otherInputs + nOutput];
+			currentState = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
+			previousState = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
+			
+			visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
 	
-		double[] testInputs;
-		//This array contains all the game inputs + the bias value
-		double[] currentState;
-		//After each epoch, assign the current state to the previous state
-		double[] previousState;
-		//After the game state contains everything from the current state plus the obtained reward plus the 
-		//targets for the actions. This information is written to a trainingSet.
-		double[] gameState;
-		
-		gameState = new double[visionGridInputs + marioTrackInputs + otherInputs + nOutput];
-		currentState = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
-		previousState = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
-		
-		visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
-
-		//don't create the actor and critic if in the demonstration phase
-		if(constants.TEST_PHASE){
-			actor = new MLPJelle(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_ACTOR, constants.ACTOR_HIDDEN_NODES/*(visionGridInputs + marioTrackInputs + otherInputs-1 + nOutput)/2*/, nOutput, filename); 
-			//critic = new Critic(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_CRITIC, 40/*(visionGridInputs + marioTrackInputs + otherInputs) / 2*/, 1, "FinalSet2New"); 		
-		}
-		if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){ 
-			actor.trainNetwork();
-			actor.setLearningRate(constants.ACTOR_CRITIC_LEARNING_RATE);  
-		}
-		if(constants.CRITIC_ON){
-			critic = new Critic(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_CRITIC, constants.CRITIC_HIDDEN_NODES/*(visionGridInputs + marioTrackInputs + otherInputs) / 2*/, 1, filename); 
-			critic.trainNetwork();
-			critic.setLearningRate(0.0001); 
-		}
-		
-		double reward = 0;
-		double feedback = 0;
-		int action = 0;
-		int previousAction = 0;
-		
-		boolean condition = true;
-		
-		while(condition){
-			//every 50000 epochs, reduce the learning rate of the actor and critic for smoother convergence
-			if(epochs % constants.LEARNING_RATE_REDUCTION_EPOCHS == 0 && epochs > 0 && constants.TEST_PHASE){ 
-				System.out.println("Current learning rate: " + actor.getLearningRate());
-				actor.setLearningRate(actor.getLearningRate() * 0.8);  
-				if(constants.CRITIC_ON){
-					critic.setLearningRate(constants.ACTOR_CRITIC_LEARNING_RATE); 
+			//don't create the actor and critic if in the demonstration phase
+			if(constants.TEST_PHASE){
+				actor = new MLPJelle(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_ACTOR, constants.ACTOR_HIDDEN_NODES/*(visionGridInputs + marioTrackInputs + otherInputs-1 + nOutput)/2*/, nOutput, filename); 
+				//critic = new Critic(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_CRITIC, 40/*(visionGridInputs + marioTrackInputs + otherInputs) / 2*/, 1, "FinalSet2New"); 		
+			}
+			if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){ 
+				actor.trainNetwork();
+				actor.setLearningRate(constants.ACTOR_CRITIC_LEARNING_RATE);  
+			}
+			if(constants.CRITIC_ON){
+				critic = new Critic(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_CRITIC, constants.CRITIC_HIDDEN_NODES/*(visionGridInputs + marioTrackInputs + otherInputs) / 2*/, 1, filename); 
+				critic.trainNetwork();
+				critic.setLearningRate(0.0001); 
+			}
+			
+			double reward = 0;
+			double feedback = 0;
+			int action = 0;
+			int previousAction = 0;
+			
+			while(gamesPlayed < 100){
+				//every 50000 epochs, reduce the learning rate of the actor and critic for smoother convergence
+				if(epochs % constants.LEARNING_RATE_REDUCTION_EPOCHS == 0 && epochs > 0 && constants.TEST_PHASE){ 
+					System.out.println("Current learning rate: " + actor.getLearningRate());
+					actor.setLearningRate(actor.getLearningRate() * 0.8);  
+					if(constants.CRITIC_ON){
+						critic.setLearningRate(constants.ACTOR_CRITIC_LEARNING_RATE); 
+					}
+					
+				}
+				//System.out.println("Performance: " + gamesWon / gamesLost);
+				System.out.println("------------- Current epoch: " + epochs + " -------------");
+				System.out.println("Temperature: " + temperature);
+				
+				//reset the vision grid 
+				visionGrid.resetDetections();
+				marioTracker.resetDetections();
+				//If sufficient epochs have been reached, slow down game model for better inspection of performance
+				if(epochs >= 1000000){
+					sleepTime = 15;  
 				}
 				
-			}
-			if(constants.TEST_PHASE){
-				condition = epochs < constants.MAX_EPOCHS;
-			}
-			else{
-				condition = gamesWon < 5;
-			}
-			//System.out.println("Performance: " + gamesWon / gamesLost);
-			System.out.println("------------- Current epoch: " + epochs + " -------------");
-			System.out.println("Temperature: " + temperature);
-			
-			//reset the vision grid 
-			visionGrid.resetDetections();
-			marioTracker.resetDetections();
-			//If sufficient epochs have been reached, slow down game model for better inspection of performance
-			if(epochs >= 1000000){
-				sleepTime = 15;  
-			}
-			
-			
-			//Add temperature to the actor
-			if(constants.TEST_PHASE){
-				actor.setTemperature(temperature);
-			}
-			//lower the temperature
-			reduceTemperature();
-			
-			
-			//this state becomes the previous state in the next iteration, but only if Mario is not jumping.
-			if(!saveStateBeforeJump && !justLanded){
-				for(int i = 0; i < previousState.length; i++){
-					previousState[i] = currentState[i];
+				
+				//Add temperature to the actor
+				if(constants.TEST_PHASE){
+					actor.setTemperature(temperature);
 				}
-			}
-			//Calculate the total state for this epoch: inputs + bias + reward + outputs
-			gameState = calculateState(reward);	
-			//Assign the inputs to the current state
-			for(int i = 0; i < currentState.length; i++){
-				currentState[i] = gameState[i];
-			}
-			//The action taken in this state becomes the previous action
-			//Don't overwrite the action when Mario has jumped
-			if(!saveStateBeforeJump && !justLanded){
-				previousAction = action;
-			}
-			System.out.println("Previous action: " + previousAction);
+				//lower the temperature
+				reduceTemperature();
+				
+				
+				//this state becomes the previous state in the next iteration, but only if Mario is not jumping.
+				if(!saveStateBeforeJump && !justLanded){
+					for(int i = 0; i < previousState.length; i++){
+						previousState[i] = currentState[i];
+					}
+				}
+				//Calculate the total state for this epoch: inputs + bias + reward + outputs
+				gameState = calculateState(reward);	
+				//Assign the inputs to the current state
+				for(int i = 0; i < currentState.length; i++){
+					currentState[i] = gameState[i];
+				}
+				//The action taken in this state becomes the previous action
+				//Don't overwrite the action when Mario has jumped
+				if(!saveStateBeforeJump && !justLanded){
+					previousAction = action;
+				}
+				System.out.println("Previous action: " + previousAction);
+							
+				//reset mario's action when standing
+				if(mario.standing){
+					mario.setAction(0); 
+				}
+				
+				//Present state to actor for action selection; don't allow action selection while jumping
+				if(constants.TEST_PHASE){ 
+					testInputs = Arrays.copyOf(currentState, visionGridInputs + marioTrackInputs + otherInputs-1);
+					action = actor.presentInput(testInputs);
+					if(!mario.isJumping()){
+						mario.setAction(action);
+					}
+				}
+				
+				//If mario was standing and chooses to jump, save this state until Mario is done jumping.
+				if(mario.standing && !mario.isJumping() && (action == 5 || action == 6) && !saveStateBeforeJump ){
+					saveStateBeforeJump = true;
+					epochBeforeJump = epochs;
+					System.out.println("NOW STARTING JUMP!");
+					for(int i = 0; i < previousState.length; i++){
+						previousState[i] = currentState[i];
+					}
+					previousAction = action;
+				}
+				System.out.println("Previous state is temporarily the state before jumping: " + saveStateBeforeJump);
+				System.out.println("Epoch right before jumping: " + epochBeforeJump);
+				
+				
 						
-			//reset mario's action when standing
-			if(mario.standing){
-				mario.setAction(0); 
-			}
-			
-			//Present state to actor for action selection; don't allow action selection while jumping
-			if(constants.TEST_PHASE){ 
-				testInputs = Arrays.copyOf(currentState, visionGridInputs + marioTrackInputs + otherInputs-1);
-				action = actor.presentInput(testInputs);
-				if(!mario.isJumping()){
-					mario.setAction(action);
-				}
-			}
-			
-			//If mario was standing and chooses to jump, save this state until Mario is done jumping.
-			if(mario.standing && !mario.isJumping() && (action == 5 || action == 6) && !saveStateBeforeJump ){
-				saveStateBeforeJump = true;
-				epochBeforeJump = epochs;
-				System.out.println("NOW STARTING JUMP!");
-				for(int i = 0; i < previousState.length; i++){
-					previousState[i] = currentState[i];
-				}
-				previousAction = action;
-			}
-			System.out.println("Previous state is temporarily the state before jumping: " + saveStateBeforeJump);
-			System.out.println("Epoch right before jumping: " + epochBeforeJump);
-			
-			
-					
-			//Spawn a barrel, determine by the spawn timer
-			if(spawnTimer == barrelSpawnTime){
-				spawnTimer = 0;
-				if(constants.BARREL_TRAINING){
-					if(!leftSpawned){
-						spawnLeftBarrel();
-						leftSpawned = true;
+				//Spawn a barrel, determine by the spawn timer
+				if(spawnTimer == barrelSpawnTime){
+					spawnTimer = 0;
+					if(constants.BARREL_TRAINING){
+						if(!leftSpawned){
+							spawnLeftBarrel();
+							leftSpawned = true;
+						}
+						else{
+							spawnRightBarrel();
+							leftSpawned = false;
+						}
 					}
 					else{
-						spawnRightBarrel();
-						leftSpawned = false;
+						spawnBarrel(true);
+					}
+					
+				}	
+			
+				spawnTimer++;
+	
+				if(powerupActivated) {
+					if (powerupIndex >=0) {
+						PUList.remove(powerupIndex);
+						powerupIndex = -1;
+					}
+					
+					if(powerupTimer == powerupDuration){
+						powerupTimer = 0;
+						powerupActivated = false;
+						mario.setPoweredUp(false);
+						System.out.println("Powerup deactivated");
+					}
+					else{
+						powerupTimer++;
 					}
 				}
-				else{
-					spawnBarrel(true);
-				}
 				
-			}	
-		
-			spawnTimer++;
-
-			if(powerupActivated) {
-				if (powerupIndex >=0) {
-					PUList.remove(powerupIndex);
-					powerupIndex = -1;
+				if(constants.TEST_CRITIC /*&& !Arrays.equals(currentState, previousState)*/ ){
+					System.out.println(critic.calculateFeedback(currentState, previousState, reward, hitByBarrel, gameWon));
+					critic.trainCritic(currentState, previousState, reward, hitByBarrel, gameWon);	
 				}
-				
-				if(powerupTimer == powerupDuration){
-					powerupTimer = 0;
-					powerupActivated = false;
-					mario.setPoweredUp(false);
-					System.out.println("Powerup deactivated");
+				if(!saveStateBeforeJump){
+					System.out.println("Critic is ready to give feedback again!");
 				}
-				else{
-					powerupTimer++;
-				}
-			}
-			
-			if(constants.TEST_CRITIC /*&& !Arrays.equals(currentState, previousState)*/ ){
-				System.out.println(critic.calculateFeedback(currentState, previousState, reward, hitByBarrel, gameWon));
-				critic.trainCritic(currentState, previousState, reward, hitByBarrel, gameWon);	
-			}
-			if(!saveStateBeforeJump){
-				System.out.println("Critic is ready to give feedback again!");
-			}
-			if(constants.TEST_PHASE && constants.CRITIC_ON && !saveStateBeforeJump && !Arrays.equals(currentState, previousState)){
-				justLanded = false;
-				//calculate the critic's feedback 
-				feedback = critic.calculateFeedback(currentState, previousState, reward, hitByBarrel, gameWon);
-				//backpropagate the feedback to the actor in the form of a TD-error (Temporal-Difference)
-				actor.propagateFeedback(previousState, feedback, previousAction);
+				if(constants.TEST_PHASE && constants.CRITIC_ON && !saveStateBeforeJump && !Arrays.equals(currentState, previousState)){
+					justLanded = false;
+					//calculate the critic's feedback 
+					feedback = critic.calculateFeedback(currentState, previousState, reward, hitByBarrel, gameWon);
+					//backpropagate the feedback to the actor in the form of a TD-error (Temporal-Difference)
+					actor.propagateFeedback(previousState, feedback, previousAction);
+					
+					//train the critic 
+					critic.trainCritic(currentState, previousState, reward, hitByBarrel, gameWon);			
+				}	
+				//Set the reward booleans to false again
+				hitByBarrel = false;
+				gameWon = false;  
+				touchedPowerUp = false;
+				jumpedOverBarrel = false;
+				destroyedBarrel = false;
 				
-				//train the critic 
-				critic.trainCritic(currentState, previousState, reward, hitByBarrel, gameWon);			
-			}	
-			//Set the reward booleans to false again
-			hitByBarrel = false;
-			gameWon = false;  
-			touchedPowerUp = false;
-			jumpedOverBarrel = false;
-			destroyedBarrel = false;
-			
-			
-			
-			//printState(reward, previousAction); 
-			for(int i = 0; i < MOList.size(); i++){
-				//Increment the air time of moving objects, to properly apply gravity 
-				incrementTime(MOList.get(i));
-				//check collisions and update moving object states
-				MovingObject MO = checkCollisions(MOList.get(i));
-				MOList.set(i, MO); 
-				//make all moving objects act/move
-				MOList.get(i).act();
 				
-				//if mario is hit, subtract a life
-				if(MOList.get(0).isKilled){	
-					gamesPlayed++;
-					hitByBarrel = true;
-					lives--;
-					resetGame();
-				}  
-				else if(gameWon){
-						//if mario saved the princess, reset game
-						System.out.println("Princess saved!");	
+				
+				//printState(reward, previousAction); 
+				for(int i = 0; i < MOList.size(); i++){
+					//Increment the air time of moving objects, to properly apply gravity 
+					incrementTime(MOList.get(i));
+					//check collisions and update moving object states
+					MovingObject MO = checkCollisions(MOList.get(i));
+					MOList.set(i, MO); 
+					//make all moving objects act/move
+					MOList.get(i).act();
+					
+					//if mario is hit, subtract a life
+					if(MOList.get(0).isKilled){	
 						gamesPlayed++;
-						gamesWon++;
-						resetGame();					
-				}					
-				//If object falls or rolls out of the game screen, delete it
-				else if(MOList.get(i).getXPos() < 0){
-					MOList.remove(i);						
-				}				
-		       //If a barrel has been smashed, the value of smashedBarrelIndex >= 0
-			   //We remove the barrel using this index
-				else if (smashedBarrelIndex >= 0) {
-					MOList.remove(smashedBarrelIndex);
-					smashedBarrelIndex = -1;
-				}
-
-				//If mario jumps over a barrel, increment score 
-				else if(MOList.get(i).getYPos() >= mario.getYPos()  && MOList.get(i).getYPos() <= mario.getYPos() + 100 && 
-					mario.getXPos() >= MOList.get(i).getXPos()	&&
-					mario.getXPos() <= MOList.get(i).getXPos()+MOList.get(i).getWidth() &&
-					!(MOList.get(i).pointAwarded) && mario.isJumping()){
-					jumpedOverBarrel = true;
-					MOList.get(i).setPointAwarded();
-					System.out.println("JUMPED OVER A BARREL!");
-				}
-			}
-			if(mario.isClimbing()){
-				saveStateBeforeJump = false;
-				justLanded = false;;				
-			}
-			System.out.println("Standing: " + mario.standing);
-			System.out.println("Jumping: " + mario.isJumping());
-			
-			if(mario.standing && mario.isJumping() && epochs > (epochBeforeJump + 20)){
-				saveStateBeforeJump = false;
-				justLanded = true;
-				System.out.println("STANDING AGAIN!");
-			}
-			
-			//Move vision grid to mario's new position
-			visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
-			//calculate the reward for the current state 
-			reward = calculateReward(action, previousAction); 
-			
-			System.out.println("Just landed: " + justLanded);
-			
-			//increment epoch
-			epochs++;	
-			
-			//slow game model down, so that game can be played by human
-			if(GUI_ON){
-				Thread.sleep(sleepTime);
-			}	
-			//Test
-			System.out.println("Current and previous state are equal: " + Arrays.equals(currentState, previousState));
-			if(constants.DEMO_PHASE /*(!mario.isJumping() || epochs == epochBeforeJump)*/ ){
-				gameState[visionGridInputs + marioTrackInputs + otherInputs + mario.getAction()] = 1.0;
-				trainingSet.add(gameState); 
-				/*System.out.println("Mario action: " + mario.getAction());
-				System.out.println("State and previous state equal? : " + Arrays.equals(currentState, previousState));
-				//print state and previous state
-				System.out.println("*** State: ");
-				for(int i = 0; i < currentState.length; i++){
-					System.out.print(currentState[i] + " ");	
-				}
-				System.out.println();
-				System.out.println("*** Previous state: ");
-				for(int i = 0; i < previousState.length; i++){
-					System.out.print(previousState[i] + " ");	
-				}
-				System.out.println();
-				System.out.println("GAME STATE!: ");
-				for(int i = 0; i < gameState.length; i++){
-					System.out.print(gameState[i] + " ");	
-				}*/
-				
-			}
-			
-			//this state becomes the previous state in the next iteration
-		
-			
-			
+						hitByBarrel = true;
+						lives--;
+						fh.writeScoreToFile(run, gamesPlayed, score, 0, constants.SCORE_FILE_NAME);
+						resetGame();
+					}  
+					else if(gameWon){
+							//if mario saved the princess, reset game
+							System.out.println("Princess saved!");	
+							gamesPlayed++;
+							gamesWon++;
+							fh.writeScoreToFile(run, gamesPlayed, score, 1, constants.SCORE_FILE_NAME);
+							resetGame();					
+					}					
+					//If object falls or rolls out of the game screen, delete it
+					else if(MOList.get(i).getXPos() < 0){
+						MOList.remove(i);						
+					}				
+			       //If a barrel has been smashed, the value of smashedBarrelIndex >= 0
+				   //We remove the barrel using this index
+					else if (smashedBarrelIndex >= 0) {
+						MOList.remove(smashedBarrelIndex);
+						smashedBarrelIndex = -1;
+					}
 	
+					//If mario jumps over a barrel, increment score 
+					else if(MOList.get(i).getYPos() >= mario.getYPos()  && MOList.get(i).getYPos() <= mario.getYPos() + 100 && 
+						mario.getXPos() >= MOList.get(i).getXPos()	&&
+						mario.getXPos() <= MOList.get(i).getXPos()+MOList.get(i).getWidth() &&
+						!(MOList.get(i).pointAwarded) && mario.isJumping()){
+						jumpedOverBarrel = true;
+						MOList.get(i).setPointAwarded();
+						System.out.println("JUMPED OVER A BARREL!");
+					}
+				}
+				if(mario.isClimbing()){
+					saveStateBeforeJump = false;
+					justLanded = false;;				
+				}
+				System.out.println("Standing: " + mario.standing);
+				System.out.println("Jumping: " + mario.isJumping());
+				
+				if(mario.standing && mario.isJumping() && epochs > (epochBeforeJump + 20)){
+					saveStateBeforeJump = false;
+					justLanded = true;
+					System.out.println("STANDING AGAIN!");
+				}
+				
+				//Move vision grid to mario's new position
+				visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
+				//calculate the reward for the current state 
+				reward = calculateReward(action, previousAction); 
+				
+				System.out.println("Just landed: " + justLanded);
+				
+				//increment epoch
+				epochs++;	
+				
+				//slow game model down, so that game can be played by human
+				if(GUI_ON){
+					Thread.sleep(sleepTime);
+				}	
+				//Test
+				System.out.println("Current and previous state are equal: " + Arrays.equals(currentState, previousState));
+				if(constants.DEMO_PHASE /*(!mario.isJumping() || epochs == epochBeforeJump)*/ ){
+					gameState[visionGridInputs + marioTrackInputs + otherInputs + mario.getAction()] = 1.0;
+					trainingSet.add(gameState); 
+					/*System.out.println("Mario action: " + mario.getAction());
+					System.out.println("State and previous state equal? : " + Arrays.equals(currentState, previousState));
+					//print state and previous state
+					System.out.println("*** State: ");
+					for(int i = 0; i < currentState.length; i++){
+						System.out.print(currentState[i] + " ");	
+					}
+					System.out.println();
+					System.out.println("*** Previous state: ");
+					for(int i = 0; i < previousState.length; i++){
+						System.out.print(previousState[i] + " ");	
+					}
+					System.out.println();
+					System.out.println("GAME STATE!: ");
+					for(int i = 0; i < gameState.length; i++){
+						System.out.print(gameState[i] + " ");	
+					}*/
+					
+				}
+				
+				//this state becomes the previous state in the next iteration
+			
+				
+				
+		
+			}
+			//Write all the data gathered during the demonstration phase to a txt file for training
+			if(constants.DEMO_PHASE){
+				fh.writeToFile(trainingSet, filename);
+				System.out.println("Written to file!");
+			}
+			//Print final performance
+			System.out.println("Final performance: " + performance);
+			fh.writePerformanceToFile(run, performance, constants.PERFORMANCE_FILE_NAME);
+			//Store the network
+			fh.storeNetwork(actor, actor.getHiddenLayers(),constants.N_HIDDEN_LAYERS_ACTOR);
+			//Quit the program 
+			//System.exit(0);
 		}
-		//Write all the data gathered during the demonstration phase to a txt file for training
-		if(constants.DEMO_PHASE){
-			fh.writeToFile(trainingSet, filename);
-			System.out.println("Written to file!");
-		}
-		//Print final performance
-		System.out.println("Final performance: " + performance);
-		//Store the network
-		fh.storeNetwork(actor, actor.getHiddenLayers(),constants.N_HIDDEN_LAYERS_ACTOR);
-		//Quit the program 
-		System.exit(0);
-
 	}	
 	
 	//This function is called at the start of the game and runs the entire model

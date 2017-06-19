@@ -1,4 +1,6 @@
+/TrainingData/
 /XORData.csv
+/images/
 /trainingSet.csv
 /trainingSet10.csv
 /trainingSet2.csv
@@ -9,3 +11,4 @@
 /trainingSet50.csv
 /trainingSet999.csv
 /trainingSetImprovedFeatures.csv
+/DataCollector.class

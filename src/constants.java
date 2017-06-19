@@ -7,15 +7,16 @@ public interface constants {
 	//Turning this value off will cause the game model to speed up significantly
 	boolean GUI_ON = true;
 	
-	boolean DEMO_PHASE = true;  
-	boolean TEST_PHASE = false;  
+	boolean DEMO_PHASE = false;  
+	boolean TEST_PHASE = true;  
 	boolean CRITIC_ON = false; 
 	
 	int GAME_SPEED = 10;
 	
 	boolean RANDOM_ACTOR = false;
 	
-	
+	String SCORE_FILE_NAME = "LearningRateScores";
+	String PERFORMANCE_FILE_NAME = "LearningRatePerformance";
 
 	
 	//This value determines whether the game should create the standard level, or the alternative level 

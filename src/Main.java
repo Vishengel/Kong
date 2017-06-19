@@ -3,6 +3,8 @@ import java.io.IOException;
 //runs the entire game 
 public class Main {
 	public static void main(String[] args) throws IOException{
+		//FileHandler fh = new FileHandler();
+		//fh.writePerformanceToFile(1, 10, "LearningRate");
 		GameController gc = new GameController();
 	    gc.start();
 		//NeuralNet network = new NeuralNet(3, 70, 1, 1);
