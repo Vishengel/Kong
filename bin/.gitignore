@@ -12,3 +12,5 @@
 /trainingSet999.csv
 /trainingSetImprovedFeatures.csv
 /DataCollector.class
+/LearningRate.csv
+/LearningRateScores.csv

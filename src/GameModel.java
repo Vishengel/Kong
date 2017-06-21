@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 public class GameModel implements constants {
 	
-	String filename = "TrainingData/FinalData/FullDataSetPaul"; 
+	String filename = "TrainingData/FinalData/FullDataSetJelle2"; 
 	
 	//performance variables
 	double gamesWon = 0;
@@ -17,8 +17,8 @@ public class GameModel implements constants {
 	private int lives = 3;
 	
 	//these values determine how fast barrels are spawned in the game
-	private int spawnTimer = 150; 	
-	private int barrelSpawnTime = 150;     
+	private int spawnTimer = 300; 	
+	private int barrelSpawnTime = 300;     
 	
 	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
@@ -222,7 +222,7 @@ public class GameModel implements constants {
 	
 	//main game loop
 	public void runGame() throws InterruptedException, IOException{
-		for (int run=0; run<10; run++) {
+		for (int run=0; run<1; run++) {
 			double[] testInputs;
 			//This array contains all the game inputs + the bias value
 			double[] currentState;
@@ -258,7 +258,7 @@ public class GameModel implements constants {
 			int action = 0;
 			int previousAction = 0;
 			
-			while(gamesPlayed < 100){
+			while(gamesPlayed < 10){
 				//every 50000 epochs, reduce the learning rate of the actor and critic for smoother convergence
 				if(epochs % constants.LEARNING_RATE_REDUCTION_EPOCHS == 0 && epochs > 0 && constants.TEST_PHASE){ 
 					System.out.println("Current learning rate: " + actor.getLearningRate());
