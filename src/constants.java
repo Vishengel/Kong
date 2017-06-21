@@ -7,20 +7,28 @@ public interface constants {
 	//Turning this value off will cause the game model to speed up significantly
 	boolean GUI_ON = true;
 	
-	boolean DEMO_PHASE = false;  
-	boolean TEST_PHASE = true;  
+	//Demo phase: Human player plays N games, these get stored in the trainingset.
+	boolean DEMO_PHASE = true;  
+	//Test phase: The AI actor plays the game.
+	boolean TEST_PHASE = false;  
+	//If true, the Critic is trained/loaded and gives the actor feedback
 	boolean CRITIC_ON = false;   
 	
-	int GAME_SPEED = 0; 
+	//Determine the game speed. Default for demo phase is 15, default for test phase is 0. 
+	int GAME_SPEED = 15; 
 	
+	//If true, the actor will not be trained.
 	boolean RANDOM_ACTOR = false;
 	
+	//Set this value to true when the critic output needs to be seen during the demo phase
 	boolean TEST_CRITIC = false;
 
-	boolean LOAD_ACTOR = true;
+	//Network restoring parameters
+	boolean LOAD_ACTOR = false;
 	boolean LOAD_CRITIC = false;
 	boolean LOAD_TRAINED_ACTOR = false;
 	
+	//Network saving parameters 
 	boolean SAVE_ACTOR = false;
 	boolean SAVE_CRITIC = false;
 	boolean SAVE_TRAINED_ACTOR = false;
