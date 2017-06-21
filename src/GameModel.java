@@ -17,8 +17,8 @@ public class GameModel implements constants {
 	private int lives = 3;
 	
 	//these values determine how fast barrels are spawned in the game
-	private int spawnTimer = 150; 	
-	private int barrelSpawnTime = 150;     
+	private int spawnTimer = 250; 	
+	private int barrelSpawnTime = 250;     
 	
 	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
@@ -29,7 +29,7 @@ public class GameModel implements constants {
 	
 	//This value determines for how many epochs the game has been running already
 	private int epochs = 0;
-	private double temperature = 1;   
+	private double temperature = 2;   
 	private double minTemp = 1;
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
@@ -217,7 +217,7 @@ public class GameModel implements constants {
 	}
 	
 	public void reduceTemperature(){
-		temperature = (temperature > minTemp? temperature * 0.999: minTemp);		
+		//temperature = (temperature > minTemp? temperature * 0.999: minTemp);		
 	}
 	
 	//main game loop
@@ -240,17 +240,19 @@ public class GameModel implements constants {
 
 		//don't create the actor and critic if in the demonstration phase
 		if(constants.TEST_PHASE){
-			actor = new MLPJelle(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_ACTOR, constants.ACTOR_HIDDEN_NODES/*(visionGridInputs + marioTrackInputs + otherInputs-1 + nOutput)/2*/, nOutput, filename); 
+			actor = new MLPJelle(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_ACTOR, constants.ACTOR_HIDDEN_NODES/*(visionGridInputs + marioTrackInputs + otherInputs-1 + nOutput)/2*/, nOutput, filename, constants.LOAD_ACTOR || constants.LOAD_TRAINED_ACTOR); 
 			//critic = new Critic(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_CRITIC, 40/*(visionGridInputs + marioTrackInputs + otherInputs) / 2*/, 1, "FinalSet2New"); 		
 		}
-		if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){ 
-			actor.trainNetwork();
-			actor.setLearningRate(constants.ACTOR_CRITIC_LEARNING_RATE);  
+		if(constants.TEST_PHASE && !constants.RANDOM_ACTOR && !constants.LOAD_ACTOR && !constants.LOAD_TRAINED_ACTOR){ 
+			actor.trainNetwork(); 
 		}
 		if(constants.CRITIC_ON){
-			critic = new Critic(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_CRITIC, constants.CRITIC_HIDDEN_NODES/*(visionGridInputs + marioTrackInputs + otherInputs) / 2*/, 1, filename); 
-			critic.trainNetwork();
-			critic.setLearningRate(0.0001); 
+			critic = new Critic(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_CRITIC, constants.CRITIC_HIDDEN_NODES/*(visionGridInputs + marioTrackInputs + otherInputs) / 2*/, 1, filename, constants.LOAD_CRITIC); 
+			if(!constants.LOAD_CRITIC){
+				critic.trainNetwork();
+			}
+			//critic.setLearningRate(0.0001); 
+			critic.setLearningRate(0);
 		}
 		
 		double reward = 0;
@@ -260,21 +262,31 @@ public class GameModel implements constants {
 		
 		boolean condition = true;
 		
+		if(constants.CRITIC_ON && constants.TEST_PHASE){
+			critic.setLearningRate(constants.ACTOR_CRITIC_LEARNING_RATE); 
+			actor.setLearningRate(constants.ACTOR_CRITIC_LEARNING_RATE); 
+		}
+		
 		while(condition){
-			//every 50000 epochs, reduce the learning rate of the actor and critic for smoother convergence
-			if(epochs % constants.LEARNING_RATE_REDUCTION_EPOCHS == 0 && epochs > 0 && constants.TEST_PHASE){ 
-				System.out.println("Current learning rate: " + actor.getLearningRate());
-				actor.setLearningRate(actor.getLearningRate() * 0.8);  
-				if(constants.CRITIC_ON){
-					critic.setLearningRate(constants.ACTOR_CRITIC_LEARNING_RATE); 
-				}
-				
-			}
 			if(constants.TEST_PHASE){
-				condition = epochs < constants.MAX_EPOCHS;
+				System.out.println("Current learning rate: " + actor.getLearningRate());
+			}
+			//every few games, reduce the learning rate of the actor and critic for smoother convergence
+			//if(gamesPlayed % constants.LEARNING_RATE_REDUCTION_GAMES == 0 && gamesPlayed > 0 && constants.TEST_PHASE){ 
+				//actor.setLearningRate(actor.getLearningRate() * 0.90);  
+				/*if(constants.CRITIC_ON){
+					critic.setLearningRate(constants.ACTOR_CRITIC_LEARNING_RATE); 
+				}*/	
+			//}
+			
+			
+			
+			if(constants.TEST_PHASE){
+				//condition = epochs < constants.MAX_EPOCHS;
+				condition = gamesPlayed < constants.MAX_GAMES;
 			}
 			else{
-				condition = gamesWon < 5;
+				condition = gamesWon < 5; 
 			}
 			//System.out.println("Performance: " + gamesWon / gamesLost);
 			System.out.println("------------- Current epoch: " + epochs + " -------------");
@@ -284,9 +296,9 @@ public class GameModel implements constants {
 			visionGrid.resetDetections();
 			marioTracker.resetDetections();
 			//If sufficient epochs have been reached, slow down game model for better inspection of performance
-			if(epochs >= 1000000){
+			/*if(epochs >= 1000000){
 				sleepTime = 15;  
-			}
+			}*/
 			
 			
 			//Add temperature to the actor
@@ -382,16 +394,16 @@ public class GameModel implements constants {
 					powerupTimer++;
 				}
 			}
-			
-			if(constants.TEST_CRITIC /*&& !Arrays.equals(currentState, previousState)*/ ){
+		
+			if(constants.TEST_CRITIC /*&& !Arrays.equals(currentState, previousState) */){
 				System.out.println(critic.calculateFeedback(currentState, previousState, reward, hitByBarrel, gameWon));
 				critic.trainCritic(currentState, previousState, reward, hitByBarrel, gameWon);	
 			}
 			if(!saveStateBeforeJump){
 				System.out.println("Critic is ready to give feedback again!");
 			}
-			if(constants.TEST_PHASE && constants.CRITIC_ON && !saveStateBeforeJump && !Arrays.equals(currentState, previousState)){
-				justLanded = false;
+			if(constants.TEST_PHASE && constants.CRITIC_ON && !saveStateBeforeJump /*&& !Arrays.equals(currentState, previousState)*/){
+				justLanded = false; 
 				//calculate the critic's feedback 
 				feedback = critic.calculateFeedback(currentState, previousState, reward, hitByBarrel, gameWon);
 				//backpropagate the feedback to the actor in the form of a TD-error (Temporal-Difference)
@@ -519,8 +531,16 @@ public class GameModel implements constants {
 		}
 		//Print final performance
 		System.out.println("Final performance: " + performance);
-		//Store the network
-		fh.storeNetwork(actor, actor.getHiddenLayers(),constants.N_HIDDEN_LAYERS_ACTOR);
+		//Store the network(s)
+		if(constants.SAVE_ACTOR){
+			fh.storeNetwork(actor, actor.getHiddenLayers(),constants.N_HIDDEN_LAYERS_ACTOR);
+		}
+		if(constants.SAVE_CRITIC){
+			fh.storeNetwork(critic, critic.getHiddenLayers(),constants.N_HIDDEN_LAYERS_CRITIC);
+		}
+		if(constants.SAVE_TRAINED_ACTOR){
+			fh.storeNetwork(actor, actor.getHiddenLayers(),constants.N_HIDDEN_LAYERS_ACTOR);
+		}
 		//Quit the program 
 		System.exit(0);
 

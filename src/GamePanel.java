@@ -80,8 +80,8 @@ public class GamePanel extends JPanel {
 	 public void paintComponent(Graphics g){
 		super.paintComponent(g); 
 		g.setColor(Color.WHITE);
-		g.drawString("Performance: " + model.performance + "%", 10, 10);
-		
+		g.drawString("Performance: " + (int)model.performance + "%", 10, 10);
+		g.drawString("Games played: " + (int)model.gamesPlayed, 200, 10);
 		//Temporary: draw visionGrid
 		//g.drawRect((int)model.getVisionGrid().getXPos(),(int) model.getVisionGrid().getYPos(),(int) model.getVisionGrid().getWidth(),(int) model.getVisionGrid().getHeight());
 		/*for(VisionBlock b : model.getVisionGrid().getBlocks()){

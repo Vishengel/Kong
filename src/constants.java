@@ -7,16 +7,25 @@ public interface constants {
 	//Turning this value off will cause the game model to speed up significantly
 	boolean GUI_ON = true;
 	
-	boolean DEMO_PHASE = true;  
-	boolean TEST_PHASE = false;  
-	boolean CRITIC_ON = false; 
+	boolean DEMO_PHASE = false;  
+	boolean TEST_PHASE = true;  
+	boolean CRITIC_ON = false;   
 	
-	int GAME_SPEED = 10;
+	int GAME_SPEED = 0; 
 	
 	boolean RANDOM_ACTOR = false;
 	
-	
+	boolean TEST_CRITIC = false;
 
+	boolean LOAD_ACTOR = true;
+	boolean LOAD_CRITIC = false;
+	boolean LOAD_TRAINED_ACTOR = false;
+	
+	boolean SAVE_ACTOR = false;
+	boolean SAVE_CRITIC = false;
+	boolean SAVE_TRAINED_ACTOR = false;
+	
+	
 	
 	//This value determines whether the game should create the standard level, or the alternative level 
 	//created for training to jump over barrels.
@@ -27,19 +36,20 @@ public interface constants {
 
 	//This value determines for how many epochs the game should run
 	int MAX_EPOCHS = 1000000; 
-
 	
-	int ACTOR_HIDDEN_NODES = 100;  
-	int CRITIC_HIDDEN_NODES = 50;
+	int MAX_GAMES = 100; 
+	
+	int ACTOR_HIDDEN_NODES = 60;  
+	int CRITIC_HIDDEN_NODES = 60;
 	
 	//These values determine the amount of hidden layers of both the actor and critic network 
-	int N_HIDDEN_LAYERS_ACTOR = 2;     
+	int N_HIDDEN_LAYERS_ACTOR = 1;       
 	int N_HIDDEN_LAYERS_CRITIC = 2;  
 	
-	boolean TEST_CRITIC = false;
 	
-	double ACTOR_CRITIC_LEARNING_RATE = 0.0001; 
-	int LEARNING_RATE_REDUCTION_EPOCHS = 50000;
+	
+	double ACTOR_CRITIC_LEARNING_RATE = 0.00001; 
+	int LEARNING_RATE_REDUCTION_GAMES = 25;  
 			
 			
 			

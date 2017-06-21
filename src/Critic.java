@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -6,12 +7,11 @@ public class Critic extends MLPJelle {
 	
 	double discount = 0.999;  
 	double[] rewards;
-	
-	public Critic(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName) {
-		super(nInput, nHiddenLayers, nHidden, nOutput, fileName);
-		target = new double[input.length][1];
+	double[][] target = new double[1][1];
+	public Critic(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName, boolean loadNetwork) throws IOException {
+		super(nInput, nHiddenLayers, nHidden, nOutput, fileName, loadNetwork);
 		//System.out.println("n in: " + target.length);
-		errorThreshold = 0.6;  
+		errorThreshold = 0.525;  
 		learningRate = 0.001;
 		//minimumChange = 0;
 	}
@@ -19,6 +19,7 @@ public class Critic extends MLPJelle {
 	
 	
 	public void trainNetwork() {
+		target = new double[input.length][1];
 		double totalError = 0, previousTotalError, epoch = 0, reward, t; 
 
 		do {
@@ -101,10 +102,7 @@ public class Critic extends MLPJelle {
 			System.out.println("Value of previous state before backprop: " + outputLayer.get(0).getOutput());
 			backwardPass(0);
 			forwardPass(previousState, false); 
-			System.out.println("Value of previous state after backprop: " + outputLayer.get(0).getOutput());
-			
-			
-			
+			System.out.println("Value of previous state after backprop: " + outputLayer.get(0).getOutput());					
 		}
 		
 		//This function calculated the feedback that the critic feeds back to the actor
@@ -119,6 +117,10 @@ public class Critic extends MLPJelle {
 			forwardPass(previousState, false);
 			//Get the estimated value of the previous state
 			double previousStateValue = outputLayer.get(0).getOutput();
+	
+			if(previousStateValue < 0){
+				previousStateValue = previousStateValue * -1;
+			} 
 			//Calculate the Temporal-Difference error: reward_t-1 + (discount * value_t) - value_t-1
 			double feedback = reward + (discount * stateValue) - previousStateValue;
 			//System.out.println("Current state value: " + stateValue);

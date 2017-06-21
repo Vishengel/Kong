@@ -1,3 +1,7 @@
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -14,7 +18,7 @@ public class MLPJelle {
 	//All four possible input combinations of two input boolean values, plus the threshold multiplier
 	protected double[][] input;
 	//The target values corresponding with each input				
-	protected double[][] target /*= new double[][] {{0.0,0.0,0.0}, {0.0,0.0,1.0}, {0.0,1.0,0.0}, {0.0,1.0,1.0}}*/;
+	protected double[][] target = new double[1][7]; /*= new double[][] {{0.0,0.0,0.0}, {0.0,0.0,1.0}, {0.0,1.0,0.0}, {0.0,1.0,1.0}}*/;
 	//Define the number of nodes in input, hidden and output layers
 	protected int nInput;
 	private int nHidden; 
@@ -28,22 +32,114 @@ public class MLPJelle {
 	//Define the learning rate, error threshold and the maximum number of epochs
 	protected double learningRate = 0.05;   
 	protected double errorThreshold = 0;     
+	//protected double errorThreshold = 0.065;   
 	//Define a minimum change that makes the training phase stop when this minimum difference between training epochs
 	//is reached
-	protected double minimumChange = 0.00005; 
+	protected double minimumChange = 0.00001;  
 	protected double maxEpochs = 500;  
 	protected String fileName;
 	
-	private double temperature = 1;
+	private double temperature = 2; 
 	
-	public MLPJelle(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName) {
+	public MLPJelle(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName, boolean loadNetwork) throws IOException {
 		this.nInput = nInput;
 		this.nHiddenLayers = nHiddenLayers;
 		this.nHidden = nHidden;
 		this.nOutput = nOutput;
 		this.fileName = fileName;
 		
-		this.initNetwork();	
+		//If an old network needs to be loaded, don't use the normal mlp initialization
+		if(loadNetwork){
+			this.loadNetwork(); 
+		}
+		else{
+			this.initNetwork();	
+		}
+	}
+	//Restore a previously trained and stored network 
+	public void loadNetwork() throws IOException{
+		String network, str;
+		String[] line;
+		BufferedReader in;
+		//Load the right file, depending on the network
+		if(this instanceof Critic){
+			System.out.println("Loading Critic!");
+			network = "storedCritic";
+		}
+		else{
+			System.out.println("Loading Actor!");
+			if(constants.LOAD_TRAINED_ACTOR){
+				network = "storedActorTrained";
+			}
+			else{
+				network = "storedActor";
+			}
+		}
+		String filename= "src/" + network + ".csv";
+		in = new BufferedReader(new FileReader(filename));
+		str = in.readLine();
+		line = str.split(",");
+		//Get the amount of hidden layers,
+		int hiddenLayers = Integer.parseInt(line[0]);
+		System.out.println("Hidden layers: " + hiddenLayers);
+		//Store the size of each hidden layer
+		int[] hiddenLayerSizes = new int[hiddenLayers];
+		int[] hiddenLayerWeights = new int[hiddenLayers];
+		for(int i = 0; i < hiddenLayers; i++){
+			hiddenLayerSizes[i] = Integer.parseInt(line[i + 1]);
+			System.out.println("Hidden layer " + i + " nodes: " + hiddenLayerSizes[i]);
+		}
+		//get the amount of output nodes
+		int outputNodes = Integer.parseInt(line[line.length - 1]);
+		System.out.println("Output nodes: " + outputNodes);
+		//Go to the next line 
+		str = in.readLine();
+		line = str.split(",");
+		//Get weights for every type of neuron
+		for(int i = 0; i < hiddenLayers; i++){
+			hiddenLayerWeights[i] = Integer.parseInt(line[i]);
+			System.out.println("Neurons in hidden layer " + i + " have " + hiddenLayerWeights[i] + " weights.");
+		}
+		int outputWeights = Integer.parseInt(line[line.length-1]);
+		System.out.println("Neurons in output layer have " + outputWeights + " weights.");
+		
+		
+		//recreate network architecture
+		//ArrayList<NeuronJelle> hiddenLayer = new ArrayList<NeuronJelle>();
+		//Create hidden layers and hidden nodes and fill them with the correct weights
+		//Loop through every hidden layer
+		for(int i = 0; i < hiddenLayers; i++){
+			//Create the hidden layer
+			ArrayList<NeuronJelle> hiddenLayer = new ArrayList<NeuronJelle>();
+			//Create the hidden nodes
+			for(int j = 0; j < hiddenLayerSizes[i]; j++){
+				hiddenLayer.add(new NeuronJelle(hiddenLayerWeights[i]));		
+				str = in.readLine();
+				line = str.split(",");
+				//System.out.println(line.length);
+				//Add the weights from the stored network to the weights of neuron
+				for(int w = 0; w < hiddenLayerWeights[i]; w++){
+					hiddenLayer.get(j).getWeights()[w] = Double.parseDouble(line[w]);
+				}
+			}
+			hiddenList.add(hiddenLayer);
+		}
+		
+		
+		//Create output layer nodes and weights
+		for(int i = 0; i < nOutput; i++){
+			outputLayer.add(new NeuronJelle(outputWeights));
+			str = in.readLine();
+			line = str.split(",");
+			for(int w = 0; w < outputWeights; w++){
+				outputLayer.get(i).getWeights()[w] = Double.parseDouble(line[w]);
+				
+			}
+		}
+		
+		
+		
+		in.close();
 	}
 	
 	public void initializeLayers(){
@@ -174,7 +270,7 @@ public class MLPJelle {
 				hiddenList.get(i).get(j).setActivation();
 				if(this instanceof Critic){
 					//Don't compute sigmoid when then input/activation is 0
-					if(hiddenList.get(i).get(j).getActivation() != 0  && i != 10){
+					if(i != 10){
 						hiddenList.get(i).get(j).setSigmoidOutput();
 					}
 					else if(i == 10){
