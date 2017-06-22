@@ -5,13 +5,13 @@ public interface constants {
 
 	//This boolean determines whether the visual representation of the game should be on or off
 	//Turning this value off will cause the game model to speed up significantly
-	boolean GUI_ON = true;
+	boolean GUI_ON = false;
 	
-	boolean DEMO_PHASE = true;  
-	boolean TEST_PHASE = false;  
+	boolean DEMO_PHASE = false;  
+	boolean TEST_PHASE = true;  
 	boolean CRITIC_ON = false; 
 	
-	int GAME_SPEED = 10;
+	int GAME_SPEED = 1;
 	
 	boolean RANDOM_ACTOR = false;
 	
@@ -34,7 +34,7 @@ public interface constants {
 	int CRITIC_HIDDEN_NODES = 50;
 	
 	//These values determine the amount of hidden layers of both the actor and critic network 
-	int N_HIDDEN_LAYERS_ACTOR = 2;     
+	int N_HIDDEN_LAYERS_ACTOR = 1;     
 	int N_HIDDEN_LAYERS_CRITIC = 2;  
 	
 	boolean TEST_CRITIC = false;

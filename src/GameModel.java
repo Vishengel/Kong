@@ -6,19 +6,20 @@ import java.util.Arrays;
 
 public class GameModel implements constants {
 	
-	String filename = "TrainingData/FinalData/FullDataSetJelle2"; 
+	String filename = "TrainingData/FinalData/FullDataSetFinal2"; 
 	
 	//performance variables
 	double gamesWon = 0;
 	double gamesPlayed = 0;
 	double performance = 0; 
+	double avgPerformance = 0;
 	
 	private double score = 0;
 	private int lives = 3;
 	
 	//these values determine how fast barrels are spawned in the game
-	private int spawnTimer = 300; 	
-	private int barrelSpawnTime = 300;     
+	private int spawnTimer = 250; 	
+	private int barrelSpawnTime = 250;     
 	
 	//These values relate to powerups and destroying barrels
 	private int smashedBarrelIndex = -1;
@@ -222,7 +223,7 @@ public class GameModel implements constants {
 	
 	//main game loop
 	public void runGame() throws InterruptedException, IOException{
-		for (int run=0; run<1; run++) {
+		for (int run=0; run<10; run++) {
 			double[] testInputs;
 			//This array contains all the game inputs + the bias value
 			double[] currentState;
@@ -514,11 +515,13 @@ public class GameModel implements constants {
 			//Print final performance
 			System.out.println("Final performance: " + performance);
 			fh.writePerformanceToFile(run, performance, constants.PERFORMANCE_FILE_NAME);
+			avgPerformance += performance;
 			//Store the network
 			fh.storeNetwork(actor, actor.getHiddenLayers(),constants.N_HIDDEN_LAYERS_ACTOR);
 			//Quit the program 
 			//System.exit(0);
 		}
+		fh.writePerformanceToFile(0, avgPerformance/10, constants.PERFORMANCE_FILE_NAME);
 	}	
 	
 	//This function is called at the start of the game and runs the entire model

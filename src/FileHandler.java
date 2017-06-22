@@ -168,8 +168,8 @@ public class FileHandler {
 			bw = new BufferedWriter(fw);
 
 			bw.write(data);
-
-			System.out.println("Done");
+			
+			System.out.println("Score written to file");
 
 		} catch (IOException e) {
 
@@ -200,7 +200,7 @@ public class FileHandler {
 
 		try {
 
-			String data = "" + run + ", " + performance + "\n";
+			String data = "" + ++run + ", " + performance + "\n";
 
 			File file = new File(dataFile);
 
@@ -214,8 +214,6 @@ public class FileHandler {
 			bw = new BufferedWriter(fw);
 
 			bw.write(data);
-
-			System.out.println("Done");
 
 		} catch (IOException e) {
 
