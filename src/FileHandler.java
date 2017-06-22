@@ -236,6 +236,51 @@ public class FileHandler {
 			}
 		}
 	}
+	
+	public void writeParameterToFile(String parameterName, double value, String fileName) {
+		String dataFile = "src/" + fileName + ".csv";
+		
+		BufferedWriter bw = null;
+		FileWriter fw = null;
+
+		try {
+
+			String data = "" + parameterName + ", " + value + "\n";
+
+			File file = new File(dataFile);
+
+			// if file doesnt exists, then create it
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+
+			// true = append file
+			fw = new FileWriter(file.getAbsoluteFile(), true);
+			bw = new BufferedWriter(fw);
+
+			bw.write(data);
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+
+		} finally {
+
+			try {
+
+				if (bw != null)
+					bw.close();
+
+				if (fw != null)
+					fw.close();
+
+			} catch (IOException ex) {
+
+				ex.printStackTrace();
+
+			}
+		}
+	}
 	//Store the weights of the network in a text file 
 	public void storeNetwork(MLPJelle mlp, ArrayList<ArrayList<NeuronJelle>> hiddenList, int hiddenLayers) throws IOException{
 		String filename= "src/" + "storedNet" + ".csv";

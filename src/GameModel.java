@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 public class GameModel implements constants {
 	
-	String filename = "TrainingData/FinalData/FullDataSetFinal2"; 
+	String filename = constants.DATA_FILEPATH; 
 	
 	//performance variables
 	double gamesWon = 0;
@@ -222,21 +222,7 @@ public class GameModel implements constants {
 	}
 	
 	//main game loop
-	public void runGame() throws InterruptedException, IOException{
-		
-		double[] testInputs;
-		//This array contains all the game inputs + the bias value
-		double[] currentState;
-		//After each epoch, assign the current state to the previous state
-		double[] previousState;
-		//After the game state contains everything from the current state plus the obtained reward plus the 
-		//targets for the actions. This information is written to a trainingSet.
-		double[] gameState;
-
-		double reward;
-		double feedback;
-		int action;
-		int previousAction;
+	public void runGame() throws InterruptedException, IOException{	
 		
 		visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
 		
@@ -251,8 +237,29 @@ public class GameModel implements constants {
 			critic.trainNetwork();
 			critic.setLearningRate(0.0001); 
 		}
+		
+		fh.writeParameterToFile("LearningRate", actor.getLearningRate(), constants.SCORE_FILE_NAME);
+		fh.writeParameterToFile("LearningRate", actor.getLearningRate(), constants.PERFORMANCE_FILE_NAME);
 			
-		for (int run=0; run<5; run++) {
+		testParameter();
+	}	
+	
+	public void testParameter() throws InterruptedException, IOException {
+		double[] testInputs;
+		//This array contains all the game inputs + the bias value
+		double[] currentState;
+		//After each epoch, assign the current state to the previous state
+		double[] previousState;
+		//After the game state contains everything from the current state plus the obtained reward plus the 
+		//targets for the actions. This information is written to a trainingSet.
+		double[] gameState;
+
+		double reward;
+		double feedback;
+		int action;
+		int previousAction;
+		
+		for (int run=0; run<constants.RUNS_PER_PARAMETER; run++) {
 			gameState = new double[visionGridInputs + marioTrackInputs + otherInputs + nOutput];
 			currentState = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
 			previousState = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
@@ -270,7 +277,7 @@ public class GameModel implements constants {
 				//actor.setLearningRate(constants.ACTOR_CRITIC_LEARNING_RATE);  
 			}
 			
-			while(gamesPlayed < 10){
+			while(gamesPlayed < constants.GAMES_PER_RUN){
 				//every 50000 epochs, reduce the learning rate of the actor and critic for smoother convergence
 				if(epochs % constants.LEARNING_RATE_REDUCTION_EPOCHS == 0 && epochs > 0 && constants.TEST_PHASE){ 
 					System.out.println("Current learning rate: " + actor.getLearningRate());
@@ -536,8 +543,8 @@ public class GameModel implements constants {
 			//Quit the program 
 			//System.exit(0);
 		}
-		fh.writePerformanceToFile(0, avgPerformance/10, constants.PERFORMANCE_FILE_NAME);
-	}	
+		fh.writePerformanceToFile(0, avgPerformance/constants.RUNS_PER_PARAMETER, constants.PERFORMANCE_FILE_NAME);
+	}
 	
 	//This function is called at the start of the game and runs the entire model
 	public void initGame() {

@@ -15,9 +15,12 @@ public interface constants {
 	
 	boolean RANDOM_ACTOR = false;
 	
+	String DATA_FILEPATH = "TrainingData/FinalData/FullDataSetFinal";
 	String SCORE_FILE_NAME = "LearningRateScores";
 	String PERFORMANCE_FILE_NAME = "LearningRatePerformance";
 
+	int RUNS_PER_PARAMETER = 10;
+	int GAMES_PER_RUN = 100;
 	
 	//This value determines whether the game should create the standard level, or the alternative level 
 	//created for training to jump over barrels.
