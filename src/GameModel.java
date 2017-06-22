@@ -223,41 +223,52 @@ public class GameModel implements constants {
 	
 	//main game loop
 	public void runGame() throws InterruptedException, IOException{
-		for (int run=0; run<10; run++) {
-			double[] testInputs;
-			//This array contains all the game inputs + the bias value
-			double[] currentState;
-			//After each epoch, assign the current state to the previous state
-			double[] previousState;
-			//After the game state contains everything from the current state plus the obtained reward plus the 
-			//targets for the actions. This information is written to a trainingSet.
-			double[] gameState;
+		
+		double[] testInputs;
+		//This array contains all the game inputs + the bias value
+		double[] currentState;
+		//After each epoch, assign the current state to the previous state
+		double[] previousState;
+		//After the game state contains everything from the current state plus the obtained reward plus the 
+		//targets for the actions. This information is written to a trainingSet.
+		double[] gameState;
+
+		double reward;
+		double feedback;
+		int action;
+		int previousAction;
+		
+		visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
+		
+		//don't create the actor and critic if in the demonstration phase
+		if(constants.TEST_PHASE){
+			actor = new MLPJelle(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_ACTOR, constants.ACTOR_HIDDEN_NODES/*(visionGridInputs + marioTrackInputs + otherInputs-1 + nOutput)/2*/, nOutput, filename); 
+			//critic = new Critic(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_CRITIC, 40/*(visionGridInputs + marioTrackInputs + otherInputs) / 2*/, 1, "FinalSet2New"); 		
+		}
+		
+		if(constants.CRITIC_ON){
+			critic = new Critic(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_CRITIC, constants.CRITIC_HIDDEN_NODES/*(visionGridInputs + marioTrackInputs + otherInputs) / 2*/, 1, filename); 
+			critic.trainNetwork();
+			critic.setLearningRate(0.0001); 
+		}
 			
+		for (int run=0; run<5; run++) {
 			gameState = new double[visionGridInputs + marioTrackInputs + otherInputs + nOutput];
 			currentState = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
 			previousState = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
 			
-			visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
-	
-			//don't create the actor and critic if in the demonstration phase
-			if(constants.TEST_PHASE){
-				actor = new MLPJelle(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_ACTOR, constants.ACTOR_HIDDEN_NODES/*(visionGridInputs + marioTrackInputs + otherInputs-1 + nOutput)/2*/, nOutput, filename); 
-				//critic = new Critic(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_CRITIC, 40/*(visionGridInputs + marioTrackInputs + otherInputs) / 2*/, 1, "FinalSet2New"); 		
-			}
-			if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){ 
-				actor.trainNetwork();
-				actor.setLearningRate(constants.ACTOR_CRITIC_LEARNING_RATE);  
-			}
-			if(constants.CRITIC_ON){
-				critic = new Critic(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_CRITIC, constants.CRITIC_HIDDEN_NODES/*(visionGridInputs + marioTrackInputs + otherInputs) / 2*/, 1, filename); 
-				critic.trainNetwork();
-				critic.setLearningRate(0.0001); 
-			}
+			reward = 0;
+			feedback = 0;
+			action = 0;
+			previousAction = 0;
 			
-			double reward = 0;
-			double feedback = 0;
-			int action = 0;
-			int previousAction = 0;
+			//Re-initialize the network for each run
+			if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){ 
+				//actor.initializeLayers();
+				actor.resetNetwork();
+				actor.trainNetwork();
+				//actor.setLearningRate(constants.ACTOR_CRITIC_LEARNING_RATE);  
+			}
 			
 			while(gamesPlayed < 10){
 				//every 50000 epochs, reduce the learning rate of the actor and critic for smoother convergence
@@ -516,6 +527,10 @@ public class GameModel implements constants {
 			System.out.println("Final performance: " + performance);
 			fh.writePerformanceToFile(run, performance, constants.PERFORMANCE_FILE_NAME);
 			avgPerformance += performance;
+			performance = 0;
+			gamesPlayed = 0;
+			gamesWon = 0;
+			score = 0;
 			//Store the network
 			fh.storeNetwork(actor, actor.getHiddenLayers(),constants.N_HIDDEN_LAYERS_ACTOR);
 			//Quit the program 

@@ -111,7 +111,15 @@ public class MLPJelle {
 		initializeLayers();
 	}
 	
-	
+	public void resetNetwork() {
+		for(ArrayList<NeuronJelle> HL : hiddenList) {
+			HL.clear();
+		}
+		hiddenList.clear();
+		outputLayer.clear();
+		
+		initializeLayers();
+	}
 	
 	public void trainNetwork() {
 		double previousError = 0;
