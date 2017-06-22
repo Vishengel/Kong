@@ -82,49 +82,49 @@ public class GamePanel extends JPanel {
 		g.setColor(Color.WHITE);
 		g.drawString("Performance: " + (int)model.performance + "%", 10, 10);
 		g.drawString("Games played: " + (int)model.gamesPlayed, 200, 10);
-		//Temporary: draw visionGrid
-		//g.drawRect((int)model.getVisionGrid().getXPos(),(int) model.getVisionGrid().getYPos(),(int) model.getVisionGrid().getWidth(),(int) model.getVisionGrid().getHeight());
-		/*for(VisionBlock b : model.getVisionGrid().getBlocks()){
-			if(b.detectedBarrel() > 0){
-				g.drawImage(orange, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);
-				//g.drawString("" + b.detectedBarrel(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
-			}
-			else if(b.detectedLadder() > 0){
-				g.drawImage(blue, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);	
-				//g.drawString("" + b.detectedLadder(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
-			}
-			else if(b.detectedPowerup() > 0 ){
-				g.drawImage(red, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);
-				//g.drawString("" + b.detectedPowerup(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
-			}
-			else if(b.detectedPeach() > 0){
-				g.drawImage(pink, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);
-				//g.drawString("" + b.detectedPeach(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
-			}
-			
-			else{
-				g.drawRect((int)b.getXPos(),(int) b.getYPos(),(int) b.getWidth(),(int) b.getHeight());
-				//g.drawString("" + b.detectedBarrel(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
+		
+		if(constants.SHOW_VISION_GRID){
+			//draw visionGrid
+			//g.drawRect((int)model.getVisionGrid().getXPos(),(int) model.getVisionGrid().getYPos(),(int) model.getVisionGrid().getWidth(),(int) model.getVisionGrid().getHeight());
+			for(VisionBlock b : model.getVisionGrid().getBlocks()){
+				if(b.detectedBarrel() > 0){
+					g.drawImage(orange, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);
+					//g.drawString("" + b.detectedBarrel(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
+				}
+				else if(b.detectedLadder() > 0){
+					g.drawImage(blue, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);	
+					//g.drawString("" + b.detectedLadder(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
+				}
+				else if(b.detectedPowerup() > 0 ){
+					g.drawImage(red, (int)b.getXPos(), (int)b.getYPos(), (int)b.getWidth(), (int)b.getHeight(), null);
+					//g.drawString("" + b.detectedPowerup(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
+				}			
+				else{
+					g.drawRect((int)b.getXPos(),(int) b.getYPos(),(int) b.getWidth(),(int) b.getHeight());
+					//g.drawString("" + b.detectedBarrel(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
+				}
 			}
 		}
-		*/
-		//draw mario tracker
-		for(VisionBlock b : model.getMarioTracker().getBlocks()){
-			
-			if(b.detectedMario() > 0){	
-				g.setColor(Color.WHITE);
-				g.fillRect((int)b.getXPos(),(int) b.getYPos(),(int) b.getWidth(),(int) b.getHeight());
-				//g.drawString("" + b.detectedMario(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
-				//System.out.println("MARIO IS CURRENTLY AT BLOCK# " + model.getMarioTracker().getBlocks().indexOf(b));
+		
+		if(constants.SHOW_MARIO_TRACKER){
+			//draw mario tracker
+			for(VisionBlock b : model.getMarioTracker().getBlocks()){
+				
+				if(b.detectedMario() > 0){	
+					g.setColor(Color.WHITE);
+					g.fillRect((int)b.getXPos(),(int) b.getYPos(),(int) b.getWidth(),(int) b.getHeight());
+					//g.drawString("" + b.detectedMario(), (int)(b.getXPos() + b.getWidth()/2), (int)(b.getYPos() + b.getHeight()/2));
+					//System.out.println("MARIO IS CURRENTLY AT BLOCK# " + model.getMarioTracker().getBlocks().indexOf(b));
+				}
+				
+				else{
+					g.setColor(Color.GRAY);
+					g.drawRect((int)b.getXPos(),(int) b.getYPos(),(int) b.getWidth(),(int) b.getHeight());
+				}
+				
 			}
-			
-			else{
-				g.setColor(Color.GRAY);
-				g.drawRect((int)b.getXPos(),(int) b.getYPos(),(int) b.getWidth(),(int) b.getHeight());
-			}
-			
 		}
-	    
+		
 		//Draw game objects	
         for (Platform p : model.getPlatformList()){
         	//if(p.getHasLadder()) {

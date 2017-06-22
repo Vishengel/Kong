@@ -7,26 +7,25 @@ public interface constants {
 	//Turning this value off will cause the game model to speed up significantly
 	boolean GUI_ON = true;
 	
-	//Demo phase: Human player plays N games, these get stored in the trainingset.
-	boolean DEMO_PHASE = true;  
+	//Demo phase: Human player plays N games, these get stored in the training set.
+	boolean DEMO_PHASE = false;  
+	//Set this value to true when the critic output needs to be seen during the demo phase
+	boolean TEST_CRITIC = false; 
 	//Test phase: The AI actor plays the game.
-	boolean TEST_PHASE = false;  
+	boolean TEST_PHASE = true;  
 	//If true, the Critic is trained/loaded and gives the actor feedback
 	boolean CRITIC_ON = false;   
 	
 	//Determine the game speed. Default for demo phase is 15, default for test phase is 0. 
-	int GAME_SPEED = 15; 
+	int GAME_SPEED = 0; 
 	
 	//If true, the actor will not be trained.
 	boolean RANDOM_ACTOR = false;
 	
-	//Set this value to true when the critic output needs to be seen during the demo phase
-	boolean TEST_CRITIC = false;
-
 	//Network restoring parameters
 	boolean LOAD_ACTOR = false;
 	boolean LOAD_CRITIC = false;
-	boolean LOAD_TRAINED_ACTOR = false;
+	boolean LOAD_TRAINED_ACTOR = true;
 	
 	//Network saving parameters 
 	boolean SAVE_ACTOR = false;
@@ -34,6 +33,9 @@ public interface constants {
 	boolean SAVE_TRAINED_ACTOR = false;
 	
 	
+	//Draw/don't draw on screen
+	boolean SHOW_VISION_GRID = false;
+	boolean SHOW_MARIO_TRACKER = true;
 	
 	//This value determines whether the game should create the standard level, or the alternative level 
 	//created for training to jump over barrels.
@@ -55,8 +57,8 @@ public interface constants {
 	int N_HIDDEN_LAYERS_CRITIC = 2;  
 	
 	
-	
-	double ACTOR_CRITIC_LEARNING_RATE = 0.00001; 
+	double CRITIC_LEARNING_RATE = 0;
+	double ACTOR_CRITIC_LEARNING_RATE = 0.0004; 
 	int LEARNING_RATE_REDUCTION_GAMES = 25;  
 			
 			

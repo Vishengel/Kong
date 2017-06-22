@@ -118,9 +118,6 @@ public class Critic extends MLPJelle {
 			//Get the estimated value of the previous state
 			double previousStateValue = outputLayer.get(0).getOutput();
 	
-			if(previousStateValue < 0){
-				previousStateValue = previousStateValue * -1;
-			} 
 			//Calculate the Temporal-Difference error: reward_t-1 + (discount * value_t) - value_t-1
 			double feedback = reward + (discount * stateValue) - previousStateValue;
 			//System.out.println("Current state value: " + stateValue);
