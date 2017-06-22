@@ -360,7 +360,7 @@ public class GameModel implements constants {
 		
 		//main game loop 
 		while(condition){
-			if(epochs % 2 == 0){
+			/*if(epochs % 2 == 0){*/
 				//critic.forwardPass(currentState, false);
 				//System.out.println("STATE VALUE: " + critic.getOutputLayer().get(0).getOutput());
 				if(constants.TEST_PHASE){
@@ -506,43 +506,27 @@ public class GameModel implements constants {
 				}	
 				//Test
 				System.out.println("Current and previous state are equal: " + Arrays.equals(currentState, previousState));
-				if(constants.DEMO_PHASE /*(!mario.isJumping() || epochs == epochBeforeJump)*/ ){
-					gameState[visionGridInputs + marioTrackInputs + otherInputs + mario.getAction()] = 1.0;
-					trainingSet.add(gameState); 
-					/*System.out.println("Mario action: " + mario.getAction());
-					System.out.println("State and previous state equal? : " + Arrays.equals(currentState, previousState));
-					//print state and previous state
-					System.out.println("*** State: ");
-					for(int i = 0; i < currentState.length; i++){
-						System.out.print(currentState[i] + " ");	
-					}
-					System.out.println();
-					System.out.println("*** Previous state: ");
-					for(int i = 0; i < previousState.length; i++){
-						System.out.print(previousState[i] + " ");	
-					}
-					System.out.println();
-					System.out.println("GAME STATE!: ");
-					for(int i = 0; i < gameState.length; i++){
-						System.out.print(gameState[i] + " ");	
-					}*/
-					
-				}
 				
 											
 			}
 			//Only move objects and nothing else every odd epoch
-			else{
+			/*else{
 				hitByBarrel = false;
 				gameWon = false;  
 				touchedPowerUp = false;
 				jumpedOverBarrel = false;
 				destroyedBarrel = false;
 				moveAll();
+			}*/
+			
+			
+			if(constants.DEMO_PHASE /*(!mario.isJumping() || epochs == epochBeforeJump)*/ ){
+				gameState[visionGridInputs + marioTrackInputs + otherInputs + mario.getAction()] = 1.0;
+				trainingSet.add(gameState); 
 			}
 			//increment epoch
 			epochs++;	
-		}
+		//}
 		//Write all the data gathered during the demonstration phase to a txt file for training
 		if(constants.DEMO_PHASE){
 			fh.writeToFile(trainingSet, filename);

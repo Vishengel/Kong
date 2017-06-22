@@ -17,15 +17,15 @@ public interface constants {
 	boolean CRITIC_ON = false;   
 	
 	//Determine the game speed. Default for demo phase is 15, default for test phase is 0. 
-	int GAME_SPEED = 0; 
+	int GAME_SPEED = 20; 
 	
 	//If true, the actor will not be trained.
 	boolean RANDOM_ACTOR = false;
 	
 	//Network restoring parameters
-	boolean LOAD_ACTOR = false;
+	boolean LOAD_ACTOR = false; 
 	boolean LOAD_CRITIC = false;
-	boolean LOAD_TRAINED_ACTOR = true;
+	boolean LOAD_TRAINED_ACTOR = false;
 	
 	//Network saving parameters 
 	boolean SAVE_ACTOR = false;
@@ -35,7 +35,7 @@ public interface constants {
 	
 	//Draw/don't draw on screen
 	boolean SHOW_VISION_GRID = false;
-	boolean SHOW_MARIO_TRACKER = true;
+	boolean SHOW_MARIO_TRACKER = false;
 	
 	//This value determines whether the game should create the standard level, or the alternative level 
 	//created for training to jump over barrels.
@@ -57,8 +57,8 @@ public interface constants {
 	int N_HIDDEN_LAYERS_CRITIC = 2;  
 	
 	
-	double CRITIC_LEARNING_RATE = 0;
-	double ACTOR_CRITIC_LEARNING_RATE = 0.0004; 
+	double CRITIC_LEARNING_RATE = 0.00001;
+	double ACTOR_CRITIC_LEARNING_RATE = 0.0001; 
 	int LEARNING_RATE_REDUCTION_GAMES = 25;  
 			
 			
