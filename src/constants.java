@@ -5,7 +5,7 @@ public interface constants {
 
 	//This boolean determines whether the visual representation of the game should be on or off
 	//Turning this value off will cause the game model to speed up significantly
-	boolean GUI_ON = true;
+	boolean GUI_ON = false;
 	
 	boolean DEMO_PHASE = false;  
 	boolean TEST_PHASE = true;  

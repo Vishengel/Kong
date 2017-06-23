@@ -26,11 +26,12 @@ public class MLPJelle {
 	//Define a list of output neurons
 	protected ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
-	protected double learningRate = 0.05;   
-	protected double errorThreshold = 0.07;     
+	protected double learningRate = 0.01;   
+	protected double errorThreshold = 0.01;     
 	//Define a minimum change that makes the training phase stop when this minimum difference between training epochs
 	//is reached
-	protected double minimumChange = 0.00005; 
+	protected double minimumChange = 0.0005;
+	//protected double minimumChange = 0.00000005;
 	protected double maxEpochs = 500;  
 	protected String fileName;
 	
@@ -140,7 +141,7 @@ public class MLPJelle {
 			
 			totalError /= this.input.length;
 			System.out.println(totalError);
-			
+			System.out.println("Error diff.: " + (totalError - previousError));
 			epoch++;
 		//Continue until either the maximum number of epochs is reached 
 		//or the decrease in the error is smaller than the threshold
@@ -283,8 +284,8 @@ public class MLPJelle {
 		}
 		for(NeuronJelle n: outputLayer){
 			n.setOutput(Math.exp(n.getActivation() / temperature) / activationSum);
-			System.out.print("Output node " + outputLayer.indexOf(n) + ": " + n.getActivation());
-			System.out.println(" " + n.getOutput());		
+			//System.out.print("Output node " + outputLayer.indexOf(n) + ": " + n.getActivation());
+			//System.out.println(" " + n.getOutput());		
 		}
 		double p = Math.random();
 		double cumulativeProbability = 0.0;
@@ -293,7 +294,7 @@ public class MLPJelle {
 		    cumulativeProbability += n.getOutput();
 		    
 		    if (p <= cumulativeProbability) {
-		    	System.out.println("Action chosen: " + outputLayer.indexOf(n));
+		    	//System.out.println("Action chosen: " + outputLayer.indexOf(n));
 		        return outputLayer.indexOf(n);
 		    }
 		}

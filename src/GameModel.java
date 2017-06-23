@@ -158,7 +158,7 @@ public class GameModel implements constants {
 		//Add the reward received in this state
 		state[visionGridInputs + marioTrackInputs + 5] = reward;
 		
-		System.out.println("Total state size should be: " + (visionGridInputs + marioTrackInputs + otherInputs+ nOutput));
+		//System.out.println("Total state size should be: " + (visionGridInputs + marioTrackInputs + otherInputs+ nOutput));
 		return state;
 		
 	}
@@ -173,24 +173,24 @@ public class GameModel implements constants {
 		}
 		
 		if(hitByBarrel){
-			System.out.println("Hit by barrel!");
+			//System.out.println("Hit by barrel!");
 			reward -= 50;
 			score -= 50; 	
 		}
 		
 		else if(jumpedOverBarrel){
-			System.out.println("Jumped over a barrel!");
+			//System.out.println("Jumped over a barrel!");
 			reward += 0.5; 
 			score += 0.5;
 		}
 		else if(destroyedBarrel){
-			System.out.println("Smashed a barrel!");
+			//System.out.println("Smashed a barrel!");
 			reward += 1;
 			score += 1;
 		}
 		
 		if(touchedPowerUp){
-			System.out.println("Picked up powerup!");
+			//System.out.println("Picked up powerup!");
 			reward += 1;
 			score += 1;
 		}
@@ -223,6 +223,13 @@ public class GameModel implements constants {
 	
 	//main game loop
 	public void runGame() throws InterruptedException, IOException{	
+		double[] learningRates = {0.01, 0.02, 0.03, 0.04, 0.05};
+		double[] temperatures = {1.0, 2.0, 3.0, 4.0, 5.0};
+		//double[] learningRates = {0.01, 0.02};
+		//double[] temperatures = {1.0, 2.0};
+		
+		//start of timer
+        long lStartTime = System.nanoTime();
 		
 		visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
 		
@@ -238,13 +245,30 @@ public class GameModel implements constants {
 			critic.setLearningRate(0.0001); 
 		}
 		
-		fh.writeParameterToFile("LearningRate", actor.getLearningRate(), constants.SCORE_FILE_NAME);
-		fh.writeParameterToFile("LearningRate", actor.getLearningRate(), constants.PERFORMANCE_FILE_NAME);
-			
-		testParameter();
+		for(double par : learningRates) {
+			fh.writeParameterToFile("learningRate", par, constants.SCORE_FILE_NAME);
+			fh.writeParameterToFile("learningRate", par, constants.PERFORMANCE_FILE_NAME);
+			testParameter("learningRate", par);
+		}
+		
+		for(double par : temperatures) {
+			fh.writeParameterToFile("temperature", par, constants.SCORE_FILE_NAME);
+			fh.writeParameterToFile("temperature", par, constants.PERFORMANCE_FILE_NAME);
+			testParameter("temperature", par);
+		}
+		
+		//fh.writePerformanceToFile(0, avgPerformance/constants.RUNS_PER_PARAMETER, constants.PERFORMANCE_FILE_NAME);
+		//end
+        long lEndTime = System.nanoTime();
+
+		//time elapsed
+        long output = lEndTime - lStartTime;
+
+        System.out.println("Elapsed time in milliseconds: " + output / 1000000);
+        System.exit(0);
 	}	
-	
-	public void testParameter() throws InterruptedException, IOException {
+	 
+	public void testParameter(String parName, double parValue) throws InterruptedException, IOException {
 		double[] testInputs;
 		//This array contains all the game inputs + the bias value
 		double[] currentState;
@@ -259,6 +283,12 @@ public class GameModel implements constants {
 		int action;
 		int previousAction;
 		
+		if(parName.equals("learningRate")) {
+			actor.setLearningRate(parValue);
+		} else if(parName.equals("temperature")) {
+			actor.setTemperature(parValue);
+		}
+		
 		for (int run=0; run<constants.RUNS_PER_PARAMETER; run++) {
 			gameState = new double[visionGridInputs + marioTrackInputs + otherInputs + nOutput];
 			currentState = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
@@ -268,6 +298,7 @@ public class GameModel implements constants {
 			feedback = 0;
 			action = 0;
 			previousAction = 0;
+			epochs = 0;
 			
 			//Re-initialize the network for each run
 			if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){ 
@@ -275,10 +306,12 @@ public class GameModel implements constants {
 				actor.resetNetwork();
 				actor.trainNetwork();
 				//actor.setLearningRate(constants.ACTOR_CRITIC_LEARNING_RATE);  
+				System.out.println("Network trained, starting trials");
 			}
 			
 			while(gamesPlayed < constants.GAMES_PER_RUN){
 				//every 50000 epochs, reduce the learning rate of the actor and critic for smoother convergence
+				/*
 				if(epochs % constants.LEARNING_RATE_REDUCTION_EPOCHS == 0 && epochs > 0 && constants.TEST_PHASE){ 
 					System.out.println("Current learning rate: " + actor.getLearningRate());
 					actor.setLearningRate(actor.getLearningRate() * 0.8);  
@@ -287,18 +320,19 @@ public class GameModel implements constants {
 					}
 					
 				}
+				*/
 				//System.out.println("Performance: " + gamesWon / gamesLost);
-				System.out.println("------------- Current epoch: " + epochs + " -------------");
-				System.out.println("Temperature: " + temperature);
+				//System.out.println("------------- Current epoch: " + epochs + " -------------");
+				//System.out.println("Temperature: " + temperature);
 				
 				//reset the vision grid 
 				visionGrid.resetDetections();
 				marioTracker.resetDetections();
-				//If sufficient epochs have been reached, slow down game model for better inspection of performance
+				/*If sufficient epochs have been reached, slow down game model for better inspection of performance
 				if(epochs >= 1000000){
 					sleepTime = 15;  
 				}
-				
+				*/
 				
 				//Add temperature to the actor
 				if(constants.TEST_PHASE){
@@ -325,7 +359,7 @@ public class GameModel implements constants {
 				if(!saveStateBeforeJump && !justLanded){
 					previousAction = action;
 				}
-				System.out.println("Previous action: " + previousAction);
+				//System.out.println("Previous action: " + previousAction);
 							
 				//reset mario's action when standing
 				if(mario.standing){
@@ -345,14 +379,14 @@ public class GameModel implements constants {
 				if(mario.standing && !mario.isJumping() && (action == 5 || action == 6) && !saveStateBeforeJump ){
 					saveStateBeforeJump = true;
 					epochBeforeJump = epochs;
-					System.out.println("NOW STARTING JUMP!");
+					//System.out.println("NOW STARTING JUMP!");
 					for(int i = 0; i < previousState.length; i++){
 						previousState[i] = currentState[i];
 					}
 					previousAction = action;
 				}
-				System.out.println("Previous state is temporarily the state before jumping: " + saveStateBeforeJump);
-				System.out.println("Epoch right before jumping: " + epochBeforeJump);
+				//System.out.println("Previous state is temporarily the state before jumping: " + saveStateBeforeJump);
+				//System.out.println("Epoch right before jumping: " + epochBeforeJump);
 				
 				
 						
@@ -387,7 +421,7 @@ public class GameModel implements constants {
 						powerupTimer = 0;
 						powerupActivated = false;
 						mario.setPoweredUp(false);
-						System.out.println("Powerup deactivated");
+						//System.out.println("Powerup deactivated");
 					}
 					else{
 						powerupTimer++;
@@ -399,7 +433,7 @@ public class GameModel implements constants {
 					critic.trainCritic(currentState, previousState, reward, hitByBarrel, gameWon);	
 				}
 				if(!saveStateBeforeJump){
-					System.out.println("Critic is ready to give feedback again!");
+					//System.out.println("Critic is ready to give feedback again!");
 				}
 				if(constants.TEST_PHASE && constants.CRITIC_ON && !saveStateBeforeJump && !Arrays.equals(currentState, previousState)){
 					justLanded = false;
@@ -440,7 +474,7 @@ public class GameModel implements constants {
 					}  
 					else if(gameWon){
 							//if mario saved the princess, reset game
-							System.out.println("Princess saved!");	
+							//System.out.println("Princess saved!");	
 							gamesPlayed++;
 							gamesWon++;
 							fh.writeScoreToFile(run, gamesPlayed, score, 1, constants.SCORE_FILE_NAME);
@@ -464,20 +498,20 @@ public class GameModel implements constants {
 						!(MOList.get(i).pointAwarded) && mario.isJumping()){
 						jumpedOverBarrel = true;
 						MOList.get(i).setPointAwarded();
-						System.out.println("JUMPED OVER A BARREL!");
+						//System.out.println("JUMPED OVER A BARREL!");
 					}
 				}
 				if(mario.isClimbing()){
 					saveStateBeforeJump = false;
 					justLanded = false;;				
 				}
-				System.out.println("Standing: " + mario.standing);
-				System.out.println("Jumping: " + mario.isJumping());
+				//System.out.println("Standing: " + mario.standing);
+				//System.out.println("Jumping: " + mario.isJumping());
 				
 				if(mario.standing && mario.isJumping() && epochs > (epochBeforeJump + 20)){
 					saveStateBeforeJump = false;
 					justLanded = true;
-					System.out.println("STANDING AGAIN!");
+					//System.out.println("STANDING AGAIN!");
 				}
 				
 				//Move vision grid to mario's new position
@@ -485,7 +519,7 @@ public class GameModel implements constants {
 				//calculate the reward for the current state 
 				reward = calculateReward(action, previousAction); 
 				
-				System.out.println("Just landed: " + justLanded);
+				//System.out.println("Just landed: " + justLanded);
 				
 				//increment epoch
 				epochs++;	
@@ -495,7 +529,7 @@ public class GameModel implements constants {
 					Thread.sleep(sleepTime);
 				}	
 				//Test
-				System.out.println("Current and previous state are equal: " + Arrays.equals(currentState, previousState));
+				//System.out.println("Current and previous state are equal: " + Arrays.equals(currentState, previousState));
 				if(constants.DEMO_PHASE /*(!mario.isJumping() || epochs == epochBeforeJump)*/ ){
 					gameState[visionGridInputs + marioTrackInputs + otherInputs + mario.getAction()] = 1.0;
 					trainingSet.add(gameState); 
@@ -537,13 +571,12 @@ public class GameModel implements constants {
 			performance = 0;
 			gamesPlayed = 0;
 			gamesWon = 0;
-			score = 0;
+			
 			//Store the network
 			fh.storeNetwork(actor, actor.getHiddenLayers(),constants.N_HIDDEN_LAYERS_ACTOR);
 			//Quit the program 
-			//System.exit(0);
+			
 		}
-		fh.writePerformanceToFile(0, avgPerformance/constants.RUNS_PER_PARAMETER, constants.PERFORMANCE_FILE_NAME);
 	}
 	
 	//This function is called at the start of the game and runs the entire model
@@ -566,6 +599,7 @@ public class GameModel implements constants {
 		//justLanded = false;
 		mario.setPoweredUp(false);
 		performance = 100 * gamesWon / gamesPlayed;
+		score = 0;
 	}
 	
 	public static boolean isColliding(GameObject o1, GameObject o2){
@@ -686,7 +720,7 @@ public class GameModel implements constants {
 				powerupIndex = PUList.indexOf(PU);
 				//This makes sure the timer is reset when a powerup is picked up while a powerup is already active
 				powerupTimer = 0;
-				System.out.println("Powerup activated");
+				//System.out.println("Powerup activated");
 			}
 		}
 		

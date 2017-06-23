@@ -86,7 +86,7 @@ public class FileHandler {
 		   
 		    //write the action taken to a file
 		    writeActionToFile(fw, action);*/
-		    System.out.println("Written to file!");
+		    //System.out.println("Written to file!");
 		    out.close();
 		}
 		catch(IOException ioe)
@@ -169,7 +169,7 @@ public class FileHandler {
 
 			bw.write(data);
 			
-			System.out.println("Score written to file");
+			//System.out.println("Score written to file");
 
 		} catch (IOException e) {
 
