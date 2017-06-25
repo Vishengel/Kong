@@ -225,7 +225,7 @@ public class GameModel implements constants {
 	public void runGame() throws InterruptedException, IOException{	
 		double[] learningRates = {0.01, 0.02, 0.03, 0.04, 0.05};
 		double[] temperatures = {1.0, 2.0, 3.0, 4.0, 5.0};
-		//double[] learningRates = {0.01, 0.02};
+		//double[] learningRates = {0.03, 0.02};
 		//double[] temperatures = {1.0, 2.0};
 		
 		//start of timer
@@ -282,13 +282,9 @@ public class GameModel implements constants {
 		double feedback;
 		int action;
 		int previousAction;
+
 		
-		if(parName.equals("learningRate")) {
-			actor.setLearningRate(parValue);
-		} else if(parName.equals("temperature")) {
-			actor.setTemperature(parValue);
-		}
-		
+
 		for (int run=0; run<constants.RUNS_PER_PARAMETER; run++) {
 			gameState = new double[visionGridInputs + marioTrackInputs + otherInputs + nOutput];
 			currentState = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
@@ -303,7 +299,18 @@ public class GameModel implements constants {
 			//Re-initialize the network for each run
 			if(constants.TEST_PHASE && !constants.RANDOM_ACTOR){ 
 				//actor.initializeLayers();
-				actor.resetNetwork();
+				//actor.resetNetwork();
+				actor = null;
+				actor = new MLPJelle(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_ACTOR, constants.ACTOR_HIDDEN_NODES, nOutput, filename);
+				
+				if(parName.equals("learningRate")) {
+					actor.setLearningRate(parValue);
+					System.out.println("Learning rate: " + actor.getLearningRate());
+				} else if(parName.equals("temperature")) {
+					actor.setTemperature(parValue);
+					System.out.println("Temperature: " + actor.getTemperature());
+				}
+				
 				actor.trainNetwork();
 				//actor.setLearningRate(constants.ACTOR_CRITIC_LEARNING_RATE);  
 				System.out.println("Network trained, starting trials");
@@ -335,9 +342,11 @@ public class GameModel implements constants {
 				*/
 				
 				//Add temperature to the actor
+				/*
 				if(constants.TEST_PHASE){
 					actor.setTemperature(temperature);
 				}
+				*/
 				//lower the temperature
 				reduceTemperature();
 				

@@ -30,7 +30,7 @@ public class MLPJelle {
 	protected double errorThreshold = 0.01;     
 	//Define a minimum change that makes the training phase stop when this minimum difference between training epochs
 	//is reached
-	protected double minimumChange = 0.0005;
+	protected double minimumChange = 0.0009;
 	//protected double minimumChange = 0.00000005;
 	protected double maxEpochs = 500;  
 	protected String fileName;
@@ -48,7 +48,10 @@ public class MLPJelle {
 	}
 	
 	public void initializeLayers(){
-		ArrayList<NeuronJelle> hiddenLayer = new ArrayList<NeuronJelle>();
+		hiddenList = new ArrayList<ArrayList<NeuronJelle>>();
+		ArrayList<NeuronJelle> hiddenLayer;
+		outputLayer = new ArrayList<NeuronJelle>();
+		
 		int nWeights = nInput - 1;
 		int hiddenLayerSize = nHidden;
 		//Initialize hidden layers
@@ -113,11 +116,13 @@ public class MLPJelle {
 	}
 	
 	public void resetNetwork() {
+		/*
 		for(ArrayList<NeuronJelle> HL : hiddenList) {
 			HL.clear();
 		}
 		hiddenList.clear();
 		outputLayer.clear();
+		*/
 		
 		initializeLayers();
 	}
@@ -459,6 +464,10 @@ public class MLPJelle {
 		for (int i=0; i<target.length; i++) {
 			System.out.println(target[i]);
 		}
+	}
+	
+	public double getTemperature() {
+		return this.temperature;
 	}
 	
 	public void setTemperature(double temperature){
