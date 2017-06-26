@@ -22,6 +22,9 @@ public interface constants {
 	int RUNS_PER_PARAMETER = 5;
 	int GAMES_PER_RUN = 100;
 	
+	double ERROR_THRESHOLD = 0.01;
+	double MINIMUM_CHANGE = 0.0007;
+	
 	//This value determines whether the game should create the standard level, or the alternative level 
 	//created for training to jump over barrels.
 	boolean BARREL_TRAINING = false;

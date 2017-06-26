@@ -2,6 +2,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import javax.swing.AbstractAction;
 import javax.swing.Timer;
@@ -13,11 +15,14 @@ public class GameController {
 	private GameView  view;
 	private InputController inputController = new InputController();
 	private Thread thread;
+	private Executor executor;
 	
-	public void start() throws IOException{
+	public GameController() {
 		//create game model and view
-		model = new GameModel();	
-		
+		model = new GameModel();
+	}
+	
+	public void start() throws IOException, InterruptedException{
 		//make a thread that controls game model logic
 		thread = new Thread(){
 		    public void run(){	
@@ -32,10 +37,26 @@ public class GameController {
 			}    
 		    }
 		  };
-		  
+		/*
+		executor = Executors.newFixedThreadPool(1);
+		
+		executor.execute(new Runnable(){
+		    public void run(){	
+		      try {
+		    	  
+				model.runGame();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}    
+		    }
+		  });
+		 */
 		thread.start();
-				
-		//If GUI is on, add frame rate and update timer
+		
 		if(constants.GUI_ON){
 			view = new GameView(model);
 			view.addKeyListener(inputController);
@@ -46,6 +67,10 @@ public class GameController {
 			};
 			new Timer(1, FPSTimer).start();
 		}
+		
+		thread.join();
+		//If GUI is on, add frame rate and update timer
+		
 	}
 	
 	
@@ -71,5 +96,9 @@ public class GameController {
 			
 		}
 		
+	}
+	
+	public GameModel getGameModel() {
+		return this.model;
 	}
 }

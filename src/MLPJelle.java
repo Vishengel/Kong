@@ -27,15 +27,17 @@ public class MLPJelle {
 	protected ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
 	protected double learningRate = 0.01;   
-	protected double errorThreshold = 0.01;     
+	private double temperature = 1;
+	
+	protected double errorThreshold = constants.ERROR_THRESHOLD;     
 	//Define a minimum change that makes the training phase stop when this minimum difference between training epochs
 	//is reached
-	protected double minimumChange = 0.0009;
+	protected double minimumChange = constants.MINIMUM_CHANGE;
 	//protected double minimumChange = 0.00000005;
 	protected double maxEpochs = 500;  
 	protected String fileName;
 	
-	private double temperature = 1;
+	
 	
 	public MLPJelle(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName) {
 		this.nInput = nInput;
@@ -90,6 +92,7 @@ public class MLPJelle {
 		
 		System.out.println("Actor init called!");
 		//read the demonstration data to be learned from 
+		
 		double[][] initialInput = FH.readFile(fileName, nInput, nOutput);
 		
 		input = new double[initialInput.length][nInput-1];
