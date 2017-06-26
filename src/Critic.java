@@ -7,11 +7,12 @@ public class Critic extends MLPJelle {
 	
 	double discount = 0.999;  
 	double[] rewards;
-	double[][] target = new double[1][1];
+	//double[][] target = new double[1][1];
 	public Critic(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName, boolean loadNetwork) throws IOException {
 		super(nInput, nHiddenLayers, nHidden, nOutput, fileName, loadNetwork);
 		//System.out.println("n in: " + target.length);
-		errorThreshold = 0.525;  
+		//errorThreshold = 0.474;  
+		errorThreshold = 0.48;  
 		learningRate = 0.001;
 		//minimumChange = 0;
 	}
@@ -19,7 +20,8 @@ public class Critic extends MLPJelle {
 	
 	
 	public void trainNetwork() {
-		target = new double[input.length][1];
+		
+		//target = new double[input.length][1];
 		double totalError = 0, previousTotalError, epoch = 0, reward, t; 
 
 		do {
@@ -29,7 +31,7 @@ public class Critic extends MLPJelle {
 			//System.out.println("Training completed in " + epoch + " epochs");
 			previousTotalError = totalError;
 			totalError = 0;
-			
+	
 			//this.shuffleInput();
 			double nextStateValue = 0;
 			for (int i=0; i < this.input.length; i++) {
@@ -106,7 +108,7 @@ public class Critic extends MLPJelle {
 		}
 		
 		//This function calculated the feedback that the critic feeds back to the actor
-		public double calculateFeedback(double[] state, double[] previousState, double reward, boolean marioKilled, boolean gameWon){
+		public double calculateFeedback(double[] state, double[] previousState, double reward, boolean marioKilled, boolean gameWon, boolean justLanded){
 			forwardPass(state, false); 
 			double stateValue = 0; 
 			//If mario is dead, the value of the next state is just 0
@@ -121,8 +123,10 @@ public class Critic extends MLPJelle {
 			//Calculate the Temporal-Difference error: reward_t-1 + (discount * value_t) - value_t-1
 			double feedback = reward + (discount * stateValue) - previousStateValue;
 			//System.out.println("Current state value: " + stateValue);
-			//System.out.println("Value of previous state: " + previousStateValue);
-			System.out.println("TD-error: " + feedback);  
+			//System.out.println("Value of previous state: " + previousStateValue); 
+			if(justLanded){
+				return reward;
+			}
 		    return feedback; 
 			
 		}

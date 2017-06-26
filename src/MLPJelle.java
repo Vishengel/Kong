@@ -30,12 +30,12 @@ public class MLPJelle {
 	//Define a list of output neurons
 	protected ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
-	protected double learningRate = 0.05;   
+	protected double learningRate = 0.001;   
 	protected double errorThreshold = 0;     
 	//protected double errorThreshold = 0.065;   
 	//Define a minimum change that makes the training phase stop when this minimum difference between training epochs
 	//is reached
-	protected double minimumChange = 0.00001;  
+	protected double minimumChange = 0.000005;  
 	protected double maxEpochs = 500;  
 	protected String fileName;
 	
@@ -80,12 +80,12 @@ public class MLPJelle {
 		str = in.readLine();
 		line = str.split(",");
 		//Get the amount of hidden layers,
-		int hiddenLayers = Integer.parseInt(line[0]);
-		System.out.println("Hidden layers: " + hiddenLayers);
+		nHiddenLayers = Integer.parseInt(line[0]);
+		System.out.println("Hidden layers: " + nHiddenLayers);
 		//Store the size of each hidden layer
-		int[] hiddenLayerSizes = new int[hiddenLayers];
-		int[] hiddenLayerWeights = new int[hiddenLayers];
-		for(int i = 0; i < hiddenLayers; i++){
+		int[] hiddenLayerSizes = new int[nHiddenLayers];
+		int[] hiddenLayerWeights = new int[nHiddenLayers];
+		for(int i = 0; i < nHiddenLayers; i++){
 			hiddenLayerSizes[i] = Integer.parseInt(line[i + 1]);
 			System.out.println("Hidden layer " + i + " nodes: " + hiddenLayerSizes[i]);
 		}
@@ -96,7 +96,7 @@ public class MLPJelle {
 		str = in.readLine();
 		line = str.split(",");
 		//Get weights for every type of neuron
-		for(int i = 0; i < hiddenLayers; i++){
+		for(int i = 0; i < nHiddenLayers; i++){
 			hiddenLayerWeights[i] = Integer.parseInt(line[i]);
 			System.out.println("Neurons in hidden layer " + i + " have " + hiddenLayerWeights[i] + " weights.");
 		}
@@ -108,7 +108,7 @@ public class MLPJelle {
 		//ArrayList<NeuronJelle> hiddenLayer = new ArrayList<NeuronJelle>();
 		//Create hidden layers and hidden nodes and fill them with the correct weights
 		//Loop through every hidden layer
-		for(int i = 0; i < hiddenLayers; i++){
+		for(int i = 0; i < nHiddenLayers; i++){
 			//Create the hidden layer
 			ArrayList<NeuronJelle> hiddenLayer = new ArrayList<NeuronJelle>();
 			//Create the hidden nodes
@@ -335,7 +335,7 @@ public class MLPJelle {
 		//Loop through all hidden layers in reverse order
 		for (int i=nHiddenLayers-1; i>=0; i--) {
 			//Train each node in the hidden layer
-			for (int j=0; j<hiddenList.get(i).size(); j++) {
+			for (int j=0; j<hiddenList.get(i).size(); j++) { 
 				//Calculate gradients for nodes in each hidden layer
 				hiddenList.get(i).get(j).setHiddenGradient(j, nextLayer, i, this instanceof Critic);
 			}
@@ -357,7 +357,6 @@ public class MLPJelle {
 				hiddenList.get(i).get(j).updateWeights(0, learningRate);
 			}
 		}
-		//System.out.println(totalError);
 		return totalError;
 		
 	}
@@ -390,32 +389,55 @@ public class MLPJelle {
 	}
 	
 	public void propagateFeedback(double[] state, double feedback, int action){
-		//Present the state, then backpropagate for improvement
-		forwardPass(state, false);  
-		System.out.println("ACTION BEFORE FEEDBACK BACKPROP: " + action);
-		//Create the new targets, using the feedback from the critic: 
-		//target = new double[1][nOutput];
-		
-		//new_target = old_target + feedback
-		for(int i = 0; i < nOutput; i++){
-			target[0][i] = outputLayer.get(i).getOutput();
-		}
-		//Action taken in previous state has to be positively or negatively reinforced
-		target[0][action] += feedback; 
-		/*for(int i = 0; i < nOutput; i++){
-			System.out.println(target[0][i]);
-		}*/
-		for(int i = 0; i < nOutput; i++){
-			System.out.println("Target for output node " + i + ": " + target[0][i]);
-		} 
-		for(int i = 0; i < nOutput; i++){
-			System.out.println("ACTOR OUTPUT BEFORE BACKPROP; NODE: " + i + ": " + outputLayer.get(i).getOutput());
-		}	
-		backwardPass(0);
-		forwardPass(state, false); 
-		for(int i = 0; i < nOutput; i++){
-			System.out.println("ACTOR OUTPUT AFTER BACKPROP; NODE: " + i + ": " + outputLayer.get(i).getOutput());
-		}	
+		System.out.println("TD-error: " + feedback); 
+		//if(feedback >= 0){ 
+			//Present the state, then backpropagate for improvement
+			forwardPass(state, true);  
+			System.out.println("ACTION BEFORE FEEDBACK BACKPROP: " + action);
+			//Create the new targets, using the feedback from the critic: 
+			//target = new double[1][nOutput];
+			if(feedback >= 0){		
+				//new_target = old_target + feedback
+				for(int i = 0; i < nOutput; i++){
+					target[0][i] = 0;
+				}
+				//Action taken in previous state has to be positively or negatively reinforced
+				target[0][action] = 1; 
+			}
+			else{
+				double activationSum = 0.0;
+				//convert output layer output to softmax for action selection
+				for(NeuronJelle n: outputLayer){
+					//calculate total activation sum of each neuron for softmax
+					activationSum += Math.exp(n.getActivation() / temperature);		
+				}
+				for(NeuronJelle n: outputLayer){
+					n.setOutput(Math.exp(n.getActivation() / temperature) / activationSum);	
+				}
+				for(int i = 0; i < nOutput; i++){
+					target[0][i] = outputLayer.get(i).getOutput();
+				}
+				/*for(NeuronJelle n: outputLayer){
+					n.setOutput(n.getActivation());
+				}*/
+				//Action taken in previous state has to be positively or negatively reinforced
+				target[0][action] = 0;
+			}
+			for(int i = 0; i < nOutput; i++){
+				System.out.println(target[0][i]);
+			}
+			for(int i = 0; i < nOutput; i++){
+				System.out.println("Target for output node " + i + ": " + target[0][i]);
+			} 
+			for(int i = 0; i < nOutput; i++){
+				System.out.println("ACTOR OUTPUT BEFORE BACKPROP; NODE: " + i + ": " + outputLayer.get(i).getOutput());
+			}	
+			backwardPass(0);
+			forwardPass(state, true); 
+			for(int i = 0; i < nOutput; i++){
+				System.out.println("ACTOR OUTPUT AFTER BACKPROP; NODE: " + i + ": " + outputLayer.get(i).getOutput());
+			}	
+		//}
 	}
 	
 	public int maxOutput(){
