@@ -405,15 +405,15 @@ public class MLPJelle {
 				target[0][action] = 1; 
 			}
 			else{
-				double activationSum = 0.0;
+				//double activationSum = 0.0;
 				//convert output layer output to softmax for action selection
-				for(NeuronJelle n: outputLayer){
+				/*for(NeuronJelle n: outputLayer){
 					//calculate total activation sum of each neuron for softmax
 					activationSum += Math.exp(n.getActivation() / temperature);		
 				}
 				for(NeuronJelle n: outputLayer){
 					n.setOutput(Math.exp(n.getActivation() / temperature) / activationSum);	
-				}
+				}*/
 				for(int i = 0; i < nOutput; i++){
 					target[0][i] = outputLayer.get(i).getOutput();
 				}

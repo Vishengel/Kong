@@ -84,10 +84,10 @@ public class GamePanel extends JPanel {
 		g.drawString("Games played: " + (int)model.gamesPlayed, 200, 10);
 		g.drawString("Temperature: " + (int)model.temperature, 390, 10);
 		if(constants.TEST_PHASE){
-		g.drawString("Actor learning rate: " + model.actor.getLearningRate(), 10, 50);
+			g.drawString("Actor learning rate: " + model.actor.getLearningRate(), 10, 50);
 		}
 		if(constants.CRITIC_ON){
-		g.drawString("Critic learning rate: " + model.critic.getLearningRate(), 200, 50);
+			g.drawString("Critic learning rate: " + model.critic.getLearningRate(), 200, 50);
 		}
 		
 		if(constants.SHOW_VISION_GRID){

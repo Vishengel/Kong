@@ -142,7 +142,9 @@ public void move(){
 		if(xPos >= constants.SCREEN_X - 30){
 			xPos = constants.SCREEN_X - 30;
 		}
-		
+		if(xPos <= 170 && yPos <= 260){
+			xPos = 170;
+		}
 		
 	}
 	

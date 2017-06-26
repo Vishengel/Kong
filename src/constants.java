@@ -23,9 +23,9 @@ public interface constants {
 	boolean RANDOM_ACTOR = false;
 	
 	//Network restoring parameters
-	boolean LOAD_ACTOR = true; 
-	boolean LOAD_CRITIC = true;
-	boolean LOAD_TRAINED_ACTOR = false;
+	boolean LOAD_ACTOR = false; 
+	boolean LOAD_CRITIC = true; 
+	boolean LOAD_TRAINED_ACTOR = true;
 
 	//Network saving parameters 
 	boolean SAVE_ACTOR = false;
@@ -47,7 +47,7 @@ public interface constants {
 	int MAX_EPOCHS = 1000000; 
 	
 	int MAX_GAMES = 100; 
-	int temperatureCooling = 10; 
+	int temperatureCooling = 200; 
 	
 	int ACTOR_HIDDEN_NODES = 60;  
 	int CRITIC_HIDDEN_NODES = 100;
@@ -58,10 +58,12 @@ public interface constants {
 	
 	
 	double CRITIC_LEARNING_RATE = 0.00001;
-	double CRITIC_LEARNING_REDUCTION = 10;
+	//double CRITIC_LEARNING_RATE = 0;
+	double CRITIC_LEARNING_REDUCTION = 20;
 	
-	double ACTOR_CRITIC_LEARNING_RATE = 0.001; 
-	double ACTOR_LEARNING_REDUCTION = 10;
+	double ACTOR_CRITIC_LEARNING_RATE = 0.000001; 
+	//double ACTOR_CRITIC_LEARNING_RATE = 0; 
+	//double ACTOR_LEARNING_REDUCTION = 100;
 	//int LEARNING_RATE_REDUCTION_GAMES = 25;  
 			
     
