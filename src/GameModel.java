@@ -30,7 +30,7 @@ public class GameModel implements constants {
 	
 	//This value determines for how many epochs the game has been running already
 	private int epochs = 0;
-	private double temperature = 1;   
+	private double temperature = 1;
 	private double minTemp = 0.1;
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
@@ -225,16 +225,23 @@ public class GameModel implements constants {
 		System.out.println("Previous reward: " + reward);
 	}
 	
+	public void printParameters() {
+		String activationFunction = actor.getActivationFunction() ? "sigmoid" : "ReLU";
+		
+		System.out.println("Learning rate: " + actor.getLearningRate());
+		System.out.println("Temperature: " + actor.getTemperature());
+		System.out.println("Hidden nodes: " + actor.getNHiddenNodes()); 
+		System.out.println("Hidden layers: " + actor.getNHiddenLayers());
+		System.out.println("Activation function: " + activationFunction);
+	}
+	
 	public void reduceTemperature(){
 		temperature = (temperature > minTemp? temperature * 0.999: minTemp);		
 	}
 	
 	//main game loop
 	public void runGame() throws InterruptedException, IOException{	
-		//double[] learningRates = {0.01, 0.02, 0.03, 0.04, 0.05};
-		//double[] temperatures = {1.0, 2.0, 3.0, 4.0, 5.0};
-		//double[] learningRates = {0.03, 0.02};
-		//double[] temperatures = {1.0, 2.0};
+		boolean useSigmoid = constants.SIGMOID;
 		
 		//start of timer
         long lStartTime = System.nanoTime();
@@ -249,9 +256,15 @@ public class GameModel implements constants {
 			System.out.println("Hidden layers: " + nHiddenLayers);
 		}
 		
+		if(parName.equals(parName.equals("learningRateSigmoid"))) {
+			useSigmoid = true;
+		} else if (parName.equals(parName.equals("learningRateRelu"))) {
+			useSigmoid = false;
+		}
+		
 		//don't create the actor and critic if in the demonstration phase
 		if(constants.TEST_PHASE){
-			actor = new MLPJelle(visionGridInputs + marioTrackInputs + otherInputs, nHiddenLayers, nHiddenNodes/*(visionGridInputs + marioTrackInputs + otherInputs-1 + nOutput)/2*/, nOutput, filename); 
+			actor = new MLPJelle(visionGridInputs + marioTrackInputs + otherInputs, nHiddenLayers, nHiddenNodes/*(visionGridInputs + marioTrackInputs + otherInputs-1 + nOutput)/2*/, nOutput, filename, useSigmoid); 
 			//critic = new Critic(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_CRITIC, 40/*(visionGridInputs + marioTrackInputs + otherInputs) / 2*/, 1, "FinalSet2New"); 		
 		}
 		
@@ -322,13 +335,20 @@ public class GameModel implements constants {
 			actor = new MLPJelle(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_ACTOR, constants.ACTOR_HIDDEN_NODES, nOutput, filename);
 			*/
 			
-			if(parName.equals("learningRate")) {
+			if(parName.equals("learningRateSigmoid") || parName.equals("learningRateRelu")) {
 				actor.setLearningRate(parValue);
 				System.out.println("Learning rate: " + actor.getLearningRate());
 			} else if(parName.equals("temperature")) {
 				actor.setTemperature(parValue);
 				System.out.println("Temperature: " + actor.getTemperature());
-			} 
+			} 		
+					
+			//Set temperature for the actor
+			if(constants.TEST_PHASE){
+				actor.setTemperature(temperature);
+			}
+			
+			printParameters();
 			
 			actor.trainNetwork();
 			//actor.setLearningRate(constants.ACTOR_CRITIC_LEARNING_RATE);  
@@ -360,12 +380,6 @@ public class GameModel implements constants {
 			}
 			*/
 			
-			//Add temperature to the actor
-			/*
-			if(constants.TEST_PHASE){
-				actor.setTemperature(temperature);
-			}
-			*/
 			//lower the temperature
 			reduceTemperature();
 			
@@ -1068,5 +1082,9 @@ public class GameModel implements constants {
 	
 	public void setRun(int run) {
 		this.run = run;
+	}
+	
+	public MLPJelle getActor() {
+		return this.actor;
 	}
 }

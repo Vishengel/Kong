@@ -1,4 +1,3 @@
-/LearningRateScoresTest3.csv
 /TrainingData/
 /XORData.csv
 /demodata.csv
@@ -15,7 +14,16 @@
 /trainingSet50.csv
 /trainingSet999.csv
 /trainingSetImprovedFeatures.csv
+/Barrel.class
+/Critic.class
 /DataCollector.class
+/FileHandler.class
+/Flame.class
 /GameController$1.class
-/GameController$2.class
-/GameController$1$1.class
+/GameController$InputController.class
+/GameController.class
+/GameModel.class
+/GameObject.class
+/GamePanel$1.class
+/GamePanel$2.class
+/GamePanel.class

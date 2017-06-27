@@ -56,7 +56,7 @@ public class GameController {
 		  });
 		 */
 		thread.start();
-		
+		//If GUI is on, add frame rate and update timer
 		if(constants.GUI_ON){
 			view = new GameView(model);
 			view.addKeyListener(inputController);
@@ -69,7 +69,12 @@ public class GameController {
 		}
 		
 		thread.join();
-		//If GUI is on, add frame rate and update timer
+		
+		if(constants.GUI_ON) {
+			System.out.println("Closing view");
+			view.dispose();
+		}
+		
 		
 	}
 	

@@ -142,6 +142,10 @@ public void move(){
 		if(xPos >= constants.SCREEN_X - 30){
 			xPos = constants.SCREEN_X - 30;
 		}
+		//This puts an invisible barrier just to the right of Kong
+		if(xPos <= 170 && yPos <= 260) {
+			xPos = 170;
+		}
 		
 		
 	}

@@ -8,7 +8,7 @@ public class Critic extends MLPJelle {
 	double[] rewards;
 	
 	public Critic(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName) {
-		super(nInput, nHiddenLayers, nHidden, nOutput, fileName);
+		super(nInput, nHiddenLayers, nHidden, nOutput, fileName, true);
 		target = new double[input.length][1];
 		//System.out.println("n in: " + target.length);
 		errorThreshold = 0.6;  

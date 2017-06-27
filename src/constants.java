@@ -25,6 +25,8 @@ public interface constants {
 	double ERROR_THRESHOLD = 0.01;
 	double MINIMUM_CHANGE = 0.0007;
 	
+	boolean SIGMOID = true;
+	
 	//This value determines whether the game should create the standard level, or the alternative level 
 	//created for training to jump over barrels.
 	boolean BARREL_TRAINING = false;
@@ -86,5 +88,4 @@ public interface constants {
 	//powerup dimensions
 	int POWERUP_HEIGHT = 27;
 	int POWERUP_WIDTH = 23;
-
 }

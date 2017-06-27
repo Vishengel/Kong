@@ -9,12 +9,13 @@ public class NeuronJelle {
 	private double output;
 	private double error;
 	private double crossEntropy;
-
+	private boolean useSigmoid;
 	
-	public NeuronJelle(int nInputs) {
+	public NeuronJelle(int nInputs, boolean useSigmoid) {
 		this.nInputs = nInputs;
 		input = new double[nInputs];
 		weights = new double[nInputs];
+		this.useSigmoid = useSigmoid;
 		//System.out.println("Weights: " + weights.length); 
 		this.initWeights();
 	}
@@ -76,7 +77,7 @@ public class NeuronJelle {
 		for (NeuronJelle n : nextLayer) {
 			sum += n.getGradient() * n.getWeights()[nodeIndex];
 		}
-		if(!isCritic){
+		if(isCritic){
 			if(hiddenLayer != 10){ 
 				this.gradient = sigmoidPrime(this.activation) * sum;	
 			}
@@ -85,11 +86,11 @@ public class NeuronJelle {
 			}
 		}
 		else{
-			if(hiddenLayer == 10){
-				this.gradient = reluPrime(this.activation) * sum;
+			if(this.useSigmoid){
+				this.gradient = sigmoidPrime(this.activation) * sum;
 			}
 			else{
-				this.gradient = sigmoidPrime(this.activation) * sum;	
+				this.gradient = reluPrime(this.activation) * sum;	
 			}
 		}
 	}

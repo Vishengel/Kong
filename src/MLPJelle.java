@@ -34,17 +34,20 @@ public class MLPJelle {
 	//is reached
 	protected double minimumChange = constants.MINIMUM_CHANGE;
 	//protected double minimumChange = 0.00000005;
+	private boolean useSigmoid;
+	
 	protected double maxEpochs = 500;  
 	protected String fileName;
 	
 	
 	
-	public MLPJelle(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName) {
+	public MLPJelle(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName, Boolean useSigmoid) {
 		this.nInput = nInput;
 		this.nHiddenLayers = nHiddenLayers;
 		this.nHidden = nHidden;
 		this.nOutput = nOutput;
 		this.fileName = fileName;
+		this.useSigmoid = useSigmoid;
 		
 		this.initNetwork();	
 	}
@@ -64,7 +67,7 @@ public class MLPJelle {
 				//Add nWeights amount of nodes to the hidden layer
 				//For the first iteration, this amount is equal to the number of inputs
 				//Afterwards, this amount is equal to the number of nodes in the previous layer
-				hiddenLayer.add(new NeuronJelle(nWeights));
+				hiddenLayer.add(new NeuronJelle(nWeights, this.useSigmoid));
 			}
 			System.out.println("Hidden layer: " + i);
 			System.out.println("Size: " + hiddenLayerSize);
@@ -83,7 +86,7 @@ public class MLPJelle {
 		}
 		//Initialize output layer
 		for(int i=0; i<nOutput; i++) {
-			outputLayer.add(new NeuronJelle(nWeights));
+			outputLayer.add(new NeuronJelle(nWeights, this.useSigmoid));
 		}
 		//System.out.println("NWEIGHTS: " + nWeights);
 		//System.out.println("OUTPUT LAYER WEIGHT LENGTH: " + getOutputLayer().get(0).getWeights().length);
@@ -134,6 +137,7 @@ public class MLPJelle {
 		double previousError = 0;
 		double totalError = 0; 
 		double epoch = 0;
+
 		do {
 			previousError = totalError;
 			//print training progress
@@ -200,7 +204,7 @@ public class MLPJelle {
 					
 				} 
 				else{ 
-					if(i != 10){   
+					if(this.useSigmoid){   
 						hiddenList.get(i).get(j).setSigmoidOutput();	
 					}
 					else{
@@ -483,12 +487,24 @@ public class MLPJelle {
 	public void setLearningRate(double learningRate){
 		this.learningRate = learningRate; 
 	}
+	
+	public int getNHiddenNodes() {
+		return this.nHidden;
+	}
+	
+	public int getNHiddenLayers() {
+		return this.nHiddenLayers;
+	}
+	
 	public ArrayList<ArrayList<NeuronJelle>> getHiddenLayers(){
 		return hiddenList;
 	}
 	public ArrayList<NeuronJelle> getOutputLayer(){
 		return outputLayer;
 	}
-	
+
+	public boolean getActivationFunction() {
+		return this.useSigmoid;
+	}
 		
 }
