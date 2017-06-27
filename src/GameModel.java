@@ -249,19 +249,32 @@ public class GameModel implements constants {
 		visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
 		
 		if(parName.equals("hiddenNodes")) {
+			System.out.println("Using ReLU");
 			nHiddenNodes = (int)parValue;
-			System.out.println("Hidden nodes: " + nHiddenNodes);
+			System.out.println("Hidden nodess: " + nHiddenNodes);
 		} else if(parName.equals("hiddenLayers")) {
 			nHiddenLayers = (int)parValue;
 			System.out.println("Hidden layers: " + nHiddenLayers);
+		} else if(parName.equals("hiddenLayersRelu")) {
+			nHiddenLayers = (int)parValue;
+			System.out.println("Hidden layers ReLU: " + nHiddenLayers);
+			System.out.println("Using ReLU");
+			useSigmoid = false;
+		} else if(parName.equals("bestParameters")) {
+			System.out.println("Setting best parameters");
+			nHiddenNodes = constants.BEST_NHIDDENNODES;
+			nHiddenLayers = constants.BEST_NHIDDENLAYERS;
+			useSigmoid = constants.BEST_ACTIVATION;
 		}
 		
-		if(parName.equals(parName.equals("learningRateSigmoid"))) {
+		if(parName.equals("learningRateSigmoid")) {
+			System.out.println("Using sigmoid");
 			useSigmoid = true;
-		} else if (parName.equals(parName.equals("learningRateRelu"))) {
+		} else if (parName.equals("learningRateRelu")) {
+			System.out.println("Using ReLU");
 			useSigmoid = false;
 		}
-		
+
 		//don't create the actor and critic if in the demonstration phase
 		if(constants.TEST_PHASE){
 			actor = new MLPJelle(visionGridInputs + marioTrackInputs + otherInputs, nHiddenLayers, nHiddenNodes/*(visionGridInputs + marioTrackInputs + otherInputs-1 + nOutput)/2*/, nOutput, filename, useSigmoid); 
@@ -335,19 +348,22 @@ public class GameModel implements constants {
 			actor = new MLPJelle(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_ACTOR, constants.ACTOR_HIDDEN_NODES, nOutput, filename);
 			*/
 			
+			//Set temperature for the actor
+			if(constants.TEST_PHASE){
+				actor.setTemperature(temperature);
+			}
+			
 			if(parName.equals("learningRateSigmoid") || parName.equals("learningRateRelu")) {
 				actor.setLearningRate(parValue);
 				System.out.println("Learning rate: " + actor.getLearningRate());
 			} else if(parName.equals("temperature")) {
 				actor.setTemperature(parValue);
 				System.out.println("Temperature: " + actor.getTemperature());
+			} else if(parName.equals("bestParameters")) {
+				actor.setLearningRate(constants.BEST_LR);
+				actor.setTemperature(constants.BEST_T);
 			} 		
-					
-			//Set temperature for the actor
-			if(constants.TEST_PHASE){
-				actor.setTemperature(temperature);
-			}
-			
+							
 			printParameters();
 			
 			actor.trainNetwork();

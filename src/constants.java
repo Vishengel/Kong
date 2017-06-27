@@ -19,11 +19,11 @@ public interface constants {
 	String SCORE_FILE_NAME = "LearningRateScores";
 	String PERFORMANCE_FILE_NAME = "LearningRatePerformance";
 
-	int RUNS_PER_PARAMETER = 5;
+	int RUNS_PER_PARAMETER = 10;
 	int GAMES_PER_RUN = 100;
 	
 	double ERROR_THRESHOLD = 0.01;
-	double MINIMUM_CHANGE = 0.0007;
+	double MINIMUM_CHANGE = 0.000005;
 	
 	boolean SIGMOID = true;
 	
@@ -50,7 +50,13 @@ public interface constants {
 	double ACTOR_CRITIC_LEARNING_RATE = 0.0001; 
 	int LEARNING_RATE_REDUCTION_EPOCHS = 50000;
 			
-			
+	//Constants to store the optimal parameter settings
+	double BEST_LR = 0.05;
+	double BEST_T = 1.5;
+	int BEST_NHIDDENNODES = 60;
+	int BEST_NHIDDENLAYERS = 1;
+	//True = sigmoid, false = ReLU
+	boolean BEST_ACTIVATION = true;
 			
 	//The following values determine positions and dimensions for game objects
 	
