@@ -12,7 +12,7 @@ public class Critic extends MLPJelle {
 		super(nInput, nHiddenLayers, nHidden, nOutput, fileName, loadNetwork);
 		//System.out.println("n in: " + target.length);
 		//errorThreshold = 0.474;  
-		errorThreshold = 0.48;  
+		errorThreshold = 0.61;  
 		learningRate = 0.001;
 		//minimumChange = 0;
 	}
@@ -38,7 +38,7 @@ public class Critic extends MLPJelle {
 				forwardPass(this.input[i], false);
 				//calculate the target for the critic: target = reward + (discount * nextValue) - previousValue
 				reward = rewards[i];
-				if(reward <= -20 || reward >= 100){
+				if(reward <= -40 || reward >= 100){
 					nextStateValue = 0;
 				}
 				else{
@@ -85,10 +85,11 @@ public class Critic extends MLPJelle {
 	//calculate the target for the Critic to learn:  V(previousState) = reward + ( discount * V(state) )
 		public void trainCritic(double[] state, double[] previousState, double reward, boolean marioKilled, boolean gameWon){
 			//present the current state to the critic
-			forwardPass(state, false);
+			forwardPass(state, false); 
 			//look at the output of the critic
 			//If mario is dead, the value of the next state is just 0
 			double valueNextState = 0;
+			System.out.println("Mario killed? " + marioKilled);
 			if(!marioKilled && !gameWon){
 				valueNextState = outputLayer.get(0).getOutput();
 			}
@@ -108,7 +109,7 @@ public class Critic extends MLPJelle {
 		}
 		
 		//This function calculated the feedback that the critic feeds back to the actor
-		public double calculateFeedback(double[] state, double[] previousState, double reward, boolean marioKilled, boolean gameWon, boolean justLanded){
+		public double calculateFeedback(double[] state, double[] previousState, double reward, boolean marioKilled, boolean gameWon){
 			forwardPass(state, false); 
 			double stateValue = 0; 
 			//If mario is dead, the value of the next state is just 0
@@ -124,9 +125,7 @@ public class Critic extends MLPJelle {
 			double feedback = reward + (discount * stateValue) - previousStateValue;
 			//System.out.println("Current state value: " + stateValue);
 			//System.out.println("Value of previous state: " + previousStateValue); 
-			if(justLanded){
-				return reward;
-			}
+			
 		    return feedback; 
 			
 		}

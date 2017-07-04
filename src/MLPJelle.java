@@ -36,7 +36,7 @@ public class MLPJelle {
 	//Define a minimum change that makes the training phase stop when this minimum difference between training epochs
 	//is reached
 	protected double minimumChange = 0.000005;  
-	protected double maxEpochs = 500;  
+	protected double maxEpochs = 200;  
 	protected String fileName;
 	
 	private double temperature = 2; 
@@ -392,37 +392,42 @@ public class MLPJelle {
 		System.out.println("TD-error: " + feedback); 
 		//if(feedback >= 0){ 
 			//Present the state, then backpropagate for improvement
-			forwardPass(state, true);  
-			System.out.println("ACTION BEFORE FEEDBACK BACKPROP: " + action);
-			//Create the new targets, using the feedback from the critic: 
-			//target = new double[1][nOutput];
-			if(feedback >= 0){		
-				//new_target = old_target + feedback
-				for(int i = 0; i < nOutput; i++){
-					target[0][i] = 0;
-				}
-				//Action taken in previous state has to be positively or negatively reinforced
-				target[0][action] = 1; 
+			if(constants.AC_ALGORITHM == "STANDARD"){
+				forwardPass(state, false);  	
 			}
 			else{
-				//double activationSum = 0.0;
-				//convert output layer output to softmax for action selection
-				/*for(NeuronJelle n: outputLayer){
-					//calculate total activation sum of each neuron for softmax
-					activationSum += Math.exp(n.getActivation() / temperature);		
-				}
-				for(NeuronJelle n: outputLayer){
-					n.setOutput(Math.exp(n.getActivation() / temperature) / activationSum);	
-				}*/
+				forwardPass(state, true);
+			}
+			System.out.println("ACTION BEFORE FEEDBACK BACKPROP: " + action);
+			if(constants.AC_ALGORITHM == "STANDARD"){
 				for(int i = 0; i < nOutput; i++){
 					target[0][i] = outputLayer.get(i).getOutput();
 				}
-				/*for(NeuronJelle n: outputLayer){
-					n.setOutput(n.getActivation());
-				}*/
 				//Action taken in previous state has to be positively or negatively reinforced
-				target[0][action] = 0;
+				target[0][action] = target[0][action] + feedback; 
 			}
+			//Create the new targets, using the feedback from the critic: 
+			//target = new double[1][nOutput];
+			else{
+				if(feedback >= 0){		
+					//new_target = old_target + feedback
+					for(int i = 0; i < nOutput; i++){
+						target[0][i] = 0;
+					}
+					//Action taken in previous state has to be positively or negatively reinforced
+					target[0][action] = 1; 
+				}
+				
+				else{
+					for(int i = 0; i < nOutput; i++){
+						target[0][i] = outputLayer.get(i).getOutput();
+					}
+					//Action taken in previous state has to be positively or negatively reinforced
+					target[0][action] = 0;
+				}
+			}
+			
+			//}
 			for(int i = 0; i < nOutput; i++){
 				System.out.println(target[0][i]);
 			}
@@ -433,11 +438,21 @@ public class MLPJelle {
 				System.out.println("ACTOR OUTPUT BEFORE BACKPROP; NODE: " + i + ": " + outputLayer.get(i).getOutput());
 			}	
 			backwardPass(0);
-			forwardPass(state, true); 
+			
+			if(constants.AC_ALGORITHM == "STANDARD"){
+				forwardPass(state, false);  	
+			}
+			else{
+				forwardPass(state, true);
+			} 
 			for(int i = 0; i < nOutput; i++){
 				System.out.println("ACTOR OUTPUT AFTER BACKPROP; NODE: " + i + ": " + outputLayer.get(i).getOutput());
 			}	
-		//}
+		/*}
+			else{
+				System.out.println("TD error negative; no feedback given.");
+			}*/
+			
 	}
 	
 	public int maxOutput(){

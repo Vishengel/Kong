@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 public class GameModel implements constants {
 	
-	String filename = "demodata"; 
+	String filename = "FullDataSetPaul"; 
 	
 	//performance variables
 	double gamesWon = 0;
@@ -29,8 +29,8 @@ public class GameModel implements constants {
 	
 	//This value determines for how many epochs the game has been running already
 	private int epochs = 0;
-	double temperature =  2;   
-	private double minTemp = 2; 
+	double temperature =  10;   
+	private double minTemp = 1.5; 
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
 	private int sleepTime = constants.GAME_SPEED;         
@@ -173,38 +173,55 @@ public class GameModel implements constants {
 		
 		if(hitByBarrel){
 			System.out.println("Hit by barrel!");
-			reward -= 50;
-			score -= 50; 	
+			reward -= 20;
+			score -= 20; 	
 		}
 		
-		else if(jumpedOverBarrel){
+		/*else if(jumpedOverBarrel){
 			System.out.println("Jumped over a barrel!");
 			reward += 0.5; 
 			score += 0.5;
-		}
+		}*/
 		else if(destroyedBarrel){
 			System.out.println("Smashed a barrel!");
 			reward += 1;
 			score += 1;
 		}
 		
-		if(touchedPowerUp){
+		/*if(touchedPowerUp){
 			System.out.println("Picked up powerup!");
 			reward += 1;
 			score += 1;
-		}
+		}*/
 		
 		
 		if(jumpedOverBarrel && (saveStateBeforeJump||justLanded)){
-			reward = 1;
+			reward += 2;
 		}
 		else if(touchedPowerUp && (saveStateBeforeJump||justLanded)){
-			reward = 0.5;
+			reward += 0.5; 
 		}
 		//penalize useless jumping
 		else if(saveStateBeforeJump || justLanded){
-			reward = -10; 
+			reward -= 4; 
 		}
+		
+		if(mario.isClimbing() && action == 3){
+			reward += 1;
+		}
+		if(mario.canClimb && action == 3){
+			reward += 1;
+		}
+		//penalize useless climbing
+		/*if((action == 3 || action == 4) && (!mario.isClimbing() || !mario.canClimb)){
+			reward -= 4;
+		}*/
+		
+		//penalize useless  actions on ladders
+		/*if(mario.isClimbing() && (action != 3 && action != 4)){
+			reward -= 4;
+		}*/
+		
 		
 		//Penalize mario if he touches the edge of the screen
 		/*if(mario.getXPos() <= 0 || mario.getXPos() >= constants.SCREEN_X - 30){
@@ -318,11 +335,23 @@ public class GameModel implements constants {
 	//main game function
 	public void runGame() throws InterruptedException, IOException{
 	
-		double[] testInputs;
+		//Initialize the Replay Memory
+		ReplayMemory memory = new ReplayMemory();
+		
 		//This array contains all the game inputs + the bias value
 		double[] currentState;
 		//After each epoch, assign the current state to the previous state
 		double[] previousState;
+		
+		//Variables for transitions and the Experience Replay
+		double[] tempCurrentState;
+		double[] tempPreviousState;
+		int tempPreviousAction;
+		double tempReward;
+		double tempFeedback;
+		boolean tempGameLost = false;
+		boolean tempGameWon = false;
+		
 		//After the game state contains everything from the current state plus the obtained reward plus the 
 		//targets for the actions. This information is written to a trainingSet.
 		double[] gameState;
@@ -331,7 +360,11 @@ public class GameModel implements constants {
 		currentState = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
 		previousState = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
 		
+		tempCurrentState = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
+		tempPreviousState = new double[visionGridInputs + marioTrackInputs + otherInputs-1];
+		
 		visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
+		
 
 		//don't create the actor and critic if in the demonstration phase
 		if(constants.TEST_PHASE){
@@ -398,11 +431,6 @@ public class GameModel implements constants {
 				//reset the vision grid 
 				visionGrid.resetDetections();
 				marioTracker.resetDetections();
-				//If sufficient epochs have been reached, slow down game model for better inspection of performance
-				/*if(epochs >= 1000000){
-					sleepTime = 15;  
-				}*/
-				
 				
 				//Add temperature to the actor
 				if(constants.TEST_PHASE){
@@ -438,8 +466,8 @@ public class GameModel implements constants {
 				
 				//Present state to actor for action selection; don't allow action selection while jumping
 				if(constants.TEST_PHASE){ 
-					testInputs = Arrays.copyOf(currentState, visionGridInputs + marioTrackInputs + otherInputs-1);
-					action = actor.presentInput(testInputs);
+					//testInputs = Arrays.copyOf(currentState, visionGridInputs + marioTrackInputs + otherInputs-1);
+					action = actor.presentInput(currentState);
 					if(!mario.isJumping()){
 						mario.setAction(action);
 					}
@@ -461,22 +489,54 @@ public class GameModel implements constants {
 				System.out.println("Epoch right before jumping: " + epochBeforeJump);
 				
 			
-				if(constants.TEST_CRITIC && !Arrays.equals(currentState, previousState) ){
-					System.out.println(critic.calculateFeedback(currentState, previousState, reward, hitByBarrel, gameWon, justLanded));
+				if(constants.TEST_CRITIC /*&& !Arrays.equals(currentState, previousState)*/ ){
+					System.out.println(critic.calculateFeedback(currentState, previousState, reward, hitByBarrel, gameWon));
 					critic.trainCritic(currentState, previousState, reward, hitByBarrel, gameWon);	
 				}
-	
-				if(constants.TEST_PHASE && constants.CRITIC_ON && (!saveStateBeforeJump || justLanded) && !Arrays.equals(currentState, previousState)){
-					
-					//calculate the critic's feedback 
-					feedback = critic.calculateFeedback(currentState, previousState, reward, hitByBarrel, gameWon, justLanded); 
+				System.out.println("Replay memory size: " + memory.transitions.size());
+				if(constants.TEST_PHASE && constants.CRITIC_ON && (!saveStateBeforeJump || justLanded) && !Arrays.equals(currentState, previousState) && epochs > 0){
 					justLanded = false; 
-					//backpropagate the feedback to the actor in the form of a TD-error (Temporal-Difference)
-					actor.propagateFeedback(previousState, feedback, previousAction);
+					//Add transition to Replay Memory
+					//Prioritized RM: ONLY add transition if the TD error is significant enough
+					feedback = critic.calculateFeedback(currentState, previousState, reward, hitByBarrel, gameWon);
+					System.out.println("TD of this transition: " + feedback);
+					if(Math.abs(feedback) >= constants.PRIORITY_THRESHOLD){
+						System.out.println("Transition significant enough; added to RM!");
+						Transition transition = new Transition(previousState, currentState, previousAction, reward, feedback, hitByBarrel, gameWon);
+						memory.storeTransition(transition);
+					}
+					else{
+						System.out.println("Transition not signifcant! Discarded!");
+					}
+				}
 					
-					//train the critic 
-					critic.trainCritic(currentState, previousState, reward, hitByBarrel, gameWon);			
-				}	
+				//Only update actor and critic once every update interval
+				if( (memory.transitions.size() > 1000 || memory.transitions.size() == memory.maxsize ) && epochs % constants.UPDATE_INTERVAL == 0){
+					//perform N updates
+					int n = constants.UPDATES;
+					for(int u = 0; u < n; u++){
+						//Sample random transition from Replay Memory
+						Transition randomTransition = memory.getTransition();
+						//Use the elements of the random transition for learning
+						for(int i = 0; i < previousState.length; i++){
+							tempCurrentState[i] = randomTransition.getNextState()[i];
+							tempPreviousState[i] = randomTransition.getPreviousState()[i];			
+						}
+						tempPreviousAction = randomTransition.getAction();
+						tempReward = randomTransition.getReward();
+						tempFeedback = randomTransition.getFeedback();
+						tempGameLost = randomTransition.getGameLost();
+						tempGameWon = randomTransition.getGameWon();
+											
+						//feedback = critic.calculateFeedback(tempCurrentState, tempPreviousState, reward, tempGameLost, tempGameWon); 
+	
+						//backpropagate the feedback to the actor in the form of a TD-error (Temporal-Difference)
+						actor.propagateFeedback(tempPreviousState, tempFeedback, tempPreviousAction);	
+						//train the critic 
+						critic.trainCritic(tempCurrentState, tempPreviousState, tempReward, tempGameLost, tempGameWon);	
+					}
+				}
+				
 				//Set the reward booleans to false again, unless Mario is still in a jump
 				if(!saveStateBeforeJump){
 					hitByBarrel = false;
@@ -590,9 +650,9 @@ public class GameModel implements constants {
 		/*if(gamesPlayed % constants.CRITIC_LEARNING_REDUCTION == 0 && constants.CRITIC_ON){
 			critic.setLearningRate(critic.getLearningRate()/2);
 		}*/
-		/*if(gamesPlayed % constants.ACTOR_LEARNING_REDUCTION == 0 && constants.TEST_PHASE){
+		if(gamesPlayed % constants.ACTOR_LEARNING_REDUCTION == 0 && constants.TEST_PHASE){
 			actor.setLearningRate(actor.getLearningRate() / 2);
-		}*/
+		}
 	}
 	
 	public static boolean isColliding(GameObject o1, GameObject o2){

@@ -14,18 +14,18 @@ public interface constants {
 	//Test phase: The AI actor plays the game.
 	boolean TEST_PHASE = true;  
 	//If true, the Critic is trained/loaded and gives the actor feedback
-	boolean CRITIC_ON = false;   
+	boolean CRITIC_ON = true;   
 
 	//Determine the game speed. Default for demo phase is 15, default for test phase is 0. 
 	int GAME_SPEED = 0; 
 	
 	//If true, the actor will not be trained.
-	boolean RANDOM_ACTOR = false;
+	boolean RANDOM_ACTOR = true;
 	
 	//Network restoring parameters
 	boolean LOAD_ACTOR = false; 
-	boolean LOAD_CRITIC = true; 
-	boolean LOAD_TRAINED_ACTOR = true;
+	boolean LOAD_CRITIC = true;
+	boolean LOAD_TRAINED_ACTOR = false;
 
 	//Network saving parameters 
 	boolean SAVE_ACTOR = false;
@@ -45,28 +45,36 @@ public interface constants {
 
 	//This value determines for how many epochs the game should run
 	int MAX_EPOCHS = 1000000; 
-	
-	int MAX_GAMES = 100; 
-	int temperatureCooling = 200; 
+
+	int MAX_GAMES = 10000; 
+	int temperatureCooling = 1000; 
 	
 	int ACTOR_HIDDEN_NODES = 60;  
-	int CRITIC_HIDDEN_NODES = 100;
+	int CRITIC_HIDDEN_NODES = 200; 
 	
 	//These values determine the amount of hidden layers of both the actor and critic network 
-	int N_HIDDEN_LAYERS_ACTOR = 1;       
-	int N_HIDDEN_LAYERS_CRITIC = 2;
+	int N_HIDDEN_LAYERS_ACTOR = 2;       
+	int N_HIDDEN_LAYERS_CRITIC = 3;
 	
 	
-	double CRITIC_LEARNING_RATE = 0.00001;
+	double CRITIC_LEARNING_RATE = 0.0004; 
 	//double CRITIC_LEARNING_RATE = 0;
-	double CRITIC_LEARNING_REDUCTION = 20;
+	double CRITIC_LEARNING_REDUCTION = 20000000;
 	
-	double ACTOR_CRITIC_LEARNING_RATE = 0.000001; 
+	double ACTOR_CRITIC_LEARNING_RATE = 0.0001;
 	//double ACTOR_CRITIC_LEARNING_RATE = 0; 
-	//double ACTOR_LEARNING_REDUCTION = 100;
+	double ACTOR_LEARNING_REDUCTION = 5000000;
 	//int LEARNING_RATE_REDUCTION_GAMES = 25;  
 			
-    
+    //Determine size of Experience Replay Memory
+	int MEMORY_SIZE = 5000;  
+	double PRIORITY_THRESHOLD = 0; 
+	int UPDATE_INTERVAL = 100; 
+	int UPDATES = 20; 
+	
+	
+	
+	String AC_ALGORITHM = "ACLA";
 			
 	//The following values determine positions and dimensions for game objects
 	
