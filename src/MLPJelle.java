@@ -36,10 +36,10 @@ public class MLPJelle {
 	//Define a minimum change that makes the training phase stop when this minimum difference between training epochs
 	//is reached
 	protected double minimumChange = 0.000005;  
-	protected double maxEpochs = 200;  
+	protected double maxEpochs = 2;  
 	protected String fileName;
 	
-	private double temperature = 2; 
+	private double temperature = 6; 
 	
 	public MLPJelle(int nInput, int nHiddenLayers, int nHidden, int nOutput, String fileName, boolean loadNetwork) throws IOException {
 		this.nInput = nInput;
@@ -390,7 +390,7 @@ public class MLPJelle {
 	
 	public void propagateFeedback(double[] state, double feedback, int action){
 		System.out.println("TD-error: " + feedback); 
-		//if(feedback >= 0){ 
+		if(Math.abs(feedback) >= constants.PRIORITY_THRESHOLD){ 
 			//Present the state, then backpropagate for improvement
 			if(constants.AC_ALGORITHM == "STANDARD"){
 				forwardPass(state, false);  	
@@ -416,43 +416,43 @@ public class MLPJelle {
 					}
 					//Action taken in previous state has to be positively or negatively reinforced
 					target[0][action] = 1; 
-				}
 				
+				/*
 				else{
 					for(int i = 0; i < nOutput; i++){
 						target[0][i] = outputLayer.get(i).getOutput();
 					}
 					//Action taken in previous state has to be positively or negatively reinforced
 					target[0][action] = 0;
+				}*/
+			
 				}
 			}
-			
-			//}
-			for(int i = 0; i < nOutput; i++){
-				System.out.println(target[0][i]);
-			}
-			for(int i = 0; i < nOutput; i++){
-				System.out.println("Target for output node " + i + ": " + target[0][i]);
-			} 
-			for(int i = 0; i < nOutput; i++){
-				System.out.println("ACTOR OUTPUT BEFORE BACKPROP; NODE: " + i + ": " + outputLayer.get(i).getOutput());
-			}	
-			backwardPass(0);
-			
-			if(constants.AC_ALGORITHM == "STANDARD"){
-				forwardPass(state, false);  	
-			}
-			else{
-				forwardPass(state, true);
-			} 
-			for(int i = 0; i < nOutput; i++){
-				System.out.println("ACTOR OUTPUT AFTER BACKPROP; NODE: " + i + ": " + outputLayer.get(i).getOutput());
-			}	
-		/*}
-			else{
-				System.out.println("TD error negative; no feedback given.");
-			}*/
-			
+				for(int i = 0; i < nOutput; i++){
+					System.out.println(target[0][i]);
+				}
+				for(int i = 0; i < nOutput; i++){
+					System.out.println("Target for output node " + i + ": " + target[0][i]);
+				} 
+				for(int i = 0; i < nOutput; i++){
+					System.out.println("ACTOR OUTPUT BEFORE BACKPROP; NODE: " + i + ": " + outputLayer.get(i).getOutput());
+				}	
+				backwardPass(0);
+				
+				if(constants.AC_ALGORITHM == "STANDARD"){
+					forwardPass(state, false);  	
+				}
+				else{
+					forwardPass(state, true);
+				} 
+				for(int i = 0; i < nOutput; i++){
+					System.out.println("ACTOR OUTPUT AFTER BACKPROP; NODE: " + i + ": " + outputLayer.get(i).getOutput());
+				}	
+			/*}
+				else{
+					System.out.println("TD error negative; no feedback given.");
+				}*/
+		  }
 	}
 	
 	public int maxOutput(){

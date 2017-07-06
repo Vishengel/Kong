@@ -93,6 +93,7 @@ public class Critic extends MLPJelle {
 			if(!marioKilled && !gameWon){
 				valueNextState = outputLayer.get(0).getOutput();
 			}
+			
 			//present previous state to the Critic and apply the target in backpropagation.
 			forwardPass(previousState, false);
 			System.out.println("Reward received: " + reward);
@@ -105,8 +106,10 @@ public class Critic extends MLPJelle {
 			System.out.println("Value of previous state before backprop: " + outputLayer.get(0).getOutput());
 			backwardPass(0);
 			forwardPass(previousState, false); 
-			System.out.println("Value of previous state after backprop: " + outputLayer.get(0).getOutput());					
+			System.out.println("Value of previous state after backprop: " + outputLayer.get(0).getOutput());	
+			
 		}
+		
 		
 		//This function calculated the feedback that the critic feeds back to the actor
 		public double calculateFeedback(double[] state, double[] previousState, double reward, boolean marioKilled, boolean gameWon){

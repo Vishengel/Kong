@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 public class GameModel implements constants {
 	
-	String filename = "FullDataSetPaul"; 
+	String filename = "FullDataSetFinal"; 
 	
 	//performance variables
 	double gamesWon = 0;
@@ -29,7 +29,7 @@ public class GameModel implements constants {
 	
 	//This value determines for how many epochs the game has been running already
 	private int epochs = 0;
-	double temperature =  10;   
+	double temperature =  1.5;   
 	private double minTemp = 1.5; 
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
@@ -203,15 +203,15 @@ public class GameModel implements constants {
 		}
 		//penalize useless jumping
 		else if(saveStateBeforeJump || justLanded){
-			reward -= 4; 
+			reward -= 5; 
 		}
 		
-		if(mario.isClimbing() && action == 3){
+		/*if(mario.isClimbing() && action == 3){
 			reward += 1;
 		}
 		if(mario.canClimb && action == 3){
 			reward += 1;
-		}
+		}*/ 
 		//penalize useless climbing
 		/*if((action == 3 || action == 4) && (!mario.isClimbing() || !mario.canClimb)){
 			reward -= 4;
@@ -437,7 +437,7 @@ public class GameModel implements constants {
 					actor.setTemperature(temperature);
 				}
 				
-				
+			
 				
 				//this state becomes the previous state in the next iteration, but only if Mario is not jumping.
 				if(!saveStateBeforeJump && !justLanded){
@@ -489,8 +489,9 @@ public class GameModel implements constants {
 				System.out.println("Epoch right before jumping: " + epochBeforeJump);
 				
 			
-				if(constants.TEST_CRITIC /*&& !Arrays.equals(currentState, previousState)*/ ){
-					System.out.println(critic.calculateFeedback(currentState, previousState, reward, hitByBarrel, gameWon));
+				if(constants.TEST_CRITIC && !Arrays.equals(currentState, previousState)){
+					feedback = critic.calculateFeedback(currentState, previousState, reward, hitByBarrel, gameWon);
+					System.out.println("TD: " + feedback);
 					critic.trainCritic(currentState, previousState, reward, hitByBarrel, gameWon);	
 				}
 				System.out.println("Replay memory size: " + memory.transitions.size());
@@ -524,14 +525,13 @@ public class GameModel implements constants {
 						}
 						tempPreviousAction = randomTransition.getAction();
 						tempReward = randomTransition.getReward();
-						tempFeedback = randomTransition.getFeedback();
+						//tempFeedback = randomTransition.getFeedback();
 						tempGameLost = randomTransition.getGameLost();
 						tempGameWon = randomTransition.getGameWon();
 											
-						//feedback = critic.calculateFeedback(tempCurrentState, tempPreviousState, reward, tempGameLost, tempGameWon); 
-	
+						feedback = critic.calculateFeedback(tempCurrentState, tempPreviousState, tempReward, tempGameLost, tempGameWon); 
 						//backpropagate the feedback to the actor in the form of a TD-error (Temporal-Difference)
-						actor.propagateFeedback(tempPreviousState, tempFeedback, tempPreviousAction);	
+						actor.propagateFeedback(tempPreviousState, feedback, tempPreviousAction);	
 						//train the critic 
 						critic.trainCritic(tempCurrentState, tempPreviousState, tempReward, tempGameLost, tempGameWon);	
 					}
@@ -609,13 +609,13 @@ public class GameModel implements constants {
 		System.out.println("Final performance: " + performance);
 		//Store the network(s)
 		if(constants.SAVE_ACTOR){
-			fh.storeNetwork(actor, actor.getHiddenLayers(),constants.N_HIDDEN_LAYERS_ACTOR);
+			fh.storeNetwork(actor, actor.getHiddenLayers(),actor.getHiddenLayers().size());
 		}
 		if(constants.SAVE_CRITIC){
-			fh.storeNetwork(critic, critic.getHiddenLayers(),constants.N_HIDDEN_LAYERS_CRITIC);
+			fh.storeNetwork(critic, critic.getHiddenLayers(),critic.getHiddenLayers().size());
 		}
 		if(constants.SAVE_TRAINED_ACTOR){
-			fh.storeNetwork(actor, actor.getHiddenLayers(),constants.N_HIDDEN_LAYERS_ACTOR);
+			fh.storeNetwork(actor, actor.getHiddenLayers(),actor.getHiddenLayers().size());
 		}
 		//Quit the program 
 		System.out.println("Quitting the simulation.");
