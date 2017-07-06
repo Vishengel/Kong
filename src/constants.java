@@ -5,13 +5,13 @@ public interface constants {
 
 	//This boolean determines whether the visual representation of the game should be on or off
 	//Turning this value off will cause the game model to speed up significantly
-	boolean GUI_ON = false;
+	boolean GUI_ON = true;
 	
 	boolean DEMO_PHASE = false;  
 	boolean TEST_PHASE = true;  
 	boolean CRITIC_ON = false; 
 	
-	int GAME_SPEED = 0;
+	int GAME_SPEED = 15;
 	
 	boolean RANDOM_ACTOR = false;
 	
@@ -23,7 +23,7 @@ public interface constants {
 	int GAMES_PER_RUN = 100;
 	
 	double ERROR_THRESHOLD = 0.01;
-	double MINIMUM_CHANGE = 0.000005;
+	double MINIMUM_CHANGE = 0.0002;
 	
 	boolean SIGMOID = true;
 	
@@ -51,12 +51,12 @@ public interface constants {
 	int LEARNING_RATE_REDUCTION_EPOCHS = 50000;
 			
 	//Constants to store the optimal parameter settings
-	double BEST_LR = 0.05;
-	double BEST_T = 1.5;
-	int BEST_NHIDDENNODES = 60;
+	double BEST_LR = 0.005;
+	double BEST_T = 2;
+	int BEST_NHIDDENNODES = 100;
 	int BEST_NHIDDENLAYERS = 1;
 	//True = sigmoid, false = ReLU
-	boolean BEST_ACTIVATION = true;
+	boolean BEST_ACTIVATION = false;
 			
 	//The following values determine positions and dimensions for game objects
 	
