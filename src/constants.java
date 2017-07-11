@@ -5,7 +5,7 @@ public interface constants {
 
 	//This boolean determines whether the visual representation of the game should be on or off
 	//Turning this value off will cause the game model to speed up significantly
-	boolean GUI_ON = true;
+	boolean GUI_ON = false;
 	
 	//Demo phase: Human player plays N games, these get stored in the training set.
 	boolean DEMO_PHASE = false; 
@@ -14,7 +14,7 @@ public interface constants {
 	//Test phase: The AI actor plays the game.
 	boolean TEST_PHASE = true;  
 	//If true, the Critic is trained/loaded and gives the actor feedback
-	boolean CRITIC_ON = true;   
+	boolean CRITIC_ON = false;   
 
 	//Determine the game speed. Default for demo phase is 15, default for test phase is 0. 
 	int GAME_SPEED = 0; 
@@ -24,15 +24,15 @@ public interface constants {
 	boolean RANDOM_CRITIC = false;
 	
 	//Network restoring parameters
-	boolean LOAD_ACTOR = true; 
+	boolean LOAD_ACTOR = false; 
 	boolean LOAD_CRITIC = true;
 	boolean LOAD_TRAINED_ACTOR = false; 
 
 	//Network saving parameters 
-	boolean SAVE_ACTOR = false;
+	boolean SAVE_ACTOR = true; 
 	boolean SAVE_CRITIC = false;
-	boolean SAVE_TRAINED_ACTOR = true; 
-		
+	boolean SAVE_TRAINED_ACTOR = false; 
+    
 	//Draw/don't draw on screen
 	boolean SHOW_VISION_GRID = false;
 	boolean SHOW_MARIO_TRACKER = false;
@@ -47,10 +47,10 @@ public interface constants {
 	//This value determines for how many epochs the game should run
 	int MAX_EPOCHS = 1000000; 
 
-	int MAX_GAMES = 1000;
+	int MAX_GAMES = 1;
 	int temperatureCooling = 200; 
 	
-	int ACTOR_HIDDEN_NODES = 200;  
+	int ACTOR_HIDDEN_NODES = 100;  
 	int CRITIC_HIDDEN_NODES = 200; 
 	
 	//These values determine the amount of hidden layers of both the actor and critic network 
@@ -58,7 +58,7 @@ public interface constants {
 	int N_HIDDEN_LAYERS_CRITIC = 3;
 	
 	
-	double CRITIC_LEARNING_RATE = 0.001; 
+	double CRITIC_LEARNING_RATE = 0.0001; 
 	//double CRITIC_LEARNING_RATE = 0;
 	double CRITIC_LEARNING_REDUCTION = 20000000;
 	

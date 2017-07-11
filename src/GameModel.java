@@ -30,7 +30,7 @@ public class GameModel implements constants {
 	
 	//This value determines for how many epochs the game has been running already
 	private int epochs = 0;
-	double temperature =  8;   
+	double temperature =  4;    
 	private double minTemp = 4; 
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
@@ -259,7 +259,7 @@ public class GameModel implements constants {
 	}
 	
 	public void reduceTemperature(){
-		//temperature = (temperature > minTemp? temperature - 1: minTemp);	
+		temperature = (temperature > minTemp? temperature - 1: minTemp);	
 	}
 	
 	//Make every moving object act and adjust booleans
@@ -718,9 +718,9 @@ public class GameModel implements constants {
 		if(gamesPlayed % constants.temperatureCooling == 0){
 			reduceTemperature(); 
 		}
-		/*if(gamesPlayed % constants.CRITIC_LEARNING_REDUCTION == 0 && constants.CRITIC_ON){
+		if(gamesPlayed % constants.CRITIC_LEARNING_REDUCTION == 0 && constants.CRITIC_ON){
 			critic.setLearningRate(critic.getLearningRate()/2);
-		}*/
+		}
 		if(gamesPlayed % constants.ACTOR_LEARNING_REDUCTION == 0 && constants.TEST_PHASE){
 			actor.setLearningRate(actor.getLearningRate() / 2);
 		}

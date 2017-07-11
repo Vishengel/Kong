@@ -77,7 +77,7 @@ public class NeuronJelle {
 			sum += n.getGradient() * n.getWeights()[nodeIndex];
 		}
 		if(!isCritic){
-			if(hiddenLayer != 10){ 
+			if(hiddenLayer == 10){ 
 				this.gradient = sigmoidPrime(this.activation) * sum;	
 			}
 			else{

@@ -36,7 +36,7 @@ public class MLPJelle {
 	//Define a minimum change that makes the training phase stop when this minimum difference between training epochs
 	//is reached
 	protected double minimumChange = 0.00001;  
-	protected double maxEpochs = 1;  
+	protected double maxEpochs = 200;  
 	protected String fileName;
 	
 	private double temperature = 6; 
@@ -282,7 +282,7 @@ public class MLPJelle {
 
 				} 
 				else{ 
-					if(i != 10){   
+					if(i == 10){   
 						hiddenList.get(i).get(j).setSigmoidOutput();	
 					}
 					else{
