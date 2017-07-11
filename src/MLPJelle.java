@@ -391,13 +391,24 @@ public class MLPJelle {
 		return 0;
 	}
 	
+	public int epsilonGreedy(double epsilon){
+		Random ran = new Random();
+		double p = Math.random();
+		if(p <= epsilon){
+			return ran.nextInt(7);
+		}
+		else{
+			return pickOutputByProbability();
+		}
+	}
+	
 	public void propagateFeedback(double[] state, double feedback, int action){
 		System.out.println("TD-error: " + feedback); 
-		if(Math.abs(feedback) >= constants.PRIORITY_THRESHOLD){ 
+		//if(Math.abs(feedback) >= constants.PRIORITY_THRESHOLD){ 
 			//Present the state, then backpropagate for improvement
 			if(constants.AC_ALGORITHM == "STANDARD"){
 				forwardPass(state, false);  	
-			}
+			} 
 			else{
 				forwardPass(state, true);
 			}
@@ -427,7 +438,7 @@ public class MLPJelle {
 					//Action taken in previous state has to be positively or negatively reinforced
 					target[0][action] = 0;
 				}*/
-			
+			//}
 			
 				for(int i = 0; i < nOutput; i++){
 					System.out.println(target[0][i]);
@@ -457,10 +468,10 @@ public class MLPJelle {
 				else{
 					System.out.println("TD error negative; no feedback given.");
 				}*/		
+		} 
 		}
-			}
 		}
-	}
+	//}
     //}
 	//}
 	
@@ -539,7 +550,7 @@ public class MLPJelle {
 		return 0;*/
 	}
 	
-	public int presentInput(double[] input) {
+	public int presentInput(double[] input, double epsilon) {
 		
 		//print input
 		//for(int i = 0; i < input.length; i++){
@@ -557,7 +568,8 @@ public class MLPJelle {
 		//System.out.println(binaryToInt());	
 		
 		//activation of output nodes
-		return pickOutputByProbability();	
+		return pickOutputByProbability();
+		
 		
 	}
 	

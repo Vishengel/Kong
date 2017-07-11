@@ -7,6 +7,7 @@ import java.util.Arrays;
 public class GameModel implements constants {
 	
 	String filename = "FullDataSetFinal"; 
+	ArrayList<Double> performancePerGame = new ArrayList<Double>();
 	
 	//performance variables
 	double gamesWon = 0;
@@ -35,6 +36,8 @@ public class GameModel implements constants {
 	//for a human
 	private int sleepTime = constants.GAME_SPEED;         
 	 
+	
+	double epsilon = 0;
 	
 	
 	private int nOutput = 7;
@@ -208,7 +211,7 @@ public class GameModel implements constants {
 		}
 		//penalize useless jumping
 		else if(saveStateBeforeJump || justLanded){
-			reward -= 10; 
+			reward -= 20; 
 		}	
 		/*
 		else if(mario.getAction() == 5 && barrelLeft){
@@ -218,11 +221,11 @@ public class GameModel implements constants {
 			reward -= 30;
 		}*/
 		/*if(mario.isClimbing() && action == 3){
-			reward += 0.2;
-		} 
-		if(mario.canClimb && action == 3){
 			reward += 2;
-		} */
+		}*/ 
+		/*if(mario.canClimb && action == 3){
+			reward += 2;
+		}*/
 		/*  
 		//penalize useless climbing
 		if((action == 3 || action == 4) && (!mario.isClimbing() || !mario.canClimb)){
@@ -256,7 +259,7 @@ public class GameModel implements constants {
 	}
 	
 	public void reduceTemperature(){
-		temperature = (temperature > minTemp? temperature - 1: minTemp);		
+		//temperature = (temperature > minTemp? temperature - 1: minTemp);	
 	}
 	
 	//Make every moving object act and adjust booleans
@@ -322,7 +325,7 @@ public class GameModel implements constants {
 					System.out.println("Princess saved!");	
 					gamesPlayed++;
 					gamesWon++;
-					gameWon = false; 
+					//gameWon = false; 
 					resetGame();					
 			}					
 			//If object falls or rolls out of the game screen, delete it
@@ -483,7 +486,7 @@ public class GameModel implements constants {
 				//Present state to actor for action selection; don't allow action selection while jumping
 				if(constants.TEST_PHASE){ 
 					//testInputs = Arrays.copyOf(currentState, visionGridInputs + marioTrackInputs + otherInputs-1);
-					action = actor.presentInput(currentState);
+					action = actor.presentInput(currentState, epsilon);
 					if(!mario.isJumping()){
 						mario.setAction(action);
 					}
@@ -636,6 +639,10 @@ public class GameModel implements constants {
 			fh.writeToFile(trainingSet, filename);
 			System.out.println("Written to file!");
 		}
+		for(int i = 0; i < constants.MAX_GAMES; i++){
+		System.out.println("Game " + i + ": " + performancePerGame.get(i));
+		}
+		fh.writePerformanceToFile(performancePerGame); 
 		//Print final performance
 		System.out.println("Final performance: " + performance);
 		//Store the network(s)
@@ -668,9 +675,9 @@ public class GameModel implements constants {
 		double[] tempPreviousState = new double[552];
 		int tempPreviousAction;
 		boolean tempGameLost, tempGameWon;
-		double tempReward, feedback;
+		double tempReward, tempFeedback;
 		//Only update actor and critic once every update interval
-		/*if( (memory.transitions.size() > 1000 || memory.transitions.size() == memory.maxsize ) && epochs % constants.UPDATE_INTERVAL == 0){
+		/*if( (memory.transitions.size() > 100 || memory.transitions.size() == memory.maxsize ) && epochs % constants.UPDATE_INTERVAL == 0){
 			//perform N updates
 			int n = constants.UPDATES;
 			for(int u = 0; u < n; u++){
@@ -683,20 +690,20 @@ public class GameModel implements constants {
 				}
 				tempPreviousAction = randomTransition.getAction();
 				tempReward = randomTransition.getReward();
-				//tempFeedback = randomTransition.getFeedback();
+				tempFeedback = randomTransition.getFeedback();
 				tempGameLost = randomTransition.getGameLost();
 				tempGameWon = randomTransition.getGameWon();
 									
-				feedback = critic.calculateFeedback(tempCurrentState, tempPreviousState, tempReward, tempGameLost, tempGameWon); 
+				//feedback = critic.calculateFeedback(tempCurrentState, tempPreviousState, tempReward, tempGameLost, tempGameWon); 
 				//backpropagate the feedback to the actor in the form of a TD-error (Temporal-Difference)
-				actor.propagateFeedback(tempPreviousState, feedback, tempPreviousAction);	
+				actor.propagateFeedback(tempPreviousState, tempFeedback, tempPreviousAction);	
 				//train the critic 
-				if(!tempGameLost){
-					critic.trainCritic(tempCurrentState, tempPreviousState, tempReward, tempGameLost, tempGameWon);	
-				}
+				critic.trainCritic(tempCurrentState, tempPreviousState, tempReward, tempGameLost, tempGameWon);	
+				
 			}
-		}*/
-		
+			
+		}
+		*/
 		MOList.clear();
 		PUList.clear();
 		initObjects();
@@ -717,6 +724,9 @@ public class GameModel implements constants {
 		if(gamesPlayed % constants.ACTOR_LEARNING_REDUCTION == 0 && constants.TEST_PHASE){
 			actor.setLearningRate(actor.getLearningRate() / 2);
 		}
+		
+		performancePerGame.add(Math.round(performance * 100) / 100.0);
+		
 	}
 	
 	public static boolean isColliding(GameObject o1, GameObject o2){

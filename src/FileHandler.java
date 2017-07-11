@@ -198,6 +198,16 @@ public class FileHandler {
 		fw.close();
 		System.out.println("Network saved!");
 	}
+	
+	public void writePerformanceToFile(ArrayList<Double> performancePerGame) throws IOException{
+		String filename = "src/PerformancePerGame.csv";
+		FileWriter fw = new FileWriter(filename,true);
+		for(int i = 0; i < constants.MAX_GAMES; i++){
+			fw.write(performancePerGame.get(i) + ",\n");
+		}
+		fw.close();
+		System.out.println("Performance score written to file!");
+	}
 }
 
     
