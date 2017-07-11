@@ -31,7 +31,7 @@ public class Transition {
 		return previousState;
 	}
 	public double[] getNextState(){
-		return previousState;
+		return nextState;
 	}
 	public int getAction(){
 		return action;

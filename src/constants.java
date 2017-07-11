@@ -14,23 +14,24 @@ public interface constants {
 	//Test phase: The AI actor plays the game.
 	boolean TEST_PHASE = true;  
 	//If true, the Critic is trained/loaded and gives the actor feedback
-	boolean CRITIC_ON = false;   
+	boolean CRITIC_ON = true;   
 
 	//Determine the game speed. Default for demo phase is 15, default for test phase is 0. 
 	int GAME_SPEED = 0; 
 	
-	//If true, the actor will not be trained.
-	boolean RANDOM_ACTOR = false;
+	//If true, the actor/critic will not be trained.
+	boolean RANDOM_ACTOR = false; 
+	boolean RANDOM_CRITIC = false;
 	
 	//Network restoring parameters
-	boolean LOAD_ACTOR = false; 
+	boolean LOAD_ACTOR = true; 
 	boolean LOAD_CRITIC = true;
-	boolean LOAD_TRAINED_ACTOR = true; 
+	boolean LOAD_TRAINED_ACTOR = false; 
 
 	//Network saving parameters 
 	boolean SAVE_ACTOR = false;
 	boolean SAVE_CRITIC = false;
-	boolean SAVE_TRAINED_ACTOR = false;
+	boolean SAVE_TRAINED_ACTOR = true; 
 		
 	//Draw/don't draw on screen
 	boolean SHOW_VISION_GRID = false;
@@ -46,10 +47,10 @@ public interface constants {
 	//This value determines for how many epochs the game should run
 	int MAX_EPOCHS = 1000000; 
 
-	int MAX_GAMES = 100; 
-	int temperatureCooling = 100; 
+	int MAX_GAMES = 1000;
+	int temperatureCooling = 200; 
 	
-	int ACTOR_HIDDEN_NODES = 60;  
+	int ACTOR_HIDDEN_NODES = 200;  
 	int CRITIC_HIDDEN_NODES = 200; 
 	
 	//These values determine the amount of hidden layers of both the actor and critic network 
@@ -57,24 +58,23 @@ public interface constants {
 	int N_HIDDEN_LAYERS_CRITIC = 3;
 	
 	
-	double CRITIC_LEARNING_RATE = 0.0001; 
+	double CRITIC_LEARNING_RATE = 0.001; 
 	//double CRITIC_LEARNING_RATE = 0;
 	double CRITIC_LEARNING_REDUCTION = 20000000;
 	
-	double ACTOR_CRITIC_LEARNING_RATE = 0.00001; 
+	//double ACTOR_CRITIC_LEARNING_RATE = 0.00004; 
+	double ACTOR_CRITIC_LEARNING_RATE = 0.0001; 
 	//double ACTOR_CRITIC_LEARNING_RATE = 0; 
-	double ACTOR_LEARNING_REDUCTION = 125;
+	double ACTOR_LEARNING_REDUCTION = 12500000;
 	//int LEARNING_RATE_REDUCTION_GAMES = 25;  
 			
     //Determine size of Experience Replay Memory
-	int MEMORY_SIZE = 100000;  
+	int MEMORY_SIZE = 50000;  
 	double PRIORITY_THRESHOLD = 0; 
 	int UPDATE_INTERVAL = 1; 
 	int UPDATES = 1; 
 	
-	
-	
-	String AC_ALGORITHM = "STANDARD";
+	String AC_ALGORITHM = "ACLA";
 			
 	//The following values determine positions and dimensions for game objects
 	

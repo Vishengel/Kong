@@ -30,13 +30,13 @@ public class MLPJelle {
 	//Define a list of output neurons
 	protected ArrayList<NeuronJelle> outputLayer = new ArrayList<NeuronJelle>();
 	//Define the learning rate, error threshold and the maximum number of epochs
-	protected double learningRate = 0.001;   
+	protected double learningRate = 0.001;  
 	protected double errorThreshold = 0;     
 	//protected double errorThreshold = 0.065;   
 	//Define a minimum change that makes the training phase stop when this minimum difference between training epochs
 	//is reached
-	protected double minimumChange = 0.000005;  
-	protected double maxEpochs = 2;  
+	protected double minimumChange = 0.00001;  
+	protected double maxEpochs = 1;  
 	protected String fileName;
 	
 	private double temperature = 6; 
@@ -51,6 +51,9 @@ public class MLPJelle {
 		//If an old network needs to be loaded, don't use the normal mlp initialization
 		if(loadNetwork){
 			this.loadNetwork(); 
+		}
+		else if(constants.RANDOM_ACTOR){
+			this.initializeLayers();	
 		}
 		else{
 			this.initNetwork();	
@@ -276,7 +279,7 @@ public class MLPJelle {
 					else if(i == 10){
 						hiddenList.get(i).get(j).setReluOutput();
 					}
-					
+
 				} 
 				else{ 
 					if(i != 10){   
@@ -291,7 +294,7 @@ public class MLPJelle {
 				outputArray[j] = hiddenList.get(i).get(j).getOutput();
 			}
 			//Set the final output to be the bias
-			outputArray[nHidden] = 1.0;
+			outputArray[nHidden] = 0.0;
 			//System.out.println("Input for next layer length: " + outputArray.length);
 			//Store the output of the hidden layer as input for the next layer
 			currentInput = Arrays.copyOf(outputArray,outputArray.length);
@@ -417,8 +420,7 @@ public class MLPJelle {
 					//Action taken in previous state has to be positively or negatively reinforced
 					target[0][action] = 1; 
 				
-				/*
-				else{
+				/*else{
 					for(int i = 0; i < nOutput; i++){
 						target[0][i] = outputLayer.get(i).getOutput();
 					}
@@ -426,8 +428,7 @@ public class MLPJelle {
 					target[0][action] = 0;
 				}*/
 			
-				}
-			}
+			
 				for(int i = 0; i < nOutput; i++){
 					System.out.println(target[0][i]);
 				}
@@ -447,13 +448,21 @@ public class MLPJelle {
 				} 
 				for(int i = 0; i < nOutput; i++){
 					System.out.println("ACTOR OUTPUT AFTER BACKPROP; NODE: " + i + ": " + outputLayer.get(i).getOutput());
+					if(Double.isNaN(outputLayer.get(i).getOutput())){
+						System.out.println("ERROR! NAN ENCOUNTERED.");
+						System.exit(-1);
+					}
 				}	
 			/*}
 				else{
 					System.out.println("TD error negative; no feedback given.");
-				}*/
-		  }
+				}*/		
+		}
+			}
+		}
 	}
+    //}
+	//}
 	
 	public int maxOutput(){
 		double max = 0;
@@ -548,7 +557,6 @@ public class MLPJelle {
 		//System.out.println(binaryToInt());	
 		
 		//activation of output nodes
-		
 		return pickOutputByProbability();	
 		
 	}

@@ -83,6 +83,7 @@ public class GamePanel extends JPanel {
 		g.drawString("Performance: " + (int)model.performance + "%", 10, 10);
 		g.drawString("Games played: " + (int)model.gamesPlayed + " / " + constants.MAX_GAMES, 200, 10);
 		g.drawString("Temperature: " + (int)model.temperature, 390, 10);
+		g.drawString("Latest TD: " + model.feedback, 10, 50);
 		/*if(constants.TEST_PHASE){
 			g.drawString("Actor learning rate: " + model.actor.getLearningRate(), 10, 50);
 		}
@@ -178,11 +179,21 @@ public class GamePanel extends JPanel {
 	
 	
 	public void animatePeach(Graphics g){
-		if(animationTimer <= 5){
-			g.drawImage(peach1,constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_WIDTH, constants.PEACH_HEIGHT, null);
+		if(constants.BARREL_TRAINING){
+			if(animationTimer <= 5){
+				g.drawImage(peach1,500,constants.PEACH_START_Y+300,constants.PEACH_WIDTH, constants.PEACH_HEIGHT, null);
+			}
+			else{
+				g.drawImage(peach2,500,constants.PEACH_START_Y+300,constants.PEACH_WIDTH, constants.PEACH_HEIGHT, null);
+			}
 		}
 		else{
-			g.drawImage(peach2,constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_WIDTH, constants.PEACH_HEIGHT, null);
+			if(animationTimer <= 5){
+				g.drawImage(peach1,constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_WIDTH, constants.PEACH_HEIGHT, null);
+			}
+			else{
+				g.drawImage(peach2,constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_WIDTH, constants.PEACH_HEIGHT, null);
+			}
 		}
 	}
 	public void animateBarrel(Graphics g, MovingObject object){

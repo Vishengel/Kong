@@ -107,7 +107,7 @@ public class NeuronJelle {
 		this.crossEntropy = target * Math.log(this.output) + (1 - target)*Math.log(1 - this.output);
 		
 		
-		for(int i=0; i<this.weights.length; i++) {
+		for(int i=0; i<this.weights.length-1; i++) {
 			//this.weights[i] += learningRate*gradient*this.input[i] + (momentum * this.previousWeightChange);
 			//this.previousWeightChange = learningRate*gradient*this.input[i] + (momentum * this.previousWeightChange);
 			this.weights[i] += learningRate*gradient*this.input[i];

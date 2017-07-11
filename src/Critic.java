@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 //This MLP represents the value function:  state ---> stateValue
@@ -12,7 +13,8 @@ public class Critic extends MLPJelle {
 		super(nInput, nHiddenLayers, nHidden, nOutput, fileName, loadNetwork);
 		//System.out.println("n in: " + target.length);
 		//errorThreshold = 0.474;  
-		errorThreshold = 0.61;  
+		//errorThreshold = 0.61;  
+		errorThreshold = 0.51;  
 		learningRate = 0.001;
 		//minimumChange = 0;
 	}
@@ -96,17 +98,23 @@ public class Critic extends MLPJelle {
 			
 			//present previous state to the Critic and apply the target in backpropagation.
 			forwardPass(previousState, false);
-			System.out.println("Reward received: " + reward);
-			
+			System.out.println("Critic: states equal? " + Arrays.equals(state, previousState));
+			System.out.println("Reward received: " + reward); 
 			System.out.println("Value of current state: " + valueNextState);
-			double target = reward + (discount * valueNextState);		
+			double target = reward + (discount * valueNextState);	
+			
+			if(Double.isNaN(valueNextState)){
+				System.out.println("ERROR! NAN ENCOUNTERED.");
+				System.exit(0);
+			}
 			System.out.println("Target for previous state: " + target);
 			//System.out.println("Target:" + target);
 			setTarget(target); 
 			System.out.println("Value of previous state before backprop: " + outputLayer.get(0).getOutput());
 			backwardPass(0);
+			/*System.out.println("CRITIC BACKWARDPASS CALLED!!!");
 			forwardPass(previousState, false); 
-			System.out.println("Value of previous state after backprop: " + outputLayer.get(0).getOutput());	
+			System.out.println("Value of previous state after backprop: " + outputLayer.get(0).getOutput());*/	
 			
 		}
 		

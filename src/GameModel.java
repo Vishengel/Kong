@@ -29,8 +29,8 @@ public class GameModel implements constants {
 	
 	//This value determines for how many epochs the game has been running already
 	private int epochs = 0;
-	double temperature =  1.5;   
-	private double minTemp = 1.5; 
+	double temperature =  8;   
+	private double minTemp = 4; 
 	//This value determines how long the game model should sleep or slow down, in order to make the game playable
 	//for a human
 	private int sleepTime = constants.GAME_SPEED;         
@@ -52,6 +52,8 @@ public class GameModel implements constants {
 	MLPJelle actor;	
 	Critic critic;
 	
+	//Initialize the Replay Memory
+	ReplayMemory memory = new ReplayMemory();
 	//double[] state;
 	//double[] previousState;
 	
@@ -77,10 +79,13 @@ public class GameModel implements constants {
 	private boolean touchedPowerUp = false;
 	private boolean jumpedOverBarrel = false;
 	private boolean destroyedBarrel = false;
+	private boolean barrelLeft = true;
 	
 	private boolean saveStateBeforeJump = false;
 	private boolean justLanded = false; 
 	private int epochBeforeJump = 0;
+	
+	double feedback = 0;
 
 	
 	//allow for alternating left and right barrel spawing during training
@@ -153,7 +158,7 @@ public class GameModel implements constants {
 		state[visionGridInputs + marioTrackInputs + 2] = powerupActivated ? 1 : 0;
 		//Give mario the time passed since he picked up a powerup
 		state[visionGridInputs + marioTrackInputs + 3] = powerupTimer/powerupDuration;
-		state[visionGridInputs + marioTrackInputs + 4] = 1.0;
+		state[visionGridInputs + marioTrackInputs + 4] = 0.0;
 		//Add the reward received in this state
 		state[visionGridInputs + marioTrackInputs + 5] = reward;
 		
@@ -173,8 +178,8 @@ public class GameModel implements constants {
 		
 		if(hitByBarrel){
 			System.out.println("Hit by barrel!");
-			reward -= 20;
-			score -= 20; 	
+			reward -= 10;
+			score -= 10; 	
 		}
 		
 		/*else if(jumpedOverBarrel){
@@ -184,8 +189,8 @@ public class GameModel implements constants {
 		}*/
 		else if(destroyedBarrel){
 			System.out.println("Smashed a barrel!");
-			reward += 1;
-			score += 1;
+			reward += 2;
+			score += 2;
 		}
 		
 		/*if(touchedPowerUp){
@@ -196,37 +201,47 @@ public class GameModel implements constants {
 		
 		
 		if(jumpedOverBarrel && (saveStateBeforeJump||justLanded)){
-			reward += 2;
+			reward += 3;
 		}
-		else if(touchedPowerUp && (saveStateBeforeJump||justLanded)){
-			reward += 0.5; 
+		if(touchedPowerUp && (saveStateBeforeJump||justLanded)){
+			reward += 1; 
 		}
 		//penalize useless jumping
 		else if(saveStateBeforeJump || justLanded){
-			reward -= 5; 
+			reward -= 10; 
+		}	
+		/*
+		else if(mario.getAction() == 5 && barrelLeft){
+			reward -= 30;
 		}
-		
-		/*if(mario.isClimbing() && action == 3){
-			reward += 1;
-		}
-		if(mario.canClimb && action == 3){
-			reward += 1;
-		}*/ 
-		//penalize useless climbing
-		/*if((action == 3 || action == 4) && (!mario.isClimbing() || !mario.canClimb)){
-			reward -= 4;
+		else if(mario.getAction() == 6 && !barrelLeft){
+			reward -= 30;
 		}*/
+		/*if(mario.isClimbing() && action == 3){
+			reward += 0.2;
+		} 
+		if(mario.canClimb && action == 3){
+			reward += 2;
+		} */
+		/*  
+		//penalize useless climbing
+		if((action == 3 || action == 4) && (!mario.isClimbing() || !mario.canClimb)){
+			reward -= 20;
+		}
 		
 		//penalize useless  actions on ladders
-		/*if(mario.isClimbing() && (action != 3 && action != 4)){
-			reward -= 4;
-		}*/
-		
-		
+		if(mario.isClimbing() && (action != 3 && action != 4)){
+			reward -= 20;
+		}
+		*/
 		//Penalize mario if he touches the edge of the screen
 		/*if(mario.getXPos() <= 0 || mario.getXPos() >= constants.SCREEN_X - 30){
 			reward = -100;
 		}*/ 
+		/*if(mario.getAction() == 5){
+			reward -= 1000;
+		}*/
+		
 		System.out.println("Calculated reward: " + reward);
 		return reward;
 	}
@@ -251,14 +266,14 @@ public class GameModel implements constants {
 		if(spawnTimer == barrelSpawnTime){
 			spawnTimer = 0;
 			if(constants.BARREL_TRAINING){
-				if(!leftSpawned){
+				/*if(!leftSpawned){
 					spawnLeftBarrel();
 					leftSpawned = true;
-				}
-				else{
+				}*/
+				//else{
 					spawnRightBarrel();
 					leftSpawned = false;
-				}
+				//}
 			}
 			else{
 				spawnBarrel(true);
@@ -307,6 +322,7 @@ public class GameModel implements constants {
 					System.out.println("Princess saved!");	
 					gamesPlayed++;
 					gamesWon++;
+					gameWon = false; 
 					resetGame();					
 			}					
 			//If object falls or rolls out of the game screen, delete it
@@ -327,6 +343,12 @@ public class GameModel implements constants {
 				!(MOList.get(i).pointAwarded) && mario.isJumping()){
 				jumpedOverBarrel = true;
 				MOList.get(i).setPointAwarded();
+				if(MOList.get(i).getAction() == 0){
+					barrelLeft = true;
+				}
+				else{
+					barrelLeft = false;
+				}
 				System.out.println("JUMPED OVER A BARREL!");
 			}
 		}
@@ -336,7 +358,7 @@ public class GameModel implements constants {
 	public void runGame() throws InterruptedException, IOException{
 	
 		//Initialize the Replay Memory
-		ReplayMemory memory = new ReplayMemory();
+		//ReplayMemory memory = new ReplayMemory();
 		
 		//This array contains all the game inputs + the bias value
 		double[] currentState;
@@ -376,7 +398,7 @@ public class GameModel implements constants {
 		}
 		if(constants.CRITIC_ON){
 			critic = new Critic(visionGridInputs + marioTrackInputs + otherInputs, constants.N_HIDDEN_LAYERS_CRITIC, constants.CRITIC_HIDDEN_NODES/*(visionGridInputs + marioTrackInputs + otherInputs) / 2*/, 1, filename, constants.LOAD_CRITIC); 
-			if(!constants.LOAD_CRITIC){
+			if(!constants.LOAD_CRITIC && !constants.RANDOM_CRITIC){
 				critic.trainNetwork();
 			}
 			critic.setLearningRate(constants.CRITIC_LEARNING_RATE);
@@ -385,7 +407,7 @@ public class GameModel implements constants {
 		}
 		
 		double reward = 0;
-		double feedback = 0;
+		//double feedback = 0;
 		int action = 0;
 		int previousAction = 0;
 		int previousEpoch = 0;
@@ -415,14 +437,8 @@ public class GameModel implements constants {
 				//}
 				
 				
-				
-				if(constants.TEST_PHASE){
-					//condition = epochs < constants.MAX_EPOCHS;
-					condition = gamesPlayed < constants.MAX_GAMES;
-				}
-				else{
-					condition = gamesWon < 10; 
-				}
+				condition = gamesPlayed < constants.MAX_GAMES;
+	
 				//System.out.println("Performance: " + gamesWon / gamesLost);
 				System.out.println("------------- Current epoch: " + epochs + " -------------");
 				
@@ -489,15 +505,25 @@ public class GameModel implements constants {
 				System.out.println("Epoch right before jumping: " + epochBeforeJump);
 				
 			
-				if(constants.TEST_CRITIC && !Arrays.equals(currentState, previousState)){
+				if(constants.TEST_CRITIC /*&& !Arrays.equals(currentState, previousState)*/){
 					feedback = critic.calculateFeedback(currentState, previousState, reward, hitByBarrel, gameWon);
-					System.out.println("TD: " + feedback);
+					//System.out.println("TD: " + feedback);
 					critic.trainCritic(currentState, previousState, reward, hitByBarrel, gameWon);	
 				}
+				
+				/*if(constants.TEST_PHASE && constants.CRITIC_ON && (!saveStateBeforeJump || justLanded) && !Arrays.equals(currentState, previousState) && epochs > 0){
+					feedback = critic.calculateFeedback(currentState, previousState, reward, hitByBarrel, gameWon); 
+					//backpropagate the feedback to the actor in the form of a TD-error (Temporal-Difference)
+					actor.propagateFeedback(previousState, feedback, previousAction);	
+					//train the critic  
+					critic.trainCritic(currentState, previousState, reward, hitByBarrel, gameWon);	
+				}
+				*/
+				
 				System.out.println("Replay memory size: " + memory.transitions.size());
 				if(constants.TEST_PHASE && constants.CRITIC_ON && (!saveStateBeforeJump || justLanded) && !Arrays.equals(currentState, previousState) && epochs > 0){
 					justLanded = false; 
-					//Add transition to Replay Memory
+					//Add transition to Replay Memory 
 					//Prioritized RM: ONLY add transition if the TD error is significant enough
 					feedback = critic.calculateFeedback(currentState, previousState, reward, hitByBarrel, gameWon);
 					System.out.println("TD of this transition: " + feedback);
@@ -525,15 +551,17 @@ public class GameModel implements constants {
 						}
 						tempPreviousAction = randomTransition.getAction();
 						tempReward = randomTransition.getReward();
-						//tempFeedback = randomTransition.getFeedback();
+						tempFeedback = randomTransition.getFeedback();
 						tempGameLost = randomTransition.getGameLost();
 						tempGameWon = randomTransition.getGameWon();
 											
-						feedback = critic.calculateFeedback(tempCurrentState, tempPreviousState, tempReward, tempGameLost, tempGameWon); 
+						//feedback = critic.calculateFeedback(tempCurrentState, tempPreviousState, tempReward, tempGameLost, tempGameWon); 
 						//backpropagate the feedback to the actor in the form of a TD-error (Temporal-Difference)
-						actor.propagateFeedback(tempPreviousState, feedback, tempPreviousAction);	
+						actor.propagateFeedback(tempPreviousState, tempFeedback, tempPreviousAction);	
 						//train the critic 
 						critic.trainCritic(tempCurrentState, tempPreviousState, tempReward, tempGameLost, tempGameWon);	
+						
+						
 					}
 				}
 				
@@ -578,6 +606,9 @@ public class GameModel implements constants {
 				}	
 				//Test
 				System.out.println("Current and previous state are equal: " + Arrays.equals(currentState, previousState));
+				if(Arrays.equals(currentState, previousState)){
+					System.out.println("TRANSITION NOT ADDED, SAME STATE!!!!!");
+				}
 				
 				if(constants.DEMO_PHASE /*(!mario.isJumping() || epochs == epochBeforeJump)*/ ){
 					gameState[visionGridInputs + marioTrackInputs + otherInputs + mario.getAction()] = 1.0;
@@ -633,6 +664,39 @@ public class GameModel implements constants {
 	}
 	
 	public void resetGame() {
+		double[] tempCurrentState = new double[552];
+		double[] tempPreviousState = new double[552];
+		int tempPreviousAction;
+		boolean tempGameLost, tempGameWon;
+		double tempReward, feedback;
+		//Only update actor and critic once every update interval
+		/*if( (memory.transitions.size() > 1000 || memory.transitions.size() == memory.maxsize ) && epochs % constants.UPDATE_INTERVAL == 0){
+			//perform N updates
+			int n = constants.UPDATES;
+			for(int u = 0; u < n; u++){
+				//Sample random transition from Replay Memory
+				Transition randomTransition = memory.getTransition();
+				//Use the elements of the random transition for learning
+				for(int i = 0; i < 552; i++){
+					tempCurrentState[i] = randomTransition.getNextState()[i];
+					tempPreviousState[i] = randomTransition.getPreviousState()[i];			
+				}
+				tempPreviousAction = randomTransition.getAction();
+				tempReward = randomTransition.getReward();
+				//tempFeedback = randomTransition.getFeedback();
+				tempGameLost = randomTransition.getGameLost();
+				tempGameWon = randomTransition.getGameWon();
+									
+				feedback = critic.calculateFeedback(tempCurrentState, tempPreviousState, tempReward, tempGameLost, tempGameWon); 
+				//backpropagate the feedback to the actor in the form of a TD-error (Temporal-Difference)
+				actor.propagateFeedback(tempPreviousState, feedback, tempPreviousAction);	
+				//train the critic 
+				if(!tempGameLost){
+					critic.trainCritic(tempCurrentState, tempPreviousState, tempReward, tempGameLost, tempGameWon);	
+				}
+			}
+		}*/
+		
 		MOList.clear();
 		PUList.clear();
 		initObjects();
@@ -814,7 +878,7 @@ public class GameModel implements constants {
 			p = new Platform(i,constants.SCREEN_Y - 200, constants.PLATFORM_HEIGHT, constants.PLATFORM_WIDTH);
 			platformList.add(p);
 		}
-		peach = new Peach(constants.PEACH_START_X,constants.PEACH_START_Y,constants.PEACH_HEIGHT,constants.PEACH_WIDTH);
+		peach = new Peach(500, constants.PEACH_START_Y+300,constants.PEACH_HEIGHT,constants.PEACH_WIDTH);
 	}
 	
 	private void initFirstLevel() {
@@ -1034,7 +1098,7 @@ public class GameModel implements constants {
 		MOList = new ArrayList<MovingObject>();
 		//initialize player. Position depends on the level
 		if(constants.BARREL_TRAINING){
-			mario = new Player(constants.PLAYER_START_X,constants.SCREEN_Y - 220,constants.PLAYER_HEIGHT,constants.PLAYER_WIDTH);	
+			mario = new Player(constants.PLAYER_START_X - 50,constants.SCREEN_Y - 220,constants.PLAYER_HEIGHT,constants.PLAYER_WIDTH);	
 		}
 		else{
 			mario = new Player(constants.PLAYER_START_X,constants.PLAYER_START_Y,constants.PLAYER_HEIGHT,constants.PLAYER_WIDTH);	
