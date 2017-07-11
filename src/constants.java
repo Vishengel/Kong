@@ -5,7 +5,7 @@ public interface constants {
 
 	//This boolean determines whether the visual representation of the game should be on or off
 	//Turning this value off will cause the game model to speed up significantly
-	boolean GUI_ON = true;
+	boolean GUI_ON = false;
 	
 	boolean DEMO_PHASE = false;  
 	boolean TEST_PHASE = true;  
@@ -15,15 +15,15 @@ public interface constants {
 	
 	boolean RANDOM_ACTOR = false;
 	
-	String DATA_FILEPATH = "TrainingData/FinalData/FullDataSetPaul";
+	String DATA_FILEPATH = "TrainingData/FinalData/FullDataSetFinal";
 	String SCORE_FILE_NAME = "LearningRateScores";
 	String PERFORMANCE_FILE_NAME = "LearningRatePerformance";
 
-	int RUNS_PER_PARAMETER = 10;
+	int RUNS_PER_PARAMETER = 5;
 	int GAMES_PER_RUN = 100;
 	
-	double ERROR_THRESHOLD = 0.01;
-	double MINIMUM_CHANGE = 0.0002;
+	double ERROR_THRESHOLD = 0.035;
+	double MINIMUM_CHANGE = 0.00004;
 	
 	boolean SIGMOID = true;
 	
@@ -52,9 +52,9 @@ public interface constants {
 			
 	//Constants to store the optimal parameter settings
 	double BEST_LR = 0.005;
-	double BEST_T = 2;
-	int BEST_NHIDDENNODES = 100;
-	int BEST_NHIDDENLAYERS = 1;
+	double BEST_T = 4;
+	int BEST_NHIDDENNODES = 200;
+	int BEST_NHIDDENLAYERS = 2;
 	//True = sigmoid, false = ReLU
 	boolean BEST_ACTIVATION = false;
 			

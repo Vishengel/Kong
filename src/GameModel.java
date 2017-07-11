@@ -249,9 +249,9 @@ public class GameModel implements constants {
 		visionGrid.moveGrid(mario.getXPos(), mario.getYPos());
 		
 		if(parName.equals("hiddenNodes")) {
-			System.out.println("Using ReLU");
+			//System.out.println("Using ReLU");
 			nHiddenNodes = (int)parValue;
-			System.out.println("Hidden nodess: " + nHiddenNodes);
+			System.out.println("Hidden nodes: " + nHiddenNodes);
 		} else if(parName.equals("hiddenLayers")) {
 			nHiddenLayers = (int)parValue;
 			System.out.println("Hidden layers: " + nHiddenLayers);
@@ -289,7 +289,7 @@ public class GameModel implements constants {
 		
 		//Only write the parameter name and value before the first run
 		if(this.run == 0) {
-			fh.writeParameterToFile(parName, parValue, constants.SCORE_FILE_NAME);
+			//fh.writeParameterToFile(parName, parValue, constants.SCORE_FILE_NAME);
 			fh.writeParameterToFile(parName, parValue, constants.PERFORMANCE_FILE_NAME);
 		}
 		
@@ -362,7 +362,9 @@ public class GameModel implements constants {
 			} else if(parName.equals("bestParameters")) {
 				actor.setLearningRate(constants.BEST_LR);
 				actor.setTemperature(constants.BEST_T);
-			} 		
+			} else if(parName.equals("hiddenLayersRelu")) {
+				actor.setLearningRate(0.001);
+			}
 							
 			printParameters();
 			
@@ -397,8 +399,7 @@ public class GameModel implements constants {
 			*/
 			
 			//lower the temperature
-			reduceTemperature();
-			
+			//reduceTemperature();
 			
 			//this state becomes the previous state in the next iteration, but only if Mario is not jumping.
 			if(!saveStateBeforeJump && !justLanded){

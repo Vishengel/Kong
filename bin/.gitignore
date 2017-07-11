@@ -20,7 +20,6 @@
 /FileHandler.class
 /Flame.class
 /GameController$1.class
-/GameController$2.class
 /GameController$InputController.class
 /GameController.class
 /GameModel.class
@@ -28,5 +27,3 @@
 /GamePanel$1.class
 /GamePanel$2.class
 /GamePanel.class
-/GameView.class
-/Ladder.class
