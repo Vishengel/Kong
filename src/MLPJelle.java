@@ -145,7 +145,7 @@ public class MLPJelle {
 			totalError = 0;
 			
 			this.shuffleInput();
-			
+			System.out.println("Length: " + this.input.length);
 			for (int i=0; i < this.input.length; i++) {
 				this.forwardPass(this.input[i], true);
 				totalError += this.backwardPass(i);

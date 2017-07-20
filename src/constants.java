@@ -5,26 +5,37 @@ public interface constants {
 
 	//This boolean determines whether the visual representation of the game should be on or off
 	//Turning this value off will cause the game model to speed up significantly
-	boolean GUI_ON = false;
+	boolean GUI_ON = true;
 	
 	boolean DEMO_PHASE = false;  
 	boolean TEST_PHASE = true;  
 	boolean CRITIC_ON = false; 
 	
+	//0 = fastest possible game speed, 15 = regular playing speed
 	int GAME_SPEED = 15;
 	
+	//Use an untrained actor
 	boolean RANDOM_ACTOR = false;
 	
-	String DATA_FILEPATH = "TrainingData/FinalData/FullDataSetFinal";
-	String SCORE_FILE_NAME = "LearningRateScores";
-	String PERFORMANCE_FILE_NAME = "LearningRatePerformance";
+	//The file path of the LfD training file
+	String DATA_FILEPATH = "./TrainingData/FullDataSetFinal";
+	//File path for the results (win/loss, score) of individual games
+	String SCORE_FILE_NAME = "./LearningRateScores";
+	//File path for the average performance for each run of 100 games
+	String PERFORMANCE_FILE_NAME = "./LearningRatePerformance";
 
-	int RUNS_PER_PARAMETER = 5;
-	int GAMES_PER_RUN = 100;
+	//Amount of runs per trial
+	int RUNS_PER_PARAMETER = 10;
+	//Amount of games per run
+	int GAMES_PER_RUN = 1;
 	
+	//Values for the error threshold and minimum error change
 	double ERROR_THRESHOLD = 0.035;
 	double MINIMUM_CHANGE = 0.00004;
+	//This value determines for how many epochs the game should run
+	int MAX_EPOCHS = 1000000; 
 	
+	//true = Sigmoid, false = ReLU
 	boolean SIGMOID = true;
 	
 	//This value determines whether the game should create the standard level, or the alternative level 
@@ -33,10 +44,6 @@ public interface constants {
 	
 	//This value determines whether Mario can die in the game when touching a barrel
 	boolean DEATH = true;
-
-	//This value determines for how many epochs the game should run
-	int MAX_EPOCHS = 1000000; 
-
 	
 	int ACTOR_HIDDEN_NODES = 100;  
 	int CRITIC_HIDDEN_NODES = 50;
@@ -48,6 +55,7 @@ public interface constants {
 	boolean TEST_CRITIC = false;
 	
 	double ACTOR_CRITIC_LEARNING_RATE = 0.0001; 
+	//Amount of epochs after which the learning rate is reduced
 	int LEARNING_RATE_REDUCTION_EPOCHS = 50000;
 			
 	//Constants to store the optimal parameter settings

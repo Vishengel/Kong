@@ -7,16 +7,14 @@ public class DataCollector {
 	}
 	
 	public void chooseParameters() throws IOException, InterruptedException {
+		//Parameter values to be tested for each parameter
 		double[] learningRatesSigmoid = {0.0005, 0.001, 0.005, 0.01, 0.05};
-		//double[] learningRatesSigmoid = {0.01};
 		double[] learningRatesRelu = {0.00005, 0.0001, 0.0005, 0.001, 0.005};
 		double[] temperatures = {0.5, 1.0, 2.0, 4.0, 8.0};
-		//double[] hiddenNodes = {25, 50, 100, 150, 200};
-		double[] hiddenNodes = {100, 200};
-		//double[] hiddenLayers = {1, 2, 3};
-		double[] hiddenLayers = {2, 3};
+		double[] hiddenNodes = {25, 50, 100, 150, 200};
+		double[] hiddenLayers = {1, 2, 3};
 		double[] hiddenLayersReLU = {1, 2, 3};
-		/*
+		
 		for (double par : learningRatesSigmoid) {;
 			runTrials("learningRateSigmoid", par);
 		}
@@ -40,7 +38,8 @@ public class DataCollector {
 		for (double par : hiddenLayersReLU) {
 			runTrials("hiddenLayersRelu", par);
 		}
-		*/
+		
+		//Run trials with the optimal parameter values as defined in the constants file
 		runTrials("bestParameters", 0);
 		
 		System.out.println("Done");
